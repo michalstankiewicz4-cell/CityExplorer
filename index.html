@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.8.0</title>
+<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.9.0</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Warszawa 3D, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.8.0"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.9.0"}
 </script>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#0d1014;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#e8e6e1}
@@ -169,7 +169,7 @@
 </div>
 <canvas id="minimap" width="440" height="440" style="display:none"></canvas>
 <canvas id="bigmap"></canvas>
-<div id="bigmapHint">Mapa — kliknij, aby się tam przenieść · kółko = zoom · M zamyka</div>
+<div id="bigmapHint">Mapa — kliknij, aby się tam przenieść · przeciągnij = przesuwanie · kółko = zoom · M zamyka</div>
 <div id="help" style="display:none">
   <div><b>E</b> wsiądź / wysiądź; tramwaj, pociąg: drzwi</div>
   <div><b>W / ↑</b> gaz, naprzód &nbsp; <b style="min-width:0">S / ↓</b> hamulec, wstecz</div>
@@ -195,7 +195,7 @@ import * as THREE from 'three';
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
-const APP_VERSION = '0.8.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+const APP_VERSION = '0.9.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
 document.getElementById('ver').textContent = 'v' + APP_VERSION; document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
 // gotowe mapy (?map=…): okecie — lotnisko Chopina (tryb Samolot); bez parametru — Śródmieście
@@ -1786,7 +1786,8 @@ function airStep(dt) {
   if (on('fast')) c.throttle = Math.min(1, c.throttle + 0.5 * dt);
   if (on('slow')) c.throttle = Math.max(0, c.throttle - 0.5 * dt);
   c.brake = on('brake') ? 1 : 0;
-  for (let i = 0; i < 2; i++) air.sim.step(dt / 2, c, (x, z) => H(x, z));
+  const gy = tileGY(), gh = (x, z) => Math.abs(x) < E && Math.abs(z) < E ? H(x, z) : gy;   // poza dokładną mapą: płaski grunt kafli
+  for (let i = 0; i < 2; i++) air.sim.step(dt / 2, c, gh);
   if (!s.crashed) {   // ściana budynku (siatka kolizji) — rozbity
     const a = collGrid.get(Math.floor(s.p[0] / COLL_CELL) * 100003 + Math.floor(s.p[2] / COLL_CELL));
     if (a && a.some(sg => sg[4] === 0 && s.p[1] >= sg[5] && s.p[1] <= sg[6] && segDist(s.p[0], s.p[2], sg)[0] < 3)) s.crashed = true;
@@ -1818,7 +1819,7 @@ function airCamera(dt, snap) {
     const want = new THREE.Vector3(-Math.sin(h) * Math.cos(el) * r, Math.sin(el) * r, -Math.cos(h) * Math.cos(el) * r);
     if (!air.off || snap) air.off = want.clone(); else air.off.lerp(want, 1 - Math.exp(-4 * dt));   // przesunięcie względem samolotu: kamera nie zostaje w tyle przy prędkości
     camPos.set(s.p[0] + air.off.x, s.p[1] + air.off.y, s.p[2] + air.off.z);
-    const gy = H(camPos.x, camPos.z) + 1.2; if (camPos.y < gy) camPos.y = gy;
+    const gy = (Math.abs(camPos.x) < E && Math.abs(camPos.z) < E ? H(camPos.x, camPos.z) : tileGY()) + 1.2; if (camPos.y < gy) camPos.y = gy;
     camLook.set(s.p[0] + f[0] * 8, s.p[1] + 1 + f[1] * 8, s.p[2] + f[2] * 8); camera.up.set(0, 1, 0);
     if (camera.near !== 0.3) { camera.near = 0.3; camera.updateProjectionMatrix(); }
   }
@@ -2228,16 +2229,21 @@ let bigOpen = false, bmZoom = 1, bmView = null;
 function toggleBigMap() {
   if (!W.ov) return;
   bigOpen = !bigOpen; bm.style.display = $('bigmapHint').style.display = bigOpen ? 'block' : 'none';
-  if (bigOpen) { bmZoom = 1; drawBigMap(); }
+  if (bigOpen) { bmZoom = 1; bmPan = null; drawBigMap(); }
 }
-bm.addEventListener('wheel', e => { e.preventDefault(); bmZoom = Math.min(8, Math.max(1, bmZoom * (e.deltaY > 0 ? 0.85 : 1.18))); drawBigMap(); }, { passive: false });
+bm.addEventListener('wheel', e => { e.preventDefault(); bmZoom = Math.min(8, Math.max(0.12, bmZoom * (e.deltaY > 0 ? 0.85 : 1.18))); drawBigMap(); }, { passive: false });
+// przesuwanie dużej mapy (przeciągnij): widać, co jest dalej — kafle wczytują się w podglądzie
+let bmPan = null, bmDrag = null, bmMoved = false;
+bm.addEventListener('pointerdown', e => { if (!bmView) return; bmDrag = { x: e.clientX, y: e.clientY, cx: bmView.cx, cz: bmView.cz }; bmMoved = false; });
+addEventListener('pointermove', e => { if (!bmDrag || !bigOpen) return; const dx = e.clientX - bmDrag.x, dy = e.clientY - bmDrag.y; if (Math.hypot(dx, dy) > 4) bmMoved = true; if (bmMoved) { bmPan = { x: bmDrag.cx - dx / bmView.s, z: bmDrag.cz - dy / bmView.s }; drawBigMap(); } });
+addEventListener('pointerup', () => { bmDrag = null; });
 bm.addEventListener('click', e => {
-  if (!bmView) return;
+  if (!bmView || bmMoved) { bmMoved = false; return; }
   const x = (e.clientX - bmView.ox) / bmView.s - E, z = (e.clientY - bmView.oy) / bmView.s - E;
   if (Math.abs(x) > R + 60 || Math.abs(z) > R + 60) return;
   if (W.inBuilding && W.inBuilding(x, z)) { $('bigmapHint').textContent = 'Tam stoi budynek — wybierz ulicę lub plac'; return; }
   if (mode === 'car') { Object.assign(car, { x, z, vx: 0, vz: 0, vy: 0 }); car.y = surfaceAt(x, z, H(x, z)); } else if (mode === 'foot') { Object.assign(ped, { x, z, vy: 0, vf: 0 }); ped.y = surfaceAt(x, z, H(x, z)); } updateCamera(0, true); toggleBigMap();
-  $('bigmapHint').textContent = 'Mapa — kliknij, aby się tam przenieść · kółko = zoom · M zamyka';
+  $('bigmapHint').textContent = 'Mapa — kliknij, aby się tam przenieść · przeciągnij = przesuwanie · kółko = zoom · M zamyka';
 });
 function drawBigMap() {
   if (!bigOpen) return;
@@ -2247,10 +2253,23 @@ function drawBigMap() {
   bmg.clearRect(0, 0, innerWidth, innerHeight);
   const size = Math.min(innerWidth, innerHeight) * 0.92 * bmZoom;
   const s = size / (2 * E);
-  // przy zoomie centrujemy na aucie
-  let ox = innerWidth / 2 - (bmZoom > 1 ? (ego.x + E) : E) * s, oy = innerHeight / 2 - (bmZoom > 1 ? (ego.z + E) : E) * s;
-  bmView = { ox, oy, s };
+  // środek: przesunięty myszą, przy zoomie gracz, inaczej środek mapy
+  const vcx = bmPan ? bmPan.x : bmZoom > 1 ? ego.x : 0, vcz = bmPan ? bmPan.z : bmZoom > 1 ? ego.z : 0;
+  let ox = innerWidth / 2 - (vcx + E) * s, oy = innerHeight / 2 - (vcz + E) * s;
+  bmView = { ox, oy, s, cx: vcx, cz: vcz };
   bmg.imageSmoothingEnabled = true;
+  if (TS.TL) {   // kafle wokół (podglądy); brakujące trafiają do kolejki wczytywania
+    const T = TS.TL.T, gx0 = (-ox / s - E) - TS.OFF[0], gz0 = (-oy / s - E) - TS.OFF[1], gx1 = gx0 + innerWidth / s, gz1 = gz0 + innerHeight / s;
+    const i0 = Math.floor(gx0 / T), i1 = Math.floor(gx1 / T), j0 = Math.floor(gz0 / T), j1 = Math.floor(gz1 / T), many = (i1 - i0 + 1) * (j1 - j0 + 1) > 400;
+    bmg.fillStyle = '#20252b'; bmg.fillRect(0, 0, innerWidth, innerHeight);
+    TS.ovq.length = 0;
+    for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) {
+      const k = i + '_' + j, px = ox + (i * T + TS.OFF[0] + E) * s, py = oy + (j * T + TS.OFF[1] + E) * s, c = TS.ov.get(k);
+      if (c) bmg.drawImage(c, px, py, T * s + 0.5, T * s + 0.5);
+      else if (!many && (TS.index.has(k) || TS.live) && !((TS.fail.get(k) || 0) > performance.now())) TS.ovq.push(k);
+    }
+    const mx = (vcx - TS.OFF[0]), mz = (vcz - TS.OFF[1]); TS.ovq.sort((a, b) => { const d = (k) => { const [i, j] = k.split('_').map(Number); return Math.hypot((i + 0.5) * T - mx, (j + 0.5) * T - mz); }; return d(a) - d(b); });
+  }
   bmg.drawImage(W.ov, ox, oy, size, size);
   bmg.strokeStyle = '#ffffff55'; bmg.lineWidth = 1; bmg.strokeRect(ox, oy, size, size);
   // etykiety
@@ -2264,8 +2283,8 @@ function drawBigMap() {
     bmg.lineWidth = 3; bmg.strokeStyle = '#000a'; bmg.strokeText(L.nm, 0, 0); bmg.fillStyle = '#fff'; bmg.fillText(L.nm, 0, 0);
     bmg.restore();
   }
-  // PKiN
-  const pk = [ox + E * s, oy + E * s];
+  // PKiN (także na innej mapie — w swoim miejscu)
+  const pkl = toXZ(52.23175, 21.00586), pk = [ox + (pkl[0] + E) * s, oy + (pkl[1] + E) * s];
   bmg.fillStyle = '#c6ae7f'; bmg.beginPath(); bmg.arc(pk[0], pk[1], 5, 0, 7); bmg.fill();
   bmg.font = '600 13px system-ui'; bmg.lineWidth = 3; bmg.strokeStyle = '#000a'; bmg.strokeText('PKiN', pk[0], pk[1] - 14); bmg.fillStyle = '#f3e3c0'; bmg.fillText('PKiN', pk[0], pk[1] - 14);
   // auto
@@ -2450,10 +2469,150 @@ function step(dt, draw) {
     PED.c.animate(carT, dt, { gait: sp < 0.15 ? 'idle' : sp > 2.6 ? 'run' : 'walk', speed: Math.max(0.6, sp) });
   }
   updateCamera(dt); sketchFrame();
+  if ((TS.t += dt) > 0.4) { TS.t = 0; streamTick(); ovTick(); }
   sun.position.set(ego.x + SUN_DIR.x * 400, ego.y + SUN_DIR.y * 400, ego.z + SUN_DIR.z * 400); sun.target.position.set(ego.x, ego.y, ego.z);
   hud(dt, fps);
   if (bigOpen && (bmT = (bmT || 0) + dt) > 0.1) { bmT = 0; drawBigMap(); }
   if (draw) renderer.render(scene, camera);
+}
+
+/* =========================================================================
+   KAFLE MAPY POZA DOKŁADNĄ MAPĄ (js/tiles.mjs): wczytywanie w stronę ruchu, zwalnianie z pamięci za plecami
+   Źródła kafla: tiles/<i>_<j>.json (Warszawa, z deployu) → pamięć przeglądarki → Overpass na żywo (poza Warszawą).
+   Uproszczone: płaski grunt z malowanymi drogami i obszarami, budynki z płaskimi dachami; bez tuneli, wiaduktów, torów do jazdy.
+   ========================================================================= */
+const TS = { TL: null, index: null, live: true, loaded: new Map(), ov: new Map(), data: new Map(), fail: new Map(), busy: false, t: 0, want: [], ovq: [], OFF: [0, 0], stats: { built: 0, freed: 0, live: 0, errors: 0 } };
+const TILE_COL = { farm: [0, '#a9a874'], indus: [0, '#8a8680'], resid: [0, '#908f87'], aero: [0, '#7f9c5b'], park: [1, '#6a964b'], rail: [1, '#7d776d'], forest: [2, '#4c7a3a'],
+  scrub: [2, '#62813f'], wet: [2, '#5f7d5a'], cem: [2, '#6b8a5a'], constr: [2, '#8f7f63'], grass: [3, '#73a052'], pitch: [5, '#5b9a52'], apron: [6, '#a3a29b'], lot: [6, '#55575a'], water: [9, '#3e6b8a'] };
+const ROAD_COL = { footway: '#bdb5a6', path: '#a9a08c', cycleway: '#a65a50', steps: '#9d968a', pedestrian: '#c7bfb0', track: '#9a8a6c', bridleway: '#a9a08c' };
+const tileGY = () => (W.terrBase || 0) - 0.3;
+async function tilesInit() {
+  try {
+    TS.TL = await import(new URL('js/tiles.mjs', location.href).href);
+    const g = toXZ(TS.TL.G0.lat, TS.TL.G0.lon); TS.OFF = [g[0], g[1]];   // środek globalny kafli w układzie tej mapy
+    const r = await fetchT('tiles/index.json', {}, 15000).catch(() => null);
+    TS.index = r && r.ok ? new Set((await r.json()).keys) : new Set();
+  } catch (e) { console.warn('[W3D] kafle', e); TS.TL = null; }
+}
+// kafel → malowanie na płótnie (S px na bok)
+function paintTile(g, tile, S) {
+  const k = S / (TS.TL.T * 10);
+  g.fillStyle = '#8c8c84'; g.fillRect(0, 0, S, S);
+  const ring = (c, from) => { for (let q = from; q < c.length; q += 2) q === from ? g.moveTo(c[q] * k, c[q + 1] * k) : g.lineTo(c[q] * k, c[q + 1] * k); g.closePath(); };
+  const areas = tile.a.filter(a => TILE_COL[a[0]]).sort((x, y) => TILE_COL[x[0]][0] - TILE_COL[y[0]][0]);
+  for (const a of areas) { g.beginPath(); for (let r = 1; r < a.length; r++) ring(a[r], 1); g.fillStyle = TILE_COL[a[0]][1]; g.fill('evenodd'); }
+  const line = (l, wd, col, dash) => { g.beginPath(); for (let q = 2; q < l.length; q += 2) q === 2 ? g.moveTo(l[q] * k, l[q + 1] * k) : g.lineTo(l[q] * k, l[q + 1] * k); g.lineWidth = Math.max(0.6, wd * 10 * k); g.strokeStyle = col; g.lineCap = g.lineJoin = 'round'; g.setLineDash(dash ? dash.map(d => d * 10 * k) : []); g.stroke(); g.setLineDash([]); };
+  for (const l of tile.l) if (/^(river|canal|stream)$/.test(l[0])) line(l, l[1], '#3e6b8a');
+  for (const l of tile.l) if (l[0] === 'taxiway') { line(l, l[1], '#8d8c86'); line(l, 0.3, '#e2b631'); }
+  for (const l of tile.l) if (l[0] === 'runway') { line(l, l[1], '#5d5e5b'); line(l, 0.9, '#efeee8', [30, 20]); }
+  for (const l of tile.l) if (ROAD_COL[l[0]]) line(l, l[1], ROAD_COL[l[0]]);
+  const veh = tile.l.filter(l => ROAD_W[l[0]] && !ROAD_COL[l[0]]).sort((a, b) => a[1] - b[1]);
+  for (const l of veh) line(l, l[1] + 0.9, '#a7a39b');
+  for (const l of veh) line(l, l[1], l[1] >= 10 ? '#3a3c3f' : '#45474a');
+  for (const l of tile.l) if (l[0] === 'rail' || l[0] === 'tram') { line(l, l[0] === 'tram' ? 2.6 : 3.4, '#6d675e'); line(l, 1.9, '#2b2b2b'); }
+}
+const tileMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, side: THREE.DoubleSide });
+function buildTile(tile) {
+  const T = TS.TL.T, x0 = tile.i * T + TS.OFF[0], z0 = tile.j * T + TS.OFF[1], GY = tileGY(), grp = new THREE.Group(), res = [];
+  // grunt: płótno 1024 px (1 m/px) na prostokątach kafla poza dokładną mapą
+  const cv = document.createElement('canvas'); cv.width = cv.height = 1024; paintTile(cv.getContext('2d'), tile, 1024);
+  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = renderer.capabilities.getMaxAnisotropy(); res.push(tex);
+  const x1 = x0 + T, z1 = z0 + T, rects = [];
+  if (x1 <= -E || x0 >= E || z1 <= -E || z0 >= E) rects.push([x0, z0, x1, z1]);
+  else {
+    if (x0 < -E) rects.push([x0, z0, -E, z1]); if (x1 > E) rects.push([E, z0, x1, z1]);
+    const ax = Math.max(x0, -E), bx = Math.min(x1, E);
+    if (z0 < -E) rects.push([ax, z0, bx, -E]); if (z1 > E) rects.push([ax, E, bx, z1]);
+  }
+  if (rects.length) {
+    const pos = [], uv = [], nor = [];
+    for (const [a, b, c, d] of rects) for (const [px, pz] of [[a, b], [a, d], [c, b], [c, b], [a, d], [c, d]]) { pos.push(px, GY, pz); nor.push(0, 1, 0); uv.push((px - x0) / T, 1 - (pz - z0) / T); }
+    const gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); gg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); gg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    const gm = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.97 }); const m = new THREE.Mesh(gg, gm); m.receiveShadow = true; grp.add(m); res.push(gg, gm);
+  }
+  // budynki: ściany i płaskie dachy, kolor z lekką zmiennością
+  const P = [], C = [], col = new THREE.Color();
+  for (const b of tile.b) {
+    const n = (b.length - 2) / 2; if (n < 3) continue;
+    const xs = [], zs = []; let cx = 0, cz = 0;
+    for (let q = 0; q < n; q++) { const x = x0 + b[2 + q * 2] / 10, z = z0 + b[3 + q * 2] / 10; xs.push(x); zs.push(z); cx += x; cz += z; }
+    cx /= n; cz /= n; if (Math.abs(cx) < E && Math.abs(cz) < E) continue;   // tę część pokazuje dokładna mapa
+    const yb = GY + b[1], yt = GY + b[0], hsh = Math.sin(cx * 12.9898 + cz * 78.233) * 43758.5453, rr = hsh - Math.floor(hsh);
+    col.setHSL(0.08 + rr * 0.05, 0.12 + rr * 0.1, 0.62 + rr * 0.12);
+    for (let q = 0; q < n; q++) {
+      const a = q, c = (q + 1) % n;
+      P.push(xs[a], yb, zs[a], xs[c], yb, zs[c], xs[a], yt, zs[a], xs[a], yt, zs[a], xs[c], yb, zs[c], xs[c], yt, zs[c]);
+      for (let v = 0; v < 6; v++) C.push(col.r, col.g, col.b);
+    }
+    const tri = THREE.ShapeUtils.triangulateShape(xs.map((x, q) => new THREE.Vector2(x, zs[q])), []);
+    const rc = col.clone().multiplyScalar(0.72);
+    for (const t of tri) for (const q of t) { P.push(xs[q], yt, zs[q]); C.push(rc.r, rc.g, rc.b); }
+  }
+  if (P.length) {
+    const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); bg.setAttribute('color', new THREE.Float32BufferAttribute(C, 3)); bg.computeVertexNormals();
+    const m = new THREE.Mesh(bg, tileMat); m.castShadow = true; grp.add(m); res.push(bg);
+  }
+  // podgląd na dużą mapę (128 px)
+  const o = document.createElement('canvas'); o.width = o.height = 128; o.getContext('2d').drawImage(cv, 0, 0, 128, 128); ovPut(tile.i + '_' + tile.j, o);
+  scene.add(grp); TS.stats.built++;
+  return { grp, res, cx: x0 + T / 2, cz: z0 + T / 2 };
+}
+function ovPut(k, c) { TS.ov.delete(k); TS.ov.set(k, c); if (TS.ov.size > 500) TS.ov.delete(TS.ov.keys().next().value); }
+function freeTile(k) { const t = TS.loaded.get(k); if (!t) return; scene.remove(t.grp); for (const r of t.res) r.dispose(); TS.loaded.delete(k); TS.stats.freed++; }
+let liveBusy = false;
+async function tileData(k, allowLive = true) {
+  if (TS.data.has(k)) return TS.data.get(k);
+  let d = null;
+  if (TS.index.has(k)) { const r = await fetchT('tiles/' + k + '.json', {}, 30000).catch(() => null); if (r && r.ok) d = await r.json(); }
+  if (!d) d = await idb.get('tile-v1-' + k);
+  if (!d && allowLive && TS.live && !liveBusy) {   // poza Warszawą: Overpass na żywo, jeden naraz
+    liveBusy = true;
+    try {
+      const [i, j] = k.split('_').map(Number), q = TS.TL.overpassQuery(TS.TL.tileBBox(i, j));
+      for (const url of OVERPASS) {
+        try { const r = await fetchT(url, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }, 60000); if (!r.ok) throw new Error('HTTP ' + r.status); const js = await r.json(); d = TS.TL.tilesFromElements(js.elements || [], new Set([k])).get(k); TS.stats.live++; await idb.set('tile-v1-' + k, d); break; }
+        catch (e) { console.warn('[W3D] kafel na żywo', k, e.message); }
+      }
+    } finally { liveBusy = false; }
+  }
+  if (d) { TS.data.set(k, d); if (TS.data.size > 30) TS.data.delete(TS.data.keys().next().value); }
+  return d;
+}
+// co 0,4 s: najbliższy brakujący kafel w zasięgu widoku wczytuje się, dalekie są zwalniane; potem podglądy dla dużej mapy
+async function streamTick() {
+  if (!TS.TL || !TS.index || TS.busy) return;
+  TS.busy = true;
+  try {
+    const T = TS.TL.T, gx = ego.x - TS.OFF[0], gz = ego.z - TS.OFF[1], LR = Math.max(1500, GFX.view + 600), now = performance.now();
+    for (const [k, t] of TS.loaded) if (Math.hypot(t.cx - ego.x, t.cz - ego.z) > LR + 1300) freeTile(k);
+    let best = null, bd = 1e9;
+    const n = Math.ceil(LR / T) + 1, ci = Math.floor(gx / T), cj = Math.floor(gz / T);
+    for (let i = ci - n; i <= ci + n; i++) for (let j = cj - n; j <= cj + n; j++) {
+      const k = i + '_' + j; if (TS.loaded.has(k) || (TS.fail.get(k) || 0) > now || !(TS.index.has(k) || TS.live)) continue;
+      const lx = i * T + TS.OFF[0], lz = j * T + TS.OFF[1]; if (lx >= -E && lx + T <= E && lz >= -E && lz + T <= E) continue;   // cały w dokładnej mapie
+      const d = Math.hypot(Math.max(lx - ego.x, 0, ego.x - lx - T), Math.max(lz - ego.z, 0, ego.z - lz - T));
+      if (d < LR && d < bd) { bd = d; best = k; }
+    }
+    if (best) {
+      const d = await tileData(best);
+      if (d) { try { TS.loaded.set(best, buildTile(d)); } catch (e) { TS.stats.errors++; console.warn('[W3D] kafel', best, e); TS.fail.set(best, now + 1e9); } }
+      else TS.fail.set(best, now + 60000);
+    }
+  } finally { TS.busy = false; }
+}
+// podglądy kafli dla dużej mapy (bez budowania 3D): kilka naraz z gotowych plików, z Overpass po jednym
+async function ovTick() {
+  if (!TS.TL || TS.ovBusy || !TS.ovq.length) return;
+  TS.ovBusy = true;
+  try {
+    for (let n = 0; n < 6 && TS.ovq.length; n++) {
+      const k = TS.ovq.shift(); if (TS.ov.has(k) || (TS.fail.get(k) || 0) > performance.now()) continue;
+      const d = await tileData(k);
+      if (d) { const c = document.createElement('canvas'); c.width = c.height = 128; paintTile(c.getContext('2d'), d, 128); ovPut(k, c); } else TS.fail.set(k, performance.now() + 60000);
+      if (!TS.index.has(k)) break;
+    }
+    if (bigOpen) drawBigMap();
+  } finally { TS.ovBusy = false; }
 }
 
 /* ---------- eksport / odświeżenie ---------- */
@@ -2492,6 +2651,7 @@ async function main() {
     if (TERR_RAW) { const t = processTerrain(TERR_RAW, dtm ? null : buildingMask(DATA), dtm); HF = t.h; W.terrBase = t.base; }
     await frame();
     const st = buildWorld(DATA);
+    await tilesInit();
     if (MAP) { document.querySelector('#start .sub').textContent = MAP.name + ' · wybierz, czym ruszasz'; }
     console.log('[W3D] stats', JSON.stringify(st));
     // ekran startowy: przelot nad miastem, modele wczytują się w tle (pasek na karcie trybu)
@@ -2515,7 +2675,7 @@ async function main() {
     $('start').classList.add('out'); setTimeout(() => { $('start').style.display = 'none'; }, 650);
     $('hud').style.display = ''; $('minimap').style.display = ''; $('help').style.display = '';
     updateCamera(0, true);
-    window.__W3D = { step, get car() { return car; }, FLEET, ped, rail, startRail, air, startAir, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, E, R, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, version: APP_VERSION };
+    window.__W3D = { step, get car() { return car; }, FLEET, ped, rail, startRail, air, startAir, TS, streamTick, buildTile, tileData, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, E, R, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, version: APP_VERSION };
     window.dispatchEvent(new Event('w3d-ready'));
   } catch (e) {
     console.error(e);

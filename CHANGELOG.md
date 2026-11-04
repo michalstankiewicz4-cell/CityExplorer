@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.0 — 2026-11-05
+- **Mapa wczytywana w locie**: poza dokładną mapą (centrum albo Okęcie) świat dobudowuje się kaflami 1 × 1 km w stronę, w którą lecisz / jedziesz (w zasięgu widoku), a kafle daleko za plecami są zwalniane z pamięci. Kafle są uproszczone: płaski grunt z malowanymi ulicami, obszarami, wodą, torami i lotniskami, budynki z płaskimi dachami (wysokości z OSM). Tunele, wiadukty, przejścia i jazda po torach na kaflach — później.
+- Źródła kafli: gotowe pliki całej Warszawy (`tiles/`, generuje deploy: `tools/fetch-tiles.mjs`, najpierw trasa centrum — Okęcie, kolejne deploye dopełniają resztę miasta przez cache), potem pamięć przeglądarki, a poza Warszawą (np. reszta Mazowsza) — Overpass na żywo, kafel po kaflu. Wspólny moduł: `js/tiles.mjs`.
+- **Duża mapa (M)**: przesuwanie przeciąganiem i oddalanie kółkiem — widać kafle dookoła (wczytują się podglądy); PKiN w swoim miejscu także na mapie Okęcia.
+- Samolot nad kaflami: grunt kafli jako podłoże (lądowanie poza dokładną mapą na płaskim gruncie).
+- **Doktor mapy**: nowy test „Kafle mapy” — liczba gotowych kafli, luki na trasie centrum — Okęcie, czy kafle w promieniu 4 km się wczytują i budują.
+
 ## 0.8.0 — 2026-11-05
 - **Tryb Samolot**: Supermarine Spitfire Mk I (1940, AirKit z GameLaboratory) na progu drogi startowej 29 **lotniska Chopina** — osobna mapa `?map=okecie` (promień 2 km; nie całe miasto). Fizyka lotu z GameLaboratory (zachowanie „lot w atmosferze”): nośna z kąta natarcia i przeciągnięcie, opór, ciąg śmigła z mocy, momenty sterów i stateczności, koła na sprężynach z hamulcami, kółko ogonowe; start, lot i lądowanie wynikają z sił. Na rozbiegu samolot zbacza — kontruje się sterem kierunku. Zderzenie z ziemią brzuchem lub ze ścianą budynku — rozbity (R od nowa).
 - Sterowanie samolotu: W/S drążek, A/D lotki (na ziemi także kółko ogonowe), Q/F ster kierunku, Shift/Ctrl gaz, Spacja hamulce, G podwozie, B klapy, E owiewka; wszystko do zmiany w opcjach. Kamera C: za samolotem, dalej, z kabiny (horyzont przechyla się z samolotem). HUD: prędkość przyrządowa, wysokość nad ziemią, gaz, klapy, podwozie, ostrzeżenie o przeciągnięciu.

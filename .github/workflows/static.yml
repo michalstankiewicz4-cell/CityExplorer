@@ -49,6 +49,25 @@ jobs:
         continue-on-error: true
         timeout-minutes: 15
         run: node tools/fetch-osm.mjs 52.1657 20.9671 2000 okecie.json
+      - name: Kafle Warszawy z poprzednich deployów (cache)
+        uses: actions/cache/restore@v4
+        with:
+          path: tiles
+          key: tiles-v1-${{ github.run_id }}
+          restore-keys: tiles-v1-
+      - name: Pobierz brakujące kafle Warszawy (tiles/, najpierw trasa centrum — Okęcie)
+        continue-on-error: true
+        timeout-minutes: 30
+        env:
+          TILE_MINUTES: 25
+        run: node tools/fetch-tiles.mjs
+      - name: Zapisz kafle (cache)
+        if: always()
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: tiles
+          key: tiles-v1-${{ github.run_id }}
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

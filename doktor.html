@@ -72,6 +72,7 @@ const CHECKS = {
   tory: 'Ciągłość torów',
   przejscia: 'Przejścia i tunele',
   modele: 'Modele (doktor GameLaboratory)',
+  kafle: 'Kafle mapy (wczytywane w locie)',
 };
 const SEV = { e: 'błąd', w: 'ostrzeżenie', i: 'info' };
 const KIND = { b: 'budynek', t: 'drzewo', p: 'filar wiaduktu', r: 'bariera', d: 'spód wiaduktu', w: 'mur', e: 'nasyp', h: 'mur portalu', g: 'ściana bramy' };
@@ -300,6 +301,34 @@ async function checkModels() {
   }
 }
 
+
+/* ---------- 6. kafle mapy poza dokładną mapą (podstawowo): plik, budowa, luki na trasie centrum — Okęcie ---------- */
+async function checkTiles() {
+  const TS = G.TS;
+  if (!TS || !TS.TL) { add('kafle', 'w', 'Kafle niedostępne', 'Nie wczytał się moduł js/tiles.mjs', null); return; }
+  const TL = TS.TL, T = TL.T, idx = TS.index || new Set();
+  add('kafle', idx.size ? 'i' : 'w', `Gotowe kafle Warszawy: ${idx.size}`, idx.size ? 'tiles/index.json' : 'Brak tiles/index.json — kafle tylko z Overpass na żywo (powstają przy deployu)', null);
+  // luki na trasie centrum (PKiN) — Okęcie
+  const [ox, oz] = TL.toG(52.1657, 20.9671), miss = [];
+  for (let f = 0; f <= 1.0001; f += 0.02) { const k = TL.key(Math.floor(ox * f / T), Math.floor(oz * f / T)); if (!idx.has(k) && !miss.includes(k)) miss.push(k); }
+  if (miss.length) add('kafle', 'w', `Trasa centrum — Okęcie: brak ${miss.length} kafli`, miss.slice(0, 12).join(', ') + (miss.length > 12 ? '…' : ''), null);
+  // każdy gotowy kafel w promieniu 4 km od gracza: dane i budowa (potem zwolnienie)
+  const gx = G.car.x - TS.OFF[0], gz = G.car.z - TS.OFF[1];
+  const near = [...idx].map(k => { const [i, j] = k.split('_').map(Number); return [k, Math.hypot((i + 0.5) * T - gx, (j + 0.5) * T - gz)]; }).filter(x => x[1] < 4000).sort((a, b) => a[1] - b[1]).slice(0, 40);
+  let ok = 0, empty = 0, bld = 0;
+  for (const [k] of near) {
+    let d; try { d = await G.tileData(k, false); } catch (e) { d = null; }
+    if (!d) { add('kafle', 'e', `Kafel ${k}: nie wczytuje się`, 'tiles/' + k + '.json', null); continue; }
+    if (!Array.isArray(d.b) || !Array.isArray(d.l) || !Array.isArray(d.a)) { add('kafle', 'e', `Kafel ${k}: zły format`, '', null); continue; }
+    if (!d.b.length && !d.l.length && !d.a.length) empty++;
+    if (G.TS.loaded.has(k)) { ok++; bld += d.b.length; continue; }
+    try { const t = G.buildTile(d); G.scene.remove(t.grp); for (const r of t.res) r.dispose(); ok++; bld += d.b.length; }
+    catch (e) { add('kafle', 'e', `Kafel ${k}: błąd budowy`, e.message, null); }
+  }
+  add('kafle', 'i', `Sprawdzone kafle w promieniu 4 km: ${ok}/${near.length}`, `budynków: ${bld}, pustych kafli: ${empty} · w tej chwili wczytane: ${TS.loaded.size}, zbudowane: ${TS.stats.built}, zwolnione: ${TS.stats.freed}, z Overpass na żywo: ${TS.stats.live}`, null);
+  if (TS.stats.errors) add('kafle', 'e', `Błędy budowy kafli w grze: ${TS.stats.errors}`, 'szczegóły w konsoli gry', null);
+}
+
 /* ---------- uruchomienie i UI ---------- */
 async function examine() {
   F = []; const t0 = performance.now();
@@ -308,6 +337,7 @@ async function examine() {
   status('Badam tory…'); await tick(); checkRails();
   status('Badam przejścia…'); await tick(); checkPassages();
   status('Doktor modeli…'); await tick(); await checkModels();
+  status('Kafle mapy…'); await tick(); await checkTiles();
   const order = { e: 0, w: 1, i: 2 };
   F.sort((a, b) => Object.keys(CHECKS).indexOf(a.check) - Object.keys(CHECKS).indexOf(b.check) || order[a.sev] - order[b.sev] || a.title.localeCompare(b.title, 'pl'));
   window.doktorReport = { version: G.version, date: new Date().toISOString(), stats: G.stats, findings: F.map(({ check, sev, title, detail, at }) => ({ check, sev: SEV[sev], title, detail, at: at && at.map(v => Math.round(v * 10) / 10) })) };

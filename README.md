@@ -19,7 +19,7 @@ Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy 
 | Shift | turbo / bieg |
 | R | autem: powrót na start; pieszo: do drzwi auta |
 | C | kamera (za plecami / wysoko / oczami — zza kierownicy) |
-| M | duża mapa (klik = teleport, kółko = zoom) |
+| M | duża mapa (klik = teleport, przeciągnij = przesuwanie, kółko = zoom i oddalanie) |
 | K | minimapa wł./wył. |
 | X | rentgen: przezroczysty grunt i budynki (tunele, metro, pociągi) |
 | N | noc / dzień |
@@ -49,6 +49,9 @@ Kolejność ładowania:
 
 Wysokości terenu: **NMT GUGiK** (`teren-nmt.bin`, model gruntu bez budynków, oczko 5 m, pokrywa ok. 2 km od PKiN; źródło: Główny Urząd Geodezji i Kartografii). Poza nim kafle Terrarium (AWS Terrain Tiles) z wycinaniem „garbów” po budynkach.
 
+## Mapa wczytywana w locie (kafle)
+Poza dokładną mapą świat dobudowuje się kaflami 1 × 1 km w zasięgu widoku, w stronę ruchu; dalekie kafle są zwalniane z pamięci. Kafle są uproszczone (płaski grunt z ulicami i obszarami, budynki z płaskimi dachami). Źródła: `tiles/<i>_<j>.json` dla całej Warszawy (generuje deploy: `tools/fetch-tiles.mjs`, w kilku przebiegach — najpierw trasa centrum — Okęcie; postęp trzyma cache GitHub Actions), pamięć przeglądarki, a poza Warszawą Overpass na żywo. Format i siatka: `js/tiles.mjs`. Duża mapa (M) przesuwa się przeciąganiem i oddala kółkiem.
+
 ## Wiadukty, tunele, przejazdy
 OSM podaje tylko poziom (`layer`), więc wysokości są liczone:
 - wiadukt: pomost między przyczółkami, podniesiony tak, by nad przecinaną drogą/torem był prześwit (5,3 m / 6,8 m), podjazd rozkłada się na sąsiednich ulicach (spadek 7%),
@@ -63,7 +66,8 @@ Dane © OpenStreetMap contributors (ODbL).
 
 ## Plan
 - Łódź: Wisła i ORP Błyskawica z wodą z laboratorium wody.
-- Lotnictwo: śmigłowiec W-3 Sokół; Boeing (samolot pasażerski); F-15 (odrzutowy); wąski korytarz mapy od centrum do Okęcia.
+- Lotnictwo: śmigłowiec W-3 Sokół; Boeing (samolot pasażerski); F-15 (odrzutowy).
+- Kafle mapy: tunele, wiadukty, przejścia i tory (jazda) na kaflach; teren z wysokościami.
 - Szynowe: metro — na początek linia M1; trolejbus linii 51 (1983–1995, Dworzec Południowy — Puławska — Piaseczno); pozostałe linie tramwajowe i kolejowe; WKD do Pruszkowa (cała trasa).
 - Schody / rampy przy wejściach do podziemi, które doktor mapy zgłasza jako niepodłączone (propozycja).
 
