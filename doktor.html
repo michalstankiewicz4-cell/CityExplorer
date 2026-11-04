@@ -248,7 +248,31 @@ function checkPassages() {
     const l = c.lines[0], m = l.samples[l.samples.length >> 1];
     if (!nearEdge(m[0], m[1]) && inArea(m)) add('przejscia', 'i', 'Przejście podziemne bez wejścia', `${lineName(l)} · ${Math.round(c.len)} m (brak połączenia z chodnikiem)`, [m[0], m[2], m[1]]);
   }
-  add('przejscia', 'i', `Przejścia podziemne: ${comp.size} zespołów, z wejściem: ${ok}`, '', null);
+  add('przejscia', 'i', `Przejścia podziemne: ${comp.size} zespołów, z wejściem w OSM: ${ok}`, '', null);
+  // wejście w OSM to jeszcze nie przejście: czy z chodnika da się zejść na posadzkę tunelu (pieszo, krokami po 0,5 m)
+  let bad = 0, good = 0;
+  for (const l of tun) for (const [end, idx] of [[0, 0], [1, l.samples.length - 1]]) {
+    const id = end ? l.ids[l.ids.length - 1] : l.ids[0]; if (!freeNodes.has(id)) continue;
+    const S = l.samples, p0 = S[idx], dir = end ? -1 : 1;
+    if (!inArea(p0) || nearEdge(p0[0], p0[1])) continue;
+    // pieszy idzie od węzła wejścia (z chodnika na powierzchni) wzdłuż osi przejścia w głąb, krokami po 0,5 m; stoi na
+    // nawierzchni najbliższej swojej wysokości (jak w grze). Tam, gdzie przejście jest już pod ziemią, powinien stać na posadzce.
+    let y = G.surfaceAt(p0[0], p0[1], G.H(p0[0], p0[1]) + 0.5), worst = 0, gap = 0, at = null, walked = 0;
+    for (let k = idx; k >= 0 && k < S.length - 0 && walked < 25; k += dir) {
+      const a = S[k], b = S[k + dir]; if (!b) break;
+      const L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+      for (let t = 0.5; t <= L; t += 0.5) {
+        const f = t / L, x = a[0] + (b[0] - a[0]) * f, z = a[1] + (b[1] - a[1]) * f, floorY = a[2] + (b[2] - a[2]) * f;
+        const yn = G.surfaceAt(x, z, y + 0.45); worst = Math.max(worst, Math.abs(yn - y)); y = yn; walked += 0.5;
+        if (floorY < G.H(x, z) - 1.8 && Math.abs(y - floorY) > gap) { gap = Math.abs(y - floorY); at = [x, floorY, z]; }
+      }
+    }
+    if (worst > 0.45 || gap > 0.8) {
+      bad++;
+      add('przejscia', 'w', `Wejście do podziemi niepodłączone: ${gap > 0.8 ? 'pieszy zostaje ' + gap.toFixed(1) + ' m nad posadzką' : 'uskok ' + worst.toFixed(1) + ' m'}`, `${lineName(l)} — chodnik na powierzchni nie schodzi do posadzki przejścia (brak schodów / rampy w świecie gry)`, [p0[0], G.H(p0[0], p0[1]), p0[1]]);
+    } else good++;
+  }
+  add('przejscia', 'i', `Wejścia do podziemi: przejściowe ${good}, niepodłączone ${bad}`, '', null);
   for (const l of G.W.lines.filter(l => l.passage && l.samples)) {
     const m = l.samples[l.samples.length >> 1]; if (!inArea(m)) continue;
     const inside = l.samples.some(p => (G.W.inAnyBuilding || G.W.inBuilding)(p[0], p[1]));

@@ -2,9 +2,10 @@
 
 ## 0.7.0 — 2026-11-04
 - **Tramwaj na pełnej fizyce z aTrain** (GameLaboratory: zachowanie „koło na szynie”): kontakt koła z szyną z profilu koła i przekroju szyny, zawieszenie, napęd i hamulec — tramwaj trzyma się toru wyłącznie siłami (bez przyklejania). Człony na wózkach stałych jadą na swoich zestawach kołowych, podwieszone wiszą na przegubach; widać przechył i kołysanie, za szybko w łuku — wykolejenie (R wraca na tor). W/S — nastawnik (prędkość zadana, widać ją w HUD), Spacja — hamulec.
-- **Szyny** na wszystkich torach tramwajowych (w jezdni) i kolejowych (na podsypce z podkładami), z tego samego opisu toru co fizyka; tory z OSM przycięte do mapy i wygładzone (także w pionie) — tor bez skoków.
+- **Szyny** na początek na linii, po której jedzie gracz — tramwajowej (w jezdni) albo kolejowej (na podsypce z podkładami); pozostałe linie później. Z tego samego opisu toru co fizyka; tory z OSM przycięte do mapy i wygładzone (także w pionie) — tor bez skoków.
 - Pociąg rusza na mapie, na szynach (w tym obszarze kolej biegnie tunelami: Tunel Średnicowy, WKD).
-- Ekran startowy: wyśrodkowane miniatury, metro w karcie „Szynowy” (wkrótce).
+- Ekran startowy: wyśrodkowane miniatury; w planie (wkrótce): metro — na początek linia M1, trolejbus linii 51 (1983–1995, Puławska).
+- **Doktor mapy**: sprawdza, czy z chodnika da się zejść do przejścia podziemnego (pieszy idzie od wejścia w głąb) — wejście jest w OSM, a w świecie gry brak schodów / rampy: „Wejście do podziemi niepodłączone”.
 
 ## 0.6.0 — 2026-11-04
 - **Tryb szynowy**: prowadzisz **tramwaj PESA Swing 120Na** (model z GameLaboratory — 5 członów, każdy człon na łuku toru, harmonijki się rozciągają, drzwi, wnętrze, nocą światła) albo **pociąg z TrainKit** (lokomotywa spalinowa, wagon drewniany i stalowy; zestawy kołowe się obracają) po prawdziwych torach z OSM. W — napęd, S — hamowanie (na postoju jazda wstecz), Spacja — hamowanie nagłe, E — drzwi na postoju; prędkość z masy, mocy, oporów i spadku toru, kozioł oporowy na końcu toru. Kamera C: widok z kabiny. Automatyczne składy znikają z toru gracza.

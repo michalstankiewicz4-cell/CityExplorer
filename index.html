@@ -122,12 +122,12 @@
     <div class="ttl">Warszawa 3D <small id="ver2"></small></div>
     <div class="sub">Prawdziwe Śródmieście z mapy · wybierz, czym ruszasz</div>
     <div id="modes">
-      <button data-mode="foot" disabled><i>Tryb 1</i><b>Pieszo i pojazdem</b><span>Spacer po mieście; przy starcie czekają FSO Polonez, M1A2 Abrams i przegubowy Solaris — wsiadasz i wysiadasz klawiszem E.</span><div class="thumbs" data-for="foot"><img src="img/pieszy.jpg" alt="Pieszy" title="Pieszy"><img src="img/polonez.jpg" alt="FSO Polonez" title="FSO Polonez 1500"><img src="img/abrams.jpg" alt="M1A2 Abrams" title="M1A2 Abrams"><img src="img/urbino18.jpg" alt="Solaris Urbino 18" title="Solaris Urbino 18 electric"></div><div class="mload"><em></em><u>Wczytuję modele…</u></div></button>
+      <button data-mode="foot" disabled><i>Tryb 1</i><b>Pieszo i pojazdem</b><span>Spacer po mieście; przy starcie czekają FSO Polonez, M1A2 Abrams i przegubowy Solaris — wsiadasz i wysiadasz klawiszem E.</span><div class="thumbs" data-for="foot"><img src="img/pieszy.jpg" alt="Pieszy" title="Pieszy"><img src="img/polonez.jpg" alt="FSO Polonez" title="FSO Polonez 1500"><img src="img/abrams.jpg" alt="M1A2 Abrams" title="M1A2 Abrams"><img src="img/urbino18.jpg" alt="Solaris Urbino 18" title="Solaris Urbino 18 electric"><span class="soonT">trolejbus 51<br>wkrótce</span></div><div class="mload"><em></em><u>Wczytuję modele…</u></div></button>
       <button data-mode="rail" disabled><i>Tryb 2</i><b>Szynowy</b><span>Tramwaj PESA Swing na fizyce koło–szyna z aTrain albo pociąg po prawdziwych torach — kliknij, którym. Metro wkrótce.</span><div class="thumbs" data-for="rail"><img src="img/swing.jpg" alt="Tramwaj PESA Swing" title="Tramwaj PESA Swing 120Na" data-veh="tram"><img src="img/pociag.jpg" alt="Pociąg" title="Pociąg: lokomotywa i dwa wagony" data-veh="train"><span class="soonT">metro<br>wkrótce</span></div><div class="mload" id="mload2" style="display:none"><em></em><u>Wczytuję skład…</u></div></button>
       <button data-mode="boat" disabled><i>Wkrótce</i><b>Łódź</b><span>ORP Błyskawica na Wiśle.</span><div class="thumbs soon">model w przygotowaniu</div></button>
       <button data-mode="air" disabled><i>Wkrótce</i><b>Samolot i śmigłowiec</b><span>Spitfire i W-3 Sokół z Okęcia.</span><div class="thumbs soon">modele w przygotowaniu</div></button>
     </div>
-    <div class="foot">Sterowanie (pieszo i pojazdem): W A S D · Shift — bieg / turbo · E — wsiądź / wysiądź · C — kamera · M — mapa · Esc — opcje</div>
+    <div class="foot">Wkrótce: trolejbus linii 51 (1983–1995, Dworzec Południowy — Puławska — Piaseczno), metro M1.<br>Sterowanie (pieszo i pojazdem): W A S D · Shift — bieg / turbo · E — wsiądź / wysiądź · C — kamera · M — mapa · Esc — opcje</div>
   </div>
 </div>
 <div id="prompt"></div>
@@ -1811,16 +1811,11 @@ function railTrack(ch) {   // opis toru (łuki, wysokości) dla ciągu — raz
   if (!trackCache.has(ch)) { const pts = clipChain(ch); trackCache.set(ch, pts.length > 3 ? PATH.pathTrack(pts, { step: 4, smooth: 3 }) : null); }
   return trackCache.get(ch);
 }
-// szyny na wszystkich torach tramwajowych i kolejowych (bez metra)
-async function buildRails(progress) {
-  PATH = PATH || await import(GL + 'js/behaviors/rail/path.js');
+// szyny: na początek tylko na linii, po której jedzie gracz (pierwsza linia tramwajowa / kolejowa); reszta później
+async function buildRails(ch, net) {
   PTRACK = PTRACK || await import(GL + 'js/models/structures/railway/path-track.js');
-  for (const net of ['tram', 'rail']) for (const ch of RAIL_CHAINS[net]) {
-    const T = railTrack(ch); if (!T || T.L < 20) continue;
-    const g = PTRACK.buildPathTrack(T, { lift: RAIL_LIFT[net], sleepers: net === 'rail', ballast: net === 'rail', step: 1.5 });
-    scene.add(g);
-  }
-  progress && progress();
+  const T = railTrack(ch); if (!T || T.L < 20) return;
+  scene.add(PTRACK.buildPathTrack(T, { lift: RAIL_LIFT[net], sleepers: net === 'rail', ballast: net === 'rail', step: 1.5 }));
 }
 async function loadRail(kind) {
   if (kind === 'tram') {
@@ -1855,6 +1850,7 @@ async function startRail(kind) {
   at = at || any;
   if (!at) { flash('Brak toru na mapie'); return; }
   const s0 = at.s;
+  await buildRails(at.ch, net);
   Object.assign(rail, { V: R, kind, ch: at.ch, T: at.T, s: s0, v: 0, total, lift: RAIL_LIFT[net], target: 0, derailed: false, sim: null });
   if (kind === 'tram') {
     rail.sim = TRAMPHYS.createTramSim(at.T, R.v.def, s0);
@@ -2353,7 +2349,6 @@ async function main() {
     requestAnimationFrame(loop);
     const ml = $('modes').querySelector('.mload u');
     await loadModels((f, t) => { ml.textContent = t + ' ' + Math.round(f * 100) + '%'; });
-    ml.textContent = 'Szyny…'; await frame(); await buildRails();
     startAt(findSpawn());
     if (GFX.sketch) setSketch(true);
     $('modes').querySelector('.mload').remove();
