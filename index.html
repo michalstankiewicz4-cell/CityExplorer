@@ -706,6 +706,11 @@ function buildWorld(D) {
     crownM.setColorAt(i, c); crownM2.setColorAt(i, c.multiplyScalar(1.12));
     collAdd(x, z, x, z, 0.45);
   });
+  // drzewa przy kamerze są wycinane (żeby nie zasłaniały auta)
+  for (const m of [trunkM, crownM, crownM2]) m.material.onBeforeCompile = sh => {
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vWP;').replace('#include <project_vertex>', '#include <project_vertex>\nvWP = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vWP;').replace('void main() {', 'void main() {\n  if (distance(vWP, cameraPosition) < 7.0) discard;');
+  };
   for (const m of [trunkM, crownM, crownM2]) { m.castShadow = true; m.receiveShadow = true; m.computeBoundingSphere(); scene.add(m); }
 
   /* ---------------- teren ---------------- */
@@ -890,6 +895,16 @@ function updateCamera(dt, snap) {
   else if (camMode === 1) { dist = 26 * camDist; hgt = 13 * camDist; look = 2; }
   else { dist = -0.3; hgt = 1.25; look = 1.1; }
   const want = new THREE.Vector3(car.x - fx * dist, car.y + hgt, car.z - fz * dist);
+  // kamera nie wchodzi w budynki: szukamy pierwszej ściany między autem a kamerą
+  if (camMode !== 2) {
+    const dx = want.x - car.x, dz = want.z - car.z, L = Math.hypot(dx, dz);
+    let tHit = 1;
+    for (let t = 0; t <= 1 && L > 0.1; t += 1.5 / L) {
+      const px = car.x + dx * t, pz = car.z + dz * t, a = collGrid.get(Math.floor(px / COLL_CELL) * 100003 + Math.floor(pz / COLL_CELL));
+      if (a && a.some(sg => sg[4] === 0 && segDist(px, pz, sg)[0] < 0.8)) { tHit = Math.max(0.12, t - 1.2 / L); break; }
+    }
+    if (tHit < 1) { want.x = car.x + dx * tHit; want.z = car.z + dz * tHit; }
+  }
   const gy = H(want.x, want.z) + 1.2; if (want.y < gy) want.y = gy;
   if (camMode === 2 || snap) camPos.copy(want); else camPos.lerp(want, 1 - Math.exp(-6 * dt));
   camLook.set(car.x + fx * (camMode === 2 ? 20 : 5), car.y + look, car.z + fz * (camMode === 2 ? 20 : 5));
