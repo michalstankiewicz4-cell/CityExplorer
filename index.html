@@ -85,7 +85,7 @@ const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.p
 /* ---------- UI ładowania ---------- */
 const $ = id => document.getElementById(id);
 function status(msg, pct) { $('log').textContent = msg; if (pct != null) $('bar').firstElementChild.style.width = (pct * 100).toFixed(0) + '%'; console.log('[W3D]', msg); }
-const frame = () => new Promise(r => requestAnimationFrame(() => r()));
+const frame = () => new Promise(r => setTimeout(r, 16));   // nie rAF: w karcie w tle rAF stoi
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function fetchT(url, opt = {}, ms = 45000) {
   const c = new AbortController(); const t = setTimeout(() => c.abort(), ms);
