@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.9.0</title>
+<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.9.1</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Warszawa 3D, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.9.0"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.9.1"}
 </script>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#0d1014;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#e8e6e1}
@@ -66,6 +66,8 @@
   #fps{font-size:11px;opacity:.5;margin-top:4px}
   #minimap{position:fixed;right:16px;bottom:16px;width:220px;height:220px;border-radius:50%;border:2px solid #ffffff55;box-shadow:0 4px 18px #0008;z-index:5;background:#222}
   #bigmap{position:fixed;inset:0;z-index:10;background:#0d1014e6;display:none;cursor:crosshair}
+  #bmQual{position:fixed;left:16px;top:14px;z-index:11;display:none;font:600 13px system-ui;color:#fff;background:#0d1014cc;padding:6px 12px;border-radius:8px;border:1px solid #ffffff33;cursor:pointer}
+  #bmQual.on{background:#c6ae7f;color:#14110c}
   #bigmapHint{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:11;display:none;font-size:13px;background:#0d1014cc;padding:6px 12px;border-radius:8px;border:1px solid #ffffff22}
   #help{position:fixed;left:16px;bottom:16px;z-index:5;background:#0d1014cc;border:1px solid #ffffff22;border-radius:10px;padding:10px 14px;font-size:13px;line-height:1.6;max-width:330px}
   #help b{display:inline-block;min-width:74px;color:#c6ae7f}
@@ -169,6 +171,7 @@
 </div>
 <canvas id="minimap" width="440" height="440" style="display:none"></canvas>
 <canvas id="bigmap"></canvas>
+<button id="bmQual" title="Pokaż, które obszary są dopracowane, a które wygenerowane automatycznie">Dopracowanie obszarów</button>
 <div id="bigmapHint">Mapa — kliknij, aby się tam przenieść · przeciągnij = przesuwanie · kółko = zoom · M zamyka</div>
 <div id="help" style="display:none">
   <div><b>E</b> wsiądź / wysiądź; tramwaj, pociąg: drzwi</div>
@@ -195,7 +198,7 @@ import * as THREE from 'three';
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
-const APP_VERSION = '0.9.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+const APP_VERSION = '0.9.1';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
 document.getElementById('ver').textContent = 'v' + APP_VERSION; document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
 // gotowe mapy (?map=…): okecie — lotnisko Chopina (tryb Samolot); bez parametru — Śródmieście
@@ -2224,11 +2227,35 @@ function hud(dt, fps) {
 }
 
 /* ---------- duża mapa (M) ---------- */
+// warstwa „dopracowanie obszarów”: mapy dokładne (ręcznie sprawdzane doktorem) i kafle generowane automatycznie
+const QUAL = [
+  { lat: 52.23175, lon: 21.00586, r: 1000, col: '#e6b84a', name: 'Centrum (PKiN) — najbardziej dopracowane', note: 'teren NMT, wiadukty, tunele, przejścia, tramwaje, metro, WKD; sprawdzane doktorem mapy' },
+  { lat: 52.1657, lon: 20.9671, r: 2000, col: '#5aa9e6', name: 'Lotnisko Chopina (Okęcie) — dopracowane', note: 'drogi startowe z oznakowaniem, samolot' },
+  { lat: 52.23175, lon: 21.00586, r: 2000, col: '#b98ad6', name: 'Centrum ?r=2000 — dokładna mapa, mniej sprawdzana', note: 'ten sam silnik co centrum, bez ręcznych poprawek', ring: true },
+];
+let bmQual = false;
+$('bmQual').onclick = () => { bmQual = !bmQual; $('bmQual').classList.toggle('on', bmQual); drawBigMap(); };
+function drawQuality(ox, oy, s) {
+  bmg.save();
+  // kafle automatyczne: szare kreskowanie na wczytanych podglądach
+  if (TS.TL) { const T = TS.TL.T; bmg.fillStyle = 'rgba(40,44,52,0.42)'; for (const k of TS.ov.keys()) { const [i, j] = k.split('_').map(Number); bmg.fillRect(ox + (i * T + TS.OFF[0] + E) * s, oy + (j * T + TS.OFF[1] + E) * s, T * s + 0.5, T * s + 0.5); } }
+  for (const q of QUAL.slice().reverse()) {
+    const [x, z] = toXZ(q.lat, q.lon), e = q.r + 150, px = ox + (x - e + E) * s, py = oy + (z - e + E) * s, w = 2 * e * s;
+    bmg.fillStyle = q.col + (q.ring ? '14' : '33'); bmg.fillRect(px, py, w, w);
+    bmg.setLineDash(q.ring ? [6, 5] : []); bmg.lineWidth = 2.5; bmg.strokeStyle = q.col; bmg.strokeRect(px, py, w, w); bmg.setLineDash([]);
+  }
+  // legenda
+  const L = [...QUAL.map(q => [q.col, q.name, q.note]), ['#6b7078', 'Kafle 1 km — wygenerowane automatycznie', 'uproszczone: płaski grunt, budynki z płaskimi dachami']];
+  const lx = 16, ly = 56, lh = 38; bmg.fillStyle = '#0d1014dd'; bmg.fillRect(lx, ly, 420, L.length * lh + 12);
+  bmg.textAlign = 'left'; bmg.textBaseline = 'alphabetic';
+  L.forEach(([c, n, d], k) => { const y = ly + 10 + k * lh; bmg.fillStyle = c; bmg.fillRect(lx + 10, y + 2, 14, 14); bmg.fillStyle = '#fff'; bmg.font = '600 13px system-ui'; bmg.fillText(n, lx + 32, y + 14); bmg.fillStyle = '#ffffffaa'; bmg.font = '12px system-ui'; bmg.fillText(d, lx + 32, y + 30); });
+  bmg.restore();
+}
 const bm = $('bigmap'), bmg = bm.getContext('2d');
 let bigOpen = false, bmZoom = 1, bmView = null;
 function toggleBigMap() {
   if (!W.ov) return;
-  bigOpen = !bigOpen; bm.style.display = $('bigmapHint').style.display = bigOpen ? 'block' : 'none';
+  bigOpen = !bigOpen; bm.style.display = $('bigmapHint').style.display = $('bmQual').style.display = bigOpen ? 'block' : 'none';
   if (bigOpen) { bmZoom = 1; bmPan = null; drawBigMap(); }
 }
 bm.addEventListener('wheel', e => { e.preventDefault(); bmZoom = Math.min(8, Math.max(0.12, bmZoom * (e.deltaY > 0 ? 0.85 : 1.18))); drawBigMap(); }, { passive: false });
@@ -2287,6 +2314,7 @@ function drawBigMap() {
   const pkl = toXZ(52.23175, 21.00586), pk = [ox + (pkl[0] + E) * s, oy + (pkl[1] + E) * s];
   bmg.fillStyle = '#c6ae7f'; bmg.beginPath(); bmg.arc(pk[0], pk[1], 5, 0, 7); bmg.fill();
   bmg.font = '600 13px system-ui'; bmg.lineWidth = 3; bmg.strokeStyle = '#000a'; bmg.strokeText('PKiN', pk[0], pk[1] - 14); bmg.fillStyle = '#f3e3c0'; bmg.fillText('PKiN', pk[0], pk[1] - 14);
+  if (bmQual) drawQuality(ox, oy, s);
   // auto
   const cx = ox + (ego.x + E) * s, cy = oy + (ego.z + E) * s, fx = Math.sin(ego.th), fz = Math.cos(ego.th);
   bmg.save(); bmg.translate(cx, cy); bmg.rotate(Math.atan2(fz, fx) + Math.PI / 2);

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.1 — 2026-11-05
+- Duża mapa (M): przycisk **„Dopracowanie obszarów”** — zaznacza obszary dopracowane (centrum przy PKiN — najbardziej, lotnisko Chopina, centrum `?r=2000` — dokładna mapa, mniej sprawdzana) i przyciemnia kafle wygenerowane automatycznie; legenda z opisem, co jest w każdym.
+
 ## 0.9.0 — 2026-11-05
 - **Mapa wczytywana w locie**: poza dokładną mapą (centrum albo Okęcie) świat dobudowuje się kaflami 1 × 1 km w stronę, w którą lecisz / jedziesz (w zasięgu widoku), a kafle daleko za plecami są zwalniane z pamięci. Kafle są uproszczone: płaski grunt z malowanymi ulicami, obszarami, wodą, torami i lotniskami, budynki z płaskimi dachami (wysokości z OSM). Tunele, wiadukty, przejścia i jazda po torach na kaflach — później.
 - Źródła kafli: gotowe pliki całej Warszawy (`tiles/`, generuje deploy: `tools/fetch-tiles.mjs`, najpierw trasa centrum — Okęcie, kolejne deploye dopełniają resztę miasta przez cache), potem pamięć przeglądarki, a poza Warszawą (np. reszta Mazowsza) — Overpass na żywo, kafel po kaflu. Wspólny moduł: `js/tiles.mjs`.
