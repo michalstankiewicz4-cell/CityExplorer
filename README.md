@@ -46,6 +46,19 @@ Jeden plik `index.html`, three.js z CDN (jsDelivr). Budynki są łączone w siat
 
 Dane © OpenStreetMap contributors (ODbL).
 
+## Doktor mapy
+`doktor.html` (https://michalstankiewicz4-cell.github.io/CityExplorer/doktor.html) uruchamia grę w ramce i bada zbudowany świat:
+
+| Test | Co znajduje |
+|---|---|
+| Przejezdność dróg | przeszkody na osi jezdni (budynek, drzewo, filar, nasyp), uskoki na konstrukcjach, stromizny > 16%, skoki wysokości na skrzyżowaniach, prześwit pod wiaduktem < 4,2 m, drogi odcięte od sieci |
+| Widoczność | jezdnia/tor w budynku, nawierzchnia pod terenem, tunel wystający nad teren, ściana budynku w tunelu |
+| Ciągłość torów | przerwy (tory blisko, bez wspólnego węzła), ślepe końce, skoki wysokości, spadki (kolej 4%, metro 5%, tramwaj 9%), ostre załamania (ważne dla fizyki kół z aTrain) |
+| Przejścia i tunele | przejścia podziemne bez wejścia, bramy bez budynku, płytkie tunele drogowe |
+| Modele | auto, tramwaj, metro, pociąg — doktor modeli z GameLaboratory (`tools/doctor/modeldoctor.js`, wczytywany z jego strony) |
+
+Wagi: błąd / ostrzeżenie / info. Klik w wynik przenosi tam auto i stawia czerwony znacznik. Raport: przycisk „Kopiuj raport JSON” albo `window.doktorReport`. Zasada jak w GameLaboratory: mapy nie poprawiamy ręcznie — wyniki pokazują, co ulepszyć w budowie świata (część to błędy samych danych OSM, np. tory bez wspólnego węzła).
+
 ## Wersje
 Projekt używa [SemVer](https://semver.org/lang/pl/): **MAJOR.MINOR.PATCH**.
 - **MINOR** – nowa funkcja widoczna dla gracza (np. wiadukty, nowe dzielnice),

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Doktor mapy — Warszawa 3D</title>
+<meta name="robots" content="noindex">
+<style>
+  html,body{margin:0;height:100%;background:#0d1014;color:#e8e6e1;font:13px/1.45 system-ui,Segoe UI,Roboto,sans-serif;overflow:hidden}
+  #wrap{display:flex;height:100%}
+  #side{width:400px;min-width:300px;display:flex;flex-direction:column;border-right:1px solid #ffffff1c;background:#11151a}
+  #game{flex:1;border:0;height:100%}
+  header{padding:12px 14px 8px;border-bottom:1px solid #ffffff14}
+  header h1{margin:0;font-size:17px;font-weight:650}
+  header .sub{opacity:.6;font-size:12px}
+  #sum{padding:8px 14px;display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid #ffffff14}
+  .chip{border:1px solid #ffffff26;border-radius:999px;padding:2px 9px;cursor:pointer;user-select:none;font-size:12px;background:#1a2027}
+  .chip.off{opacity:.38}
+  .chip b{font-weight:650}
+  .e{color:#ff8a7a}.w{color:#f2c46a}.i{color:#8fb8e8}
+  #bar{padding:6px 14px;display:flex;gap:6px;border-bottom:1px solid #ffffff14}
+  button{background:#2a3038;color:#e8e6e1;border:1px solid #ffffff2a;border-radius:6px;padding:4px 9px;font-size:12px;cursor:pointer}
+  button:hover{background:#353d47}
+  #list{flex:1;overflow:auto;padding:4px 0}
+  .grp{padding:8px 14px 2px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.55}
+  .f{padding:6px 14px;border-left:3px solid transparent;cursor:pointer}
+  .f:hover{background:#1a2027}
+  .f.sel{background:#212a33;border-left-color:#c6ae7f}
+  .f .t{font-weight:600}
+  .f .d{opacity:.7;font-size:12px}
+  .sev{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+  .sev.e{background:#ff6a5a}.sev.w{background:#f2b84a}.sev.i{background:#6aa0e0}
+  #status{padding:8px 14px;border-top:1px solid #ffffff14;opacity:.7;font-size:12px;white-space:pre-line}
+  #about{font-size:12px;opacity:.65;padding:6px 14px 10px}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="side">
+    <header>
+      <h1>Doktor mapy</h1>
+      <div class="sub" id="ver">Warszawa 3D — sprawdza przejezdność, widoczność, tory, przejścia i modele</div>
+    </header>
+    <div id="sum"></div>
+    <div id="bar">
+      <button id="bAgain">Zbadaj ponownie</button>
+      <button id="bCopy">Kopiuj raport JSON</button>
+      <button id="bClear">Usuń znacznik</button>
+    </div>
+    <div id="list"></div>
+    <div id="about">Kliknij wynik: auto przeniesie się na miejsce, a czerwony słup je wskaże. Doktor modeli pochodzi z GameLaboratory (tools/doctor/modeldoctor.js).</div>
+    <div id="status">Ładuję grę…</div>
+  </div>
+  <iframe id="game" title="Warszawa 3D"></iframe>
+</div>
+<script type="module">
+/* =========================================================================
+   DOKTOR MAPY — bada zbudowany świat gry (dane w ramce: window.__W3D)
+   Zasady jak w doktorze modeli GameLaboratory: doktor jest uniwersalny, nie
+   poprawia mapy ręcznie — wyniki wskazują, co ulepszyć w budowie świata.
+   ========================================================================= */
+const QS = new URLSearchParams(location.search);
+const MODEL_DOCTOR = QS.get('md') || 'https://michalstankiewicz4-cell.github.io/GameLaboratory/tools/doctor/modeldoctor.js';
+const frame = document.getElementById('game');
+frame.src = 'index.html' + (QS.get('r') ? '?r=' + QS.get('r') : '');
+const $ = id => document.getElementById(id);
+const status = t => { $('status').textContent = t; };
+
+const CHECKS = {
+  przejazd: 'Przejezdność dróg',
+  widok: 'Widoczność',
+  tory: 'Ciągłość torów',
+  przejscia: 'Przejścia i tunele',
+  modele: 'Modele (doktor GameLaboratory)',
+};
+const SEV = { e: 'błąd', w: 'ostrzeżenie', i: 'info' };
+const KIND = { b: 'budynek', t: 'drzewo', p: 'filar wiaduktu', r: 'bariera', d: 'spód wiaduktu', w: 'mur', e: 'nasyp', h: 'mur portalu', g: 'ściana bramy' };
+let G = null, F = [], off = new Set(), sel = null, marker = null;
+
+const segDist = (px, pz, s) => { const dx = s[2] - s[0], dz = s[3] - s[1], l2 = dx * dx + dz * dz; let t = l2 > 0 ? ((px - s[0]) * dx + (pz - s[1]) * dz) / l2 : 0; t = Math.max(0, Math.min(1, t)); return Math.hypot(px - s[0] - dx * t, pz - s[1] - dz * t); };
+const lineName = l => l.t.name ? (l.t.name) : (l.hw || l.rail || l.net);
+const nearEdge = (x, z, m = 80) => Math.max(Math.abs(x), Math.abs(z)) > G.E - m;
+const inArea = p => Math.max(Math.abs(p[0]), Math.abs(p[1])) <= G.R + 80;   // obszar jazdy (dalej mapa się kończy)
+
+/* ---------- wspólne: przeszkody w punkcie ---------- */
+function obstaclesAt(x, z, y, r) {
+  const out = [], C = G.COLL_CELL, i0 = Math.floor((x - r - 2) / C), i1 = Math.floor((x + r + 2) / C), j0 = Math.floor((z - r - 2) / C), j1 = Math.floor((z + r + 2) / C);
+  for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) for (const s of G.collGrid.get(i * 100003 + j) || []) {
+    if (y + 0.7 < s[5] || y + 0.7 > s[6]) continue;
+    if (segDist(x, z, s) < r + s[4]) out.push(s[7] || '?');
+  }
+  return out;
+}
+// grupowanie kolejnych próbek linii w jeden wynik
+function runs(S, test) {
+  const res = []; let cur = null;
+  for (let k = 0; k < S.length; k++) {
+    const v = test(S[k], k);
+    if (v) { if (cur && cur.v === v) { cur.k1 = k; } else { if (cur) res.push(cur); cur = { v, k0: k, k1: k }; } }
+    else if (cur) { res.push(cur); cur = null; }
+  }
+  if (cur) res.push(cur);
+  return res.filter(r => inArea(S[(r.k0 + r.k1) >> 1])).map(r => { const a = S[r.k0], b = S[r.k1], m = S[(r.k0 + r.k1) >> 1]; return { v: r.v, len: Math.hypot(b[0] - a[0], b[1] - a[1]), at: [m[0], m[2], m[1]], heading: Math.atan2(b[0] - a[0], b[1] - a[1]) }; });
+}
+const add = (check, sev, title, detail, at, extra = {}) => F.push({ check, sev, title, detail, at, ...extra });
+
+/* ---------- 1. przejezdność ---------- */
+function checkDrive() {
+  const roads = G.W.lines.filter(l => l.net === 'road' && l.samples && l.samples.length > 1);
+  for (const l of roads) {
+    const S = l.samples, rank = l.rank || 0, nm = lineName(l), hw = (l.wd || 6) / 2;
+    if (l.passage) continue;
+    // przeszkody na osi jezdni (promień ~ pół szerokości auta)
+    for (const r of runs(S, p => { const o = obstaclesAt(p[0], p[1], p[2], 0.9).filter(k => k !== 'w' && k !== 'g' && k !== 'r'); return o.length ? o[0] : null; })) {
+      const sev = r.v === 'b' ? (rank >= 4 ? 'e' : rank >= 2 ? 'w' : 'i') : r.v === 't' ? 'i' : 'w';
+      add('przejazd', sev, `Przeszkoda na jezdni: ${KIND[r.v] || r.v}`, `${nm} · ${Math.max(1, Math.round(r.len))} m`, r.at, { heading: r.heading });
+    }
+    // uskoki: tylko na konstrukcjach (zwykła droga idzie po ciągłym terenie, więc stromy teren to nie uskok)
+    if (l.kind !== 'free') for (let k = 0; k < S.length - 1; k++) {
+      const a = S[k], b = S[k + 1], dy = b[2] - a[2];
+      if (Math.abs(dy) > 1.0 && inArea(a)) add('przejazd', rank <= 1 ? 'i' : 'e', `Uskok ${Math.abs(dy).toFixed(1)} m`, `${nm} (${l.kind}${rank <= 1 ? ', zjazd do garażu' : ''})`, [a[0], a[2], a[1]], { heading: Math.atan2(b[0] - a[0], b[1] - a[1]) });
+    }
+    for (const r of runs(S, (p, k) => { if (k === 0) return null; const q = S[k - 1], d = Math.hypot(p[0] - q[0], p[1] - q[1]); return d > 0.5 && Math.abs(p[2] - q[2]) / d > 0.16 ? 'stromo' : null; }))
+      if (r.len >= 6) add('przejazd', rank <= 1 ? 'i' : 'w', 'Bardzo stromo (>16%)', `${nm}${rank <= 1 ? ' (zjazd do garażu)' : ''} · ${Math.round(r.len)} m`, r.at, { heading: r.heading });
+    // prześwit pod wiaduktami
+    if (l.kind !== 'bridge' && l.kind !== 'tunnel') {
+      for (const r of runs(S, p => {
+        const a = G.surfGrid.get(Math.floor(p[0] / G.SURF_CELL) * 100003 + Math.floor(p[1] / G.SURF_CELL)); if (!a) return null;
+        let clr = 1e9;
+        const k = S.indexOf(p), q = S[Math.min(S.length - 1, k + 1)], o = S[Math.max(0, k - 1)], tx = q[0] - o[0], tz = q[1] - o[1], tl = Math.hypot(tx, tz) || 1;
+        for (const s of a) {
+          if (s[7]) continue; const seg = [s[0], s[2], s[3], s[5]]; if (segDist(p[0], p[1], seg) > s[6]) continue;
+          const sx = s[3] - s[0], sz = s[5] - s[2], sl = Math.hypot(sx, sz) || 1; if (Math.abs((tx * sx + tz * sz) / (tl * sl)) > 0.9) continue;   // równoległa jezdnia obok, nie nad
+          const yd = (s[1] + s[4]) / 2; if (yd - p[2] > 1.5) clr = Math.min(clr, yd - 1.1 - p[2]);
+        }
+        return clr < 4.2 ? 'nisko' : null;
+      })) add('przejazd', 'w', 'Niski prześwit pod wiaduktem (<4,2 m)', `${nm} · ${Math.round(r.len)} m`, r.at, { heading: r.heading });
+    }
+  }
+  // skoki wysokości na skrzyżowaniach (ten sam węzeł, różne linie)
+  junctions(roads, 0.5, (y0, y1, at, names) => add('przejazd', 'e', `Skok na skrzyżowaniu ${(y1 - y0).toFixed(1)} m`, names, at));
+  // spójność sieci drogowej
+  const par = new Map(), find = a => { while (par.get(a) !== a) { par.set(a, par.get(par.get(a))); a = par.get(a); } return a; };
+  for (const l of roads) for (const id of l.ids) if (!par.has(id)) par.set(id, id);
+  for (const l of roads) for (let i = 1; i < l.ids.length; i++) { const a = find(l.ids[0]), b = find(l.ids[i]); if (a !== b) par.set(a, b); }
+  const comp = new Map(); for (const l of roads) { const c = find(l.ids[0]); const v = comp.get(c) || { len: 0, lines: [] }; v.len += l.len || 0; v.lines.push(l); comp.set(c, v); }
+  const main = [...comp.values()].sort((a, b) => b.len - a.len)[0];
+  for (const c of comp.values()) {
+    if (c === main || c.len < 60 || !c.lines.some(l => (l.rank || 0) >= 2)) continue;
+    const l = c.lines.sort((a, b) => b.len - a.len)[0], m = l.samples[l.samples.length >> 1], edge = c.lines.some(q => q.samples.some(p => nearEdge(p[0], p[1], 30)));
+    add('przejazd', edge ? 'i' : 'w', 'Droga odcięta od reszty sieci', `${lineName(l)} · ${Math.round(c.len)} m${edge ? ' (przy krawędzi mapy)' : ''}`, [m[0], m[2], m[1]]);
+  }
+}
+// wysokości tej samej linii/węzła z różnych dróg
+function junctions(lines, tol, cb) {
+  const byNode = new Map();
+  for (const l of lines) l.ids.forEach((id, i) => {
+    const p = l.pts[i]; let best = null, bd = 1e9; for (const s of l.samples) { const d = Math.hypot(s[0] - p[0], s[1] - p[1]); if (d < bd) { bd = d; best = s; } }
+    if (!best || bd > 0.5) return; let a = byNode.get(id); if (!a) byNode.set(id, a = []); a.push([best[2], l, p]);
+  });
+  for (const a of byNode.values()) {
+    if (a.length < 2) continue; let lo = a[0], hi = a[0]; for (const e of a) { if (e[0] < lo[0]) lo = e; if (e[0] > hi[0]) hi = e; }
+    if (hi[0] - lo[0] > tol) cb(lo[0], hi[0], [lo[2][0], hi[0], lo[2][1]], `${lineName(lo[1])} (${lo[1].kind}) ↔ ${lineName(hi[1])} (${hi[1].kind})`);
+  }
+}
+
+/* ---------- 2. widoczność ---------- */
+function checkView() {
+  for (const l of G.W.lines) {
+    if (!l.samples || l.samples.length < 2) continue;
+    const S = l.samples, nm = lineName(l), rank = l.rank || 0, surf = l.net !== 'foot' && l.net !== 'subway';
+    if (surf && l.kind !== 'tunnel' && !l.passage) {
+      for (const r of runs(S, p => G.W.inBuilding(p[0], p[1]) && p[2] > G.H(p[0], p[1]) - 1 ? 'bud' : null))
+        if (r.len >= 3) add('widok', l.net === 'road' ? (rank >= 2 ? 'w' : 'i') : 'w', l.net === 'road' ? 'Jezdnia ukryta w budynku' : 'Tor ukryty w budynku', `${nm} · ${Math.round(r.len)} m`, r.at, { heading: r.heading });
+      for (const r of runs(S, p => p[2] < G.H(p[0], p[1]) - 0.35 ? 'pod' : null))
+        add('widok', 'e', 'Nawierzchnia pod terenem (niewidoczna)', `${nm} (${l.kind}) · ${Math.round(r.len)} m`, r.at, { heading: r.heading });
+    }
+    if (l.kind === 'tunnel' && l.net !== 'foot') {
+      const hT = G.TUBE_H[l.net] || 5.6, L = l.len || 0;
+      let acc = 0;
+      const dist = S.map((p, k) => (k ? acc += Math.hypot(p[0] - S[k - 1][0], p[1] - S[k - 1][1]) : 0));
+      for (const r of runs(S, (p, k) => dist[k] > 25 && L - dist[k] > 25 && G.H(p[0], p[1]) - (p[2] + hT) < 0.2 ? 'nad' : null))
+        if (r.len >= 4) add('widok', 'w', 'Tunel wystaje nad teren', `${nm} · ${Math.round(r.len)} m`, r.at, { heading: r.heading });
+      // ściana budynku nad tunelem: dół ściany (teren przy krawędzi − 1,5 m) niżej niż strop tunelu
+      const wallIn = p => { const C = G.COLL_CELL, r = (l.wd || 5) / 2 + 0.5; for (let i = Math.floor((p[0] - r) / C); i <= Math.floor((p[0] + r) / C); i++) for (let j = Math.floor((p[1] - r) / C); j <= Math.floor((p[1] + r) / C); j++) for (const s of G.collGrid.get(i * 100003 + j) || []) if (s[7] === 'b' && segDist(p[0], p[1], s) < r && s[5] < p[2] + hT - 0.2) return true; return false; };
+      for (const r of runs(S, p => wallIn(p) ? 'bud' : null))
+        if (r.len >= 2) add('widok', 'w', 'Budynek wchodzi do tunelu', `${nm} · ${Math.round(r.len)} m`, r.at, { heading: r.heading });
+    }
+  }
+}
+
+/* ---------- 3. ciągłość torów ---------- */
+const GRADE = { rail: 0.04, subway: 0.05, tram: 0.09 };
+const MIN_R = { rail: 150, subway: 120, tram: 18 };
+function checkRails() {
+  for (const net of ['rail', 'subway', 'tram']) {
+    const L = G.W.lines.filter(l => l.net === net && l.samples && l.samples.length > 1); if (!L.length) continue;
+    const label = net === 'tram' ? 'tramwaj' : net === 'subway' ? 'metro' : 'kolej';
+    const deg = new Map(); for (const l of L) l.ids.forEach((id, i) => deg.set(id, (deg.get(id) || 0) + (i === 0 || i === l.ids.length - 1 ? 1 : 2)));
+    const seen = new Set();
+    for (const l of L) for (const end of [0, l.ids.length - 1]) {
+      const id = l.ids[end], p = l.pts[end]; if (deg.get(id) !== 1 || nearEdge(p[0], p[1])) continue;
+      // przerwa: blisko innej linii tej samej sieci, ale bez wspólnego węzła
+      const y = l.samples[end ? l.samples.length - 1 : 0][2];
+      let best = null, bd = 12;
+      for (const o of L) {
+        if (o === l) continue;
+        for (let i = 0; i < o.pts.length - 1; i++) {
+          const d = segDist(p[0], p[1], [o.pts[i][0], o.pts[i][1], o.pts[i + 1][0], o.pts[i + 1][1]]); if (d >= bd) continue;
+          const yo = o.samples.reduce((m, s) => Math.hypot(s[0] - p[0], s[1] - p[1]) < m[0] ? [Math.hypot(s[0] - p[0], s[1] - p[1]), s[2]] : m, [1e9, 0])[1];
+          if (Math.abs(yo - y) < 1.5) { bd = d; best = o; }   // inaczej to skrzyżowanie na różnych poziomach, nie przerwa
+        }
+      }
+      if (best) { const key = [l.ids[0], best.ids[0]].sort().join(); if (seen.has(key)) continue; seen.add(key); add('tory', 'e', `Przerwa w torze (${label}) ${bd.toFixed(1)} m`, `${lineName(l)} — tory blisko, ale niepołączone`, [p[0], y, p[1]]); }
+      else add('tory', 'w', `Ślepy koniec toru (${label})`, `${lineName(l)}${l.kind === 'tunnel' ? ' (w tunelu)' : ''}`, [p[0], y, p[1]]);
+    }
+    junctions(L, 0.3, (y0, y1, at, names) => add('tory', 'e', `Skok wysokości toru ${(y1 - y0).toFixed(1)} m (${label})`, names, at));
+    for (const l of L) {
+      const S = l.samples, lim = GRADE[net];
+      for (const r of runs(S, (p, k) => { if (k < 2) return null; const q = S[k - 2], d = Math.hypot(p[0] - q[0], p[1] - q[1]); return d > 3 && Math.abs(p[2] - q[2]) / d > lim ? 'stromo' : null; }))
+        if (r.len >= 8) add('tory', 'w', `Za stromo dla: ${label} (>${Math.round(lim * 100)}%)`, `${lineName(l)} (${l.kind}) · ${Math.round(r.len)} m`, r.at, { heading: r.heading });
+      // ostre załamania łamanej (ważne dla fizyki „koło na szynie” z aTrain)
+      let minR = 1e9, at = null;
+      for (let i = 1; i < l.pts.length - 1; i++) {
+        const a = l.pts[i - 1], b = l.pts[i], c = l.pts[i + 1], d1 = Math.hypot(b[0] - a[0], b[1] - a[1]), d2 = Math.hypot(c[0] - b[0], c[1] - b[1]);
+        const ang = Math.abs(Math.atan2((b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]), (b[0] - a[0]) * (c[0] - b[0]) + (b[1] - a[1]) * (c[1] - b[1])));
+        if (ang < 0.01) continue; const Rr = Math.min(d1, d2) / ang; if (Rr < minR) { minR = Rr; at = b; }
+      }
+      if (minR < MIN_R[net]) add('tory', 'i', `Ostre załamanie toru R≈${Math.round(minR)} m (${label})`, `${lineName(l)} — wymaga wygładzenia pod fizykę kół`, [at[0], G.H(at[0], at[1]), at[1]]);
+    }
+  }
+  const tr = G.trains || [];
+  add('tory', 'i', `Składy w ruchu: ${tr.length}`, ['tram', 'subway', 'rail'].map(k => `${k}: ${tr.filter(t => t.T === G.TRAIN_T[k]).length}`).join(', '), null);
+}
+
+/* ---------- 4. przejścia podziemne, tunele, bramy ---------- */
+function checkPassages() {
+  const foot = G.W.lines.filter(l => l.net === 'foot' && l.samples);
+  const tun = foot.filter(l => l.kind === 'tunnel'), freeNodes = new Set();
+  for (const l of foot) if (l.kind !== 'tunnel') l.ids.forEach(id => freeNodes.add(id));
+  const par = new Map(), find = a => { while (par.get(a) !== a) { par.set(a, par.get(par.get(a))); a = par.get(a); } return a; };
+  for (const l of tun) for (const id of l.ids) if (!par.has(id)) par.set(id, id);
+  for (const l of tun) for (let i = 1; i < l.ids.length; i++) { const a = find(l.ids[0]), b = find(l.ids[i]); if (a !== b) par.set(a, b); }
+  const comp = new Map(); for (const l of tun) { const c = find(l.ids[0]); const v = comp.get(c) || { lines: [], entries: 0, len: 0 }; v.lines.push(l); v.len += l.len || 0; v.entries += l.ids.filter(id => freeNodes.has(id)).length; comp.set(c, v); }
+  let ok = 0;
+  for (const c of comp.values()) {
+    if (c.entries) { ok++; continue; }
+    const l = c.lines[0], m = l.samples[l.samples.length >> 1];
+    if (!nearEdge(m[0], m[1]) && inArea(m)) add('przejscia', 'i', 'Przejście podziemne bez wejścia', `${lineName(l)} · ${Math.round(c.len)} m (brak połączenia z chodnikiem)`, [m[0], m[2], m[1]]);
+  }
+  add('przejscia', 'i', `Przejścia podziemne: ${comp.size} zespołów, z wejściem: ${ok}`, '', null);
+  for (const l of G.W.lines.filter(l => l.passage && l.samples)) {
+    const m = l.samples[l.samples.length >> 1]; if (!inArea(m)) continue;
+    const inside = l.samples.some(p => (G.W.inAnyBuilding || G.W.inBuilding)(p[0], p[1]));
+    if (!inside) add('przejscia', 'i', 'Przejazd bramny poza budynkiem', `${lineName(l)} — w OSM jest brama, a budynku nie ma`, [m[0], m[2], m[1]]);
+  }
+  for (const l of G.W.lines.filter(l => l.kind === 'tunnel' && l.net === 'road' && l.samples)) {
+    const S = l.samples, hT = G.TUBE_H.road, m = S[S.length >> 1];
+    const minCover = Math.min(...S.map(p => G.H(p[0], p[1]) - p[2]));
+    if (minCover < hT - 0.5 && (l.rank || 0) >= 2 && inArea(m)) add('przejscia', 'i', `Tunel drogowy płytko: ${minCover.toFixed(1)} m pod terenem`, lineName(l), [m[0], m[2], m[1]]);
+  }
+}
+
+/* ---------- 5. modele: doktor modeli z GameLaboratory ---------- */
+async function checkModels() {
+  let MD;
+  try { MD = await import(MODEL_DOCTOR); }
+  catch (e) { add('modele', 'w', 'Doktor modeli niedostępny', 'Nie udało się wczytać ' + MODEL_DOCTOR + ' (' + e.message + ')', null); return; }
+  const models = [['Auto gracza', () => G.makeCar().g], ['Tramwaj (człon)', () => G.makeTrainCar(G.TRAIN_T.tram, true)], ['Metro (wagon)', () => G.makeTrainCar(G.TRAIN_T.subway, true)], ['Pociąg (wagon)', () => G.makeTrainCar(G.TRAIN_T.rail, true)]];
+  const map = { error: 'e', warning: 'w', info: 'i' };
+  for (const [name, build] of models) {
+    const root = build(); root.updateMatrixWorld(true);
+    let res; try { res = MD.examine(root, {}); } catch (e) { add('modele', 'w', `${name}: doktor przerwał`, e.message, null); continue; }
+    if (!res.findings.length) add('modele', 'i', `${name}: bez uwag`, `${res.stats.meshes} części, ${res.stats.triangles} trójkątów`, null);
+    for (const f of res.findings) add('modele', map[f.severity] || 'i', `${name}: ${f.check}`, `${f.detail} — ${f.parts.slice(0, 3).join(', ')}`, null, { about: MD.ABOUT[f.check] });
+  }
+}
+
+/* ---------- uruchomienie i UI ---------- */
+async function examine() {
+  F = []; const t0 = performance.now();
+  status('Badam przejezdność…'); await tick(); checkDrive();
+  status('Badam widoczność…'); await tick(); checkView();
+  status('Badam tory…'); await tick(); checkRails();
+  status('Badam przejścia…'); await tick(); checkPassages();
+  status('Doktor modeli…'); await tick(); await checkModels();
+  const order = { e: 0, w: 1, i: 2 };
+  F.sort((a, b) => Object.keys(CHECKS).indexOf(a.check) - Object.keys(CHECKS).indexOf(b.check) || order[a.sev] - order[b.sev] || a.title.localeCompare(b.title, 'pl'));
+  window.doktorReport = { version: G.version, date: new Date().toISOString(), stats: G.stats, findings: F.map(({ check, sev, title, detail, at }) => ({ check, sev: SEV[sev], title, detail, at: at && at.map(v => Math.round(v * 10) / 10) })) };
+  render();
+  const c = s => F.filter(f => f.sev === s).length;
+  status(`Gotowe w ${((performance.now() - t0) / 1000).toFixed(1)} s · błędy: ${c('e')}, ostrzeżenia: ${c('w')}, info: ${c('i')}`);
+}
+const tick = () => new Promise(r => setTimeout(r, 20));
+function render() {
+  const sum = $('sum'); sum.innerHTML = '';
+  for (const [k, label] of Object.entries(CHECKS)) {
+    const fs = F.filter(f => f.check === k), e = fs.filter(f => f.sev === 'e').length, w = fs.filter(f => f.sev === 'w').length;
+    const ch = document.createElement('span'); ch.className = 'chip' + (off.has(k) ? ' off' : '');
+    ch.innerHTML = `${label} <b class="e">${e}</b>/<b class="w">${w}</b>/<b class="i">${fs.length - e - w}</b>`;
+    ch.onclick = () => { off.has(k) ? off.delete(k) : off.add(k); render(); }; sum.appendChild(ch);
+  }
+  const list = $('list'); list.innerHTML = '';
+  let last = null;
+  F.forEach((f, idx) => {
+    if (off.has(f.check)) return;
+    if (f.check !== last) { const g = document.createElement('div'); g.className = 'grp'; g.textContent = CHECKS[f.check]; list.appendChild(g); last = f.check; }
+    const d = document.createElement('div'); d.className = 'f' + (sel === idx ? ' sel' : '');
+    d.innerHTML = `<div class="t"><span class="sev ${f.sev}"></span>${f.title}</div><div class="d">${f.detail || ''}${f.about ? ' · ' + f.about : ''}</div>`;
+    d.title = SEV[f.sev] + (f.at ? ` · x ${f.at[0].toFixed(0)}, z ${f.at[2].toFixed(0)}` : '');
+    d.onclick = () => { sel = idx; show(f); render(); };
+    list.appendChild(d);
+  });
+}
+function show(f) {
+  if (!f.at) return;
+  const T = G.THREE, [x, y, z] = f.at;
+  if (!marker) {
+    marker = new T.Group();
+    const beam = new T.Mesh(new T.CylinderGeometry(0.6, 0.6, 80, 10), new T.MeshBasicMaterial({ color: '#ff3b30', transparent: true, opacity: 0.55, depthWrite: false }));
+    beam.position.y = 40; marker.add(beam);
+    const ring = new T.Mesh(new T.TorusGeometry(4, 0.35, 8, 32), new T.MeshBasicMaterial({ color: '#ff3b30' })); ring.rotation.x = Math.PI / 2; ring.position.y = 0.4; marker.add(ring);
+    G.scene.add(marker);
+  }
+  marker.visible = true; marker.position.set(x, y, z);
+  const c = G.car; c.x = x; c.z = z; c.vx = c.vz = c.vy = 0; c.y = G.surfaceAt(x, z, y + 0.5); if (f.heading != null) c.th = f.heading;
+  G.setCamMode(1); G.updateCamera(0, true);
+  try { frame.contentWindow.focus(); } catch (e) { }
+}
+$('bAgain').onclick = examine;
+$('bClear').onclick = () => { if (marker) marker.visible = false; sel = null; render(); };
+$('bCopy').onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(window.doktorReport, null, 1)); status('Raport skopiowany.'); } catch (e) { status('Nie udało się skopiować: ' + e.message); } };
+frame.addEventListener('load', () => {
+  const w = frame.contentWindow;
+  const go = () => { G = w.__W3D; try { w.document.getElementById('help').style.display = 'none'; } catch (e) { } $('ver').textContent = `Warszawa 3D v${G.version} · teren: ${G.stats.terrain} · budynki: ${G.stats.buildings}`; examine(); };
+  if (w.__W3D) go(); else w.addEventListener('w3d-ready', go, { once: true });
+  status('Gra się ładuje (dane OSM, teren)…');
+});
+</script>
+</body>
+</html>
