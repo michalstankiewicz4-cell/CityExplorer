@@ -240,8 +240,37 @@ async function loadTerrain() {
   }
   return h;
 }
-function processTerrain(raw) {
+// maska budynków na siatce terenu (dane wysokości to model pokrycia — dachy trzeba wyciąć)
+function buildingMask(D) {
+  const N = SEG + 1, cv = document.createElement('canvas'); cv.width = cv.height = N;
+  const g = cv.getContext('2d', { willReadFrequently: true }); g.fillStyle = g.strokeStyle = '#fff'; g.lineJoin = 'round';
+  g.lineWidth = 2.5;   // ~20 m poszerzenia
+  const sc = SEG / (2 * E), P = id => { const p = D.nodes[id]; if (!p) return null; const [x, z] = toXZ(p[0], p[1]); return [(x + E) * sc, (z + E) * sc]; };
+  const relW = new Set(); for (const r of D.rels) if (r.t && (r.t.building || r.t['building:part'])) for (const m of r.m) relW.add(m[0]);
+  for (const w of D.ways) {
+    if (!((w.t && (w.t.building || w.t['building:part'])) || relW.has(w.id))) continue;
+    if (w.t && (w.t.building === 'roof' || num(w.t.layer) < 0)) continue;
+    g.beginPath(); let k = 0; for (const id of w.n) { const p = P(id); if (!p) continue; k++ ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]); }
+    g.closePath(); g.fill(); g.stroke();
+  }
+  const d = g.getImageData(0, 0, N, N).data, m = new Uint8Array(N * N);
+  for (let i = 0; i < N * N; i++) m[i] = d[i * 4] > 60 ? 1 : 0;
+  return m;
+}
+function processTerrain(raw, mask) {
   const N = SEG + 1; let h = Float32Array.from(raw);
+  if (mask) {   // dopełnianie dziur z sąsiednich znanych komórek (warstwa po warstwie)
+    const known = Uint8Array.from(mask, v => 1 - v); let left = known.reduce((a, b) => a + (1 - b), 0);
+    if (left < N * N * 0.9) for (let pass = 0; pass < 200 && left > 0; pass++) {
+      const nh = Float32Array.from(h), nk = Uint8Array.from(known);
+      for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+        const k = j * N + i; if (known[k]) continue; let s = 0, c = 0;
+        for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]]) { const ii = i + di, jj = j + dj; if (ii < 0 || jj < 0 || ii >= N || jj >= N) continue; const q = jj * N + ii; if (known[q]) { s += h[q]; c++; } }
+        if (c) { nh[k] = s / c; nk[k] = 1; left--; }
+      }
+      h = nh; known.set(nk);
+    }
+  }
   const pass = (src, r, op) => {   // separowalny filtr: min / max / średnia
     const tmp = new Float32Array(N * N), out = new Float32Array(N * N);
     for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
@@ -257,7 +286,7 @@ function processTerrain(raw) {
     return out;
   };
   // otwarcie morfologiczne usuwa "garby" po budynkach z modelu pokrycia, potem wygładzenie
-  h = pass(h, 3, 'min'); h = pass(h, 3, 'max'); h = pass(h, 2, 'avg'); h = pass(h, 2, 'avg');
+  h = pass(h, 2, 'min'); h = pass(h, 2, 'max'); h = pass(h, 2, 'avg'); h = pass(h, 2, 'avg');
   const c = h[(N >> 1) * N + (N >> 1)];
   let edgeSum = 0, edgeN = 0;
   for (let i = 0; i < N; i++) { edgeSum += h[i] + h[(N - 1) * N + i] + h[i * N] + h[i * N + N - 1]; edgeN += 4; }
@@ -1019,7 +1048,7 @@ async function main() {
       try { status('Pobieram wysokości terenu…', 0.5); TERR_RAW = await loadTerrain(); await idb.set(TERR_KEY, TERR_RAW); }
       catch (e) { console.warn('teren', e); status('Brak danych wysokości — teren płaski', 0.6); TERR_RAW = null; }
     }
-    if (TERR_RAW) { const t = processTerrain(TERR_RAW); HF = t.h; W.terrBase = t.base; }
+    if (TERR_RAW) { const t = processTerrain(TERR_RAW, buildingMask(DATA)); HF = t.h; W.terrBase = t.base; }
     await frame();
     const st = buildWorld(DATA);
     console.log('[W3D] stats', JSON.stringify(st));
