@@ -1161,10 +1161,13 @@ function buildWorld(D) {
           if (tb - ta < 1e-4 || wallTop - yb < 0.05) continue;
           const ax = a[0] + dx * ta, az = a[1] + dz * ta, bx = a[0] + dx * tb, bz = a[1] + dz * tb;
           const ua = u0 + (u1 - u0) * ta, ub = u0 + (u1 - u0) * tb, vb = (yb - G) / 12.8;
-          const A0 = [ax, yb, az], B0 = [bx, yb, bz], B1 = [bx, wallTop, bz], A1 = [ax, wallTop, az];
+          // na skarpie dół ściany idzie za terenem (nie schodzi do najniższego punktu działki, np. do tunelu)
+          const ya = yb === y0 && minH <= 0 ? Math.min(wallTop - 0.5, Math.max(yb, H(ax, az) - 1.5)) : yb, yb2 = yb === y0 && minH <= 0 ? Math.min(wallTop - 0.5, Math.max(yb, H(bx, bz) - 1.5)) : yb;
+          const va = (ya - G) / 12.8, vb2 = (yb2 - G) / 12.8;
+          const A0 = [ax, ya, az], B0 = [bx, yb2, bz], B1 = [bx, wallTop, bz], A1 = [ax, wallTop, az];
           if (WB) {
-            WB.v(...A0, nx, 0, nz, col, ua, vb); WB.v(...B1, nx, 0, nz, col, ub, v1); WB.v(...B0, nx, 0, nz, col, ub, vb);
-            WB.v(...A0, nx, 0, nz, col, ua, vb); WB.v(...A1, nx, 0, nz, col, ua, v1); WB.v(...B1, nx, 0, nz, col, ub, v1);
+            WB.v(...A0, nx, 0, nz, col, ua, va); WB.v(...B1, nx, 0, nz, col, ub, v1); WB.v(...B0, nx, 0, nz, col, ub, vb2);
+            WB.v(...A0, nx, 0, nz, col, ua, va); WB.v(...A1, nx, 0, nz, col, ua, v1); WB.v(...B1, nx, 0, nz, col, ub, v1);
           } else {
             T.v(...A0, nx, 0, nz, col); T.v(...B1, nx, 0, nz, col); T.v(...B0, nx, 0, nz, col);
             T.v(...A0, nx, 0, nz, col); T.v(...A1, nx, 0, nz, col); T.v(...B1, nx, 0, nz, col);
