@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0 — 2026-11-05
+- **Tryb Samolot**: Supermarine Spitfire Mk I (1940, AirKit z GameLaboratory) na progu drogi startowej 29 **lotniska Chopina** — osobna mapa `?map=okecie` (promień 2 km; nie całe miasto). Fizyka lotu z GameLaboratory (zachowanie „lot w atmosferze”): nośna z kąta natarcia i przeciągnięcie, opór, ciąg śmigła z mocy, momenty sterów i stateczności, koła na sprężynach z hamulcami, kółko ogonowe; start, lot i lądowanie wynikają z sił. Na rozbiegu samolot zbacza — kontruje się sterem kierunku. Zderzenie z ziemią brzuchem lub ze ścianą budynku — rozbity (R od nowa).
+- Sterowanie samolotu: W/S drążek, A/D lotki (na ziemi także kółko ogonowe), Q/F ster kierunku, Shift/Ctrl gaz, Spacja hamulce, G podwozie, B klapy, E owiewka; wszystko do zmiany w opcjach. Kamera C: za samolotem, dalej, z kabiny (horyzont przechyla się z samolotem). HUD: prędkość przyrządowa, wysokość nad ziemią, gaz, klapy, podwozie, ostrzeżenie o przeciągnięciu.
+- Mapa: lotniska z OSM (`aeroway`) — trawa lotniska, płyty, drogi kołowania z żółtą osią, drogi startowe z oznakowaniem (krawędzie, oś, „klawisze fortepianu” na progach, numery, strefy przyziemienia). Deploy pobiera `okecie.json`.
+- Ekran startowy: karta „Samolot” czynna (z centrum przenosi na mapę Okęcia); w planie (wkrótce): śmigłowiec W-3 Sokół, Boeing, odrzutowy F-15.
+- README: sterowanie samolotu, `?map=okecie`, sekcja **Plan**.
+
 ## 0.7.1 — 2026-11-04
 - Pociąg jedzie linią **WKD**: start na stacji Śródmieście WKD (pod ziemią), czołem w stronę Pruszkowa — tunelem, za portalem wykopem w górę (tor się wznosi, teren przycięty pod tor) do końca mapy (dalsza trasa później); szyny na tej linii.
 - Mapa: tory w wykopie (OSM layer −1 bez tunelu) i na podziemnych stacjach (level < 0) nie znikają już z mapy — wykop i zjazd od portalu robią konstrukcje; stacja podziemna to tunel.

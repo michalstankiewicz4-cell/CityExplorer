@@ -5,7 +5,7 @@ Spacer i jazda (FSO Polonez, czołg M1A2 Abrams, przegubowy Solaris Urbino 18) p
 **Graj:** https://michalstankiewicz4-cell.github.io/CityExplorer/
 
 ## Tryby
-Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy zaparkowanych pojazdach: Polonezie, czołgu i autobusie; **szynowy** (czynny) — tramwaj PESA Swing 120Na albo pociąg (TrainKit) na torach z OSM: W napęd, S hamowanie / wstecz, Spacja hamowanie nagłe, E drzwi; **łódź**, **samolot** — wkrótce.
+Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy zaparkowanych pojazdach: Polonezie, czołgu i autobusie; **szynowy** (czynny) — tramwaj PESA Swing 120Na albo pociąg (TrainKit) na torach z OSM: W napęd, S hamowanie / wstecz, Spacja hamowanie nagłe, E drzwi; **samolot** (czynny) — Supermarine Spitfire Mk I (1940) na progu drogi startowej Okęcia (osobna mapa `?map=okecie`), fizyka lotu z GameLaboratory (zachowanie „lot w atmosferze”: nośna, przeciągnięcie, ciąg śmigła, momenty sterów, podwozie na sprężynach); **łódź** — wkrótce.
 
 ## Sterowanie
 | Klawisz | Akcja |
@@ -25,16 +25,25 @@ Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy 
 | N | noc / dzień |
 | P | filtr pixel-art |
 | H | ukryj pomoc |
+| **Samolot:** W / S | drążek: pchnij (nos w dół) / ciągnij (nos w górę) |
+| A / D | lotki (na ziemi także kółko ogonowe) |
+| Q / F | ster kierunku |
+| Shift / Ctrl | gaz więcej / mniej |
+| Spacja | hamulce kół |
+| G / B | podwozie / klapy |
+| E | owiewka kabiny |
+| R | od nowa na progu drogi startowej |
 | Mysz | LPM + przeciągnij = rozglądanie dookoła i w górę/dół, kółko = zoom |
 
 ## Parametry URL
 `?mode=foot` – bez ekranu wyboru trybu
 `?r=1500` – promień obszaru w metrach (300–2500, domyślnie 1000)
 `?lat=52.2297&lon=21.0122` – inny środek mapy (dane pobiorą się z OSM w przeglądarce)
+`?map=okecie` – mapa lotniska Chopina (Okęcie, promień 2000 m; plik `okecie.json` z deployu); `?map=okecie&mode=air` — od razu w samolocie
 
 ## Skąd dane
 Kolejność ładowania:
-1. `warszawa-centrum.json` obok strony – generowany przy każdym deployu przez GitHub Actions (`tools/fetch-osm.mjs`), tylko dla domyślnego środka i promienia,
+1. `warszawa-centrum.json` (oraz `warszawa-r2000.json` i `okecie.json`) obok strony – generowane przy każdym deployu przez GitHub Actions (`tools/fetch-osm.mjs`; Okęcie z drogami startowymi, kołowania i płytami — `aeroway`),
 2. pamięć przeglądarki (IndexedDB) – po pierwszym pobraniu,
 3. Overpass API, a gdy nie odpowiada – API OpenStreetMap (kafle).
 
@@ -48,9 +57,15 @@ OSM podaje tylko poziom (`layer`), więc wysokości są liczone:
 Przycisk „Zapisz dane (JSON)” zapisuje komplet (OSM + teren) – taki plik wrzucony do repo jako `warszawa-centrum.json` też zadziała.
 
 ## Technika
-Jeden plik `index.html`. Three.js r186, auto (RoadKit: FSO Polonez) i człowiek (LifeKit z laboratorium ludzi) ładują się z [GameLaboratory](https://michalstankiewicz4-cell.github.io/GameLaboratory/) — jedna kopia Three.js dla gry i modeli. Budynki są łączone w siatki po kwadratach 220 m. Ulice, place i trawniki są malowane na teksturze gruntu nałożonej na teren. Drzewa to instancje. Kolizje liczone są z obrysami budynków i pniami drzew. Wysokości: `height` / `building:levels` / `min_height` / `roof:shape` (pyramidal, dome, hipped). Gdy budynek ma części (`building:part`), rysowane są tylko części.
+Jeden plik `index.html`. Three.js r186, pojazdy (RoadKit, TramKit, TrainKit, AirKit: Spitfire Mk I) i fizyka (koło na szynie, lot w atmosferze) i człowiek (LifeKit z laboratorium ludzi) ładują się z [GameLaboratory](https://michalstankiewicz4-cell.github.io/GameLaboratory/) — jedna kopia Three.js dla gry i modeli. Budynki są łączone w siatki po kwadratach 220 m. Ulice, place i trawniki są malowane na teksturze gruntu nałożonej na teren. Drzewa to instancje. Kolizje liczone są z obrysami budynków i pniami drzew. Wysokości: `height` / `building:levels` / `min_height` / `roof:shape` (pyramidal, dome, hipped). Gdy budynek ma części (`building:part`), rysowane są tylko części.
 
 Dane © OpenStreetMap contributors (ODbL).
+
+## Plan
+- Łódź: Wisła i ORP Błyskawica z wodą z laboratorium wody.
+- Lotnictwo: śmigłowiec W-3 Sokół; Boeing (samolot pasażerski); F-15 (odrzutowy); wąski korytarz mapy od centrum do Okęcia.
+- Szynowe: metro — na początek linia M1; trolejbus linii 51 (1983–1995, Dworzec Południowy — Puławska — Piaseczno); pozostałe linie tramwajowe i kolejowe; WKD do Pruszkowa (cała trasa).
+- Schody / rampy przy wejściach do podziemi, które doktor mapy zgłasza jako niepodłączone (propozycja).
 
 ## Doktor mapy
 `doktor.html` (https://michalstankiewicz4-cell.github.io/CityExplorer/doktor.html) uruchamia grę w ramce i bada zbudowany świat:

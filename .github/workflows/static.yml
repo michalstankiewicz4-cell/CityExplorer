@@ -45,6 +45,10 @@ jobs:
         continue-on-error: true
         timeout-minutes: 15
         run: node tools/fetch-osm.mjs 52.23175 21.00586 2000
+      - name: Pobierz dane OSM lotniska Okęcie (okecie.json, ?map=okecie)
+        continue-on-error: true
+        timeout-minutes: 15
+        run: node tools/fetch-osm.mjs 52.1657 20.9671 2000 okecie.json
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

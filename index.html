@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.7.1</title>
+<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.8.0</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Warszawa 3D, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.7.1"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.8.0"}
 </script>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#0d1014;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#e8e6e1}
@@ -125,9 +125,9 @@
       <button data-mode="foot" disabled><i>Tryb 1</i><b>Pieszo i pojazdem</b><span>Spacer po mieście; przy starcie czekają FSO Polonez, M1A2 Abrams i przegubowy Solaris — wsiadasz i wysiadasz klawiszem E.</span><div class="thumbs" data-for="foot"><img src="img/pieszy.jpg" alt="Pieszy" title="Pieszy"><img src="img/polonez.jpg" alt="FSO Polonez" title="FSO Polonez 1500"><img src="img/abrams.jpg" alt="M1A2 Abrams" title="M1A2 Abrams"><img src="img/urbino18.jpg" alt="Solaris Urbino 18" title="Solaris Urbino 18 electric"><span class="soonT">trolejbus 51<br>wkrótce</span></div><div class="mload"><em></em><u>Wczytuję modele…</u></div></button>
       <button data-mode="rail" disabled><i>Tryb 2</i><b>Szynowy</b><span>Tramwaj PESA Swing na fizyce koło–szyna z aTrain albo nasz pociąg na linii WKD w stronę Pruszkowa (na razie do końca mapy) — kliknij, którym.</span><div class="thumbs" data-for="rail"><img src="img/swing.jpg" alt="Tramwaj PESA Swing" title="Tramwaj PESA Swing 120Na" data-veh="tram"><img src="img/pociag.jpg" alt="Pociąg WKD" title="WKD w stronę Pruszkowa: nasz pociąg (lokomotywa i dwa wagony)" data-veh="train"><span class="soonT">metro<br>wkrótce</span></div><div class="mload" id="mload2" style="display:none"><em></em><u>Wczytuję skład…</u></div></button>
       <button data-mode="boat" disabled><i>Wkrótce</i><b>Łódź</b><span>ORP Błyskawica na Wiśle.</span><div class="thumbs soon">model w przygotowaniu</div></button>
-      <button data-mode="air" disabled><i>Wkrótce</i><b>Samolot i śmigłowiec</b><span>Spitfire i W-3 Sokół z Okęcia.</span><div class="thumbs soon">modele w przygotowaniu</div></button>
+      <button data-mode="air" disabled><i>Tryb 3</i><b>Samolot</b><span>Supermarine Spitfire Mk I (1940) na progu drogi startowej Okęcia — prawdziwa fizyka lotu: nośna, przeciągnięcie, ciąg śmigła, podwozie na sprężynach.</span><div class="thumbs" data-for="air"><img src="img/spitfire.jpg" alt="Supermarine Spitfire Mk I" title="Supermarine Spitfire Mk I"><span class="soonT">W-3 Sokół, Boeing, F-15<br>wkrótce</span></div><div class="mload" id="mload3" style="display:none"><em></em><u>Wczytuję samolot…</u></div></button>
     </div>
-    <div class="foot">Wkrótce: trolejbus linii 51 (1983–1995, Dworzec Południowy — Puławska — Piaseczno), metro M1.<br>Sterowanie (pieszo i pojazdem): W A S D · Shift — bieg / turbo · E — wsiądź / wysiądź · C — kamera · M — mapa · Esc — opcje</div>
+    <div class="foot">Wkrótce: trolejbus linii 51 (1983–1995, Dworzec Południowy — Puławska — Piaseczno), metro M1, śmigłowiec W-3 Sokół, Boeing, odrzutowy F-15.<br>Sterowanie (pieszo i pojazdem): W A S D · Shift — bieg / turbo · E — wsiądź / wysiądź · C — kamera · M — mapa · Esc — opcje</div>
   </div>
 </div>
 <div id="prompt"></div>
@@ -195,11 +195,14 @@ import * as THREE from 'three';
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
-const APP_VERSION = '0.7.1';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+const APP_VERSION = '0.8.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
 document.getElementById('ver').textContent = 'v' + APP_VERSION; document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
-const CENTER = { lat: +(QS.get('lat') || 52.23175), lon: +(QS.get('lon') || 21.00586) };
-const R = Math.min(2500, Math.max(300, +(QS.get('r') || 1000)));
+// gotowe mapy (?map=…): okecie — lotnisko Chopina (tryb Samolot); bez parametru — Śródmieście
+const MAPS = { okecie: { lat: 52.1657, lon: 20.9671, r: 2000, file: 'okecie.json', name: 'Lotnisko Chopina (Okęcie)' } };
+const MAP = MAPS[QS.get('map')] || null;
+const CENTER = { lat: +(QS.get('lat') || (MAP && MAP.lat) || 52.23175), lon: +(QS.get('lon') || (MAP && MAP.lon) || 21.00586) };
+const R = Math.min(2500, Math.max(300, +(QS.get('r') || (MAP && MAP.r) || 1000)));
 const E = R + 150;                       // połowa boku świata (m)
 let SEG = Math.min(400, Math.round(2 * E / 8));   // siatka terenu ~8 m (z NMT: ~4 m)
 const KX = 111320 * Math.cos(CENTER.lat * Math.PI / 180), KY = 110574;
@@ -234,17 +237,17 @@ const idb = {
    ========================================================================= */
 const TAGS = new Set(['building', 'building:part', 'height', 'min_height', 'building:levels', 'building:min_level', 'roof:shape', 'roof:height', 'roof:levels',
   'building:colour', 'roof:colour', 'highway', 'lanes', 'width', 'railway', 'natural', 'leisure', 'landuse', 'water', 'waterway', 'amenity', 'parking', 'area',
-  'area:highway', 'layer', 'bridge', 'tunnel', 'name', 'footway', 'crossing', 'oneway', 'service', 'place', 'location', 'covered', 'type', 'indoor', 'level']);
+  'area:highway', 'layer', 'bridge', 'tunnel', 'name', 'footway', 'crossing', 'oneway', 'service', 'place', 'location', 'covered', 'type', 'indoor', 'level', 'aeroway', 'ref', 'surface']);
 const pick = t => { if (!t) return undefined; const o = {}; let k = 0; for (const a in t) if (TAGS.has(a)) { o[a] = t[a]; k++; } return k ? o : undefined; };
 function relevantWay(t) {
   if (!t) return false;
-  return !!(t.building || t['building:part'] || t.highway || t['area:highway'] || t.railway || t.natural || t.leisure || t.landuse || t.waterway || t.amenity === 'parking' || t.place === 'square');
+  return !!(t.building || t['building:part'] || t.highway || t['area:highway'] || t.railway || t.natural || t.leisure || t.landuse || t.waterway || t.amenity === 'parking' || t.place === 'square' || t.aeroway);
 }
 function relevantRel(t) {
   if (!t || t.type !== 'multipolygon') return false;
   return !!(t.building || t['building:part'] || /^(park|garden|pitch|playground)$/.test(t.leisure || '') ||
     /^(forest|grass|meadow|recreation_ground|village_green|cemetery|construction|railway)$/.test(t.landuse || '') ||
-    /^(wood|water|scrub|grassland)$/.test(t.natural || '') || t.amenity === 'parking' || t['area:highway'] || t.place === 'square' || t.highway === 'pedestrian');
+    /^(wood|water|scrub|grassland)$/.test(t.natural || '') || t.amenity === 'parking' || t['area:highway'] || t.place === 'square' || t.highway === 'pedestrian' || /^(aerodrome|apron|runway|taxiway)$/.test(t.aeroway || ''));
 }
 class OsmStore {
   constructor() { this.nodes = new Map(); this.ways = new Map(); this.rels = new Map(); }
@@ -272,7 +275,7 @@ class OsmStore {
 
 async function fetchOverpass() {
   const b = `${BBOX.s.toFixed(6)},${BBOX.w.toFixed(6)},${BBOX.n.toFixed(6)},${BBOX.e.toFixed(6)}`;
-  const q = `[out:json][timeout:120][bbox:${b}];(nwr["building"];nwr["building:part"];way["highway"];way["area:highway"];way["railway"];node["natural"="tree"];way["natural"];rel["natural"~"^(wood|scrub)$"];way["leisure"];rel["leisure"~"^(park|garden)$"];way["landuse"];rel["landuse"~"^(forest|grass|recreation_ground|cemetery)$"];way["waterway"];way["amenity"="parking"];rel["amenity"="parking"];way["place"="square"];rel["place"="square"];rel["highway"="pedestrian"];);(._;>;);out body qt;`;
+  const q = `[out:json][timeout:120][bbox:${b}];(nwr["building"];nwr["building:part"];way["highway"];way["area:highway"];way["railway"];node["natural"="tree"];way["natural"];rel["natural"~"^(wood|scrub)$"];way["leisure"];rel["leisure"~"^(park|garden)$"];way["landuse"];rel["landuse"~"^(forest|grass|recreation_ground|cemetery)$"];way["waterway"];way["amenity"="parking"];rel["amenity"="parking"];way["place"="square"];rel["place"="square"];rel["highway"="pedestrian"];way["aeroway"];rel["aeroway"];);(._;>;);out body qt;`;
   for (const url of OVERPASS) {
     try {
       status(`Pobieram dane OSM (Overpass: ${new URL(url).host})…`, 0.08);
@@ -322,7 +325,7 @@ async function fetchOsmApi() {
 async function loadLocalFile() {
   if (location.protocol === 'file:') return null;
   try {
-    const r = await fetchT(R === 1000 ? 'warszawa-centrum.json' : `warszawa-r${R}.json`, {}, 40000); if (!r.ok) return null;
+    const r = await fetchT(MAP ? MAP.file : R === 1000 ? 'warszawa-centrum.json' : `warszawa-r${R}.json`, {}, 40000); if (!r.ok) return null;
     const j = await r.json();
     if (!j.meta || Math.abs(j.meta.lat - CENTER.lat) > 1e-4 || Math.abs(j.meta.lon - CENTER.lon) > 1e-4 || j.meta.R !== R) return null;
     return j;
@@ -1129,6 +1132,9 @@ function buildWorld(D) {
     if (lu === 'cemetery') return [2, '#6b8a5a'];
     if (lu === 'construction' || lu === 'brownfield') return [2, '#8f7f63'];
     if (lu === 'railway') return [1, '#7d776d'];
+    if (t.aeroway === 'aerodrome') return [0, '#7f9c5b'];             // trawa lotniska pod wszystkim
+    if (t.aeroway === 'apron') return [6, '#a3a29b'];                 // płyta postojowa (beton)
+    if (t.aeroway === 'runway' || t.aeroway === 'taxiway') return [8, '#8d8c86'];
     if (t.amenity === 'parking' && !/^(underground|multi-storey|rooftop)$/.test(t.parking || '')) return [6, '#55575a'];
     if (t['area:highway'] || (t.highway === 'pedestrian' && (t.area === 'yes' || 1)) || t.place === 'square') {
       const ah = t['area:highway'] || t.highway;
@@ -1200,6 +1206,32 @@ function buildWorld(D) {
   for (const l of gl) if (l.rail && l.net !== 'subway') {
     strokePts(l.pts, l.rail === 'tram' ? 2.6 : 3.4, l.rail === 'tram' ? 'rgba(70,70,70,0.45)' : '#6d675e');
     strokePts(l.pts, 1.9, '#2b2b2b'); strokePts(l.pts, 1.2, l.rail === 'tram' ? '#55575a' : '#6d675e');
+  }
+
+  // lotnisko: drogi startowe (oznakowanie ICAO: krawędzie, oś, progi, numery) i drogi kołowania (żółta oś)
+  W.runways = [];
+  const AW = [];
+  for (const w of D.ways) { const t = w.t; if (!t || !/^(runway|taxiway)$/.test(t.aeroway || '') || (closed(w) && t.area === 'yes')) continue; const pts = wayXZ(w); if (pts.length >= 2) AW.push({ t, pts, wd: num(t.width) > 3 && num(t.width) < 100 ? num(t.width) : t.aeroway === 'runway' ? 45 : 18 }); }
+  for (const a of AW) if (a.t.aeroway === 'taxiway') { strokePts(a.pts, a.wd + 3, '#8a8984'); }
+  for (const a of AW) if (a.t.aeroway === 'taxiway') strokePts(a.pts, 0.3, '#e2b631');
+  for (const a of AW) if (a.t.aeroway === 'runway') {
+    const p0 = a.pts[0], p1 = a.pts[a.pts.length - 1], L = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]); if (L < 200) continue;
+    const ux = (p1[0] - p0[0]) / L, uz = (p1[1] - p0[1]) / L, nx = -uz, nz = ux, wd = a.wd;
+    W.runways.push({ p0, p1, L, wd, ref: a.t.ref || '' });
+    strokePts([p0, p1], wd + 8, '#7e8a62'); strokePts([p0, p1], wd, '#5d5e5b');
+    for (const sgn of [-1, 1]) strokePts([[p0[0] + nx * sgn * (wd / 2 - 1), p0[1] + nz * sgn * (wd / 2 - 1)], [p1[0] + nx * sgn * (wd / 2 - 1), p1[1] + nz * sgn * (wd / 2 - 1)]], 0.9, '#efeee8');
+    const refs = (a.t.ref || '').split('/');
+    for (const [end, dir, num_] of [[p0, 1, refs[0]], [p1, -1, refs[1] || '']]) {
+      const at = (d, s) => [end[0] + ux * dir * d + nx * s, end[1] + uz * dir * d + nz * s];
+      for (let k = 0, n = Math.max(4, Math.floor((wd - 6) / 3.6)); k < n; k++) { const s0 = -wd / 2 + 3 + (k + 0.5) * (wd - 6) / n; strokePts([at(6, s0), at(36, s0)], 1.8, '#efeee8'); }   // „klawisze fortepianu”
+      if (num_) {   // numer drogi startowej
+        const [cx, cz] = at(60, 0); g.save(); g.translate(PX(cx), PX(cz)); g.rotate(Math.atan2(uz * dir, ux * dir) + Math.PI / 2);
+        g.fillStyle = '#efeee8'; g.font = `bold ${Math.round(9 * sc)}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.scale(1, 2.2); g.fillText(num_.replace(/[^0-9LRC]/g, ''), 0, 0); g.restore();
+      }
+      for (const s0 of [-wd / 2 + 7, wd / 2 - 7]) strokePts([at(300, s0), at(345, s0)], 8, '#efeee8');   // strefa przyziemienia
+    }
+    const dash = []; for (let d = 90; d < L - 90; d += 50) dash.push(d);
+    for (const d of dash) strokePts([[p0[0] + ux * d, p0[1] + uz * d], [p0[0] + ux * (d + 30), p0[1] + uz * (d + 30)]], 0.9, '#efeee8');   // oś
   }
 
   /* ---------------- budynki ---------------- */
@@ -1573,9 +1605,10 @@ function sequence(dt) {
 /* ---------- klawisze (do zmiany w opcjach, Esc) ---------- */
 const ACTIONS = [
   ['fwd', 'Naprzód / gaz', ['KeyW', 'ArrowUp']], ['back', 'Wstecz / hamulec', ['KeyS', 'ArrowDown']], ['left', 'W lewo', ['KeyA', 'ArrowLeft']], ['right', 'W prawo', ['KeyD', 'ArrowRight']],
-  ['fast', 'Bieg / turbo', ['ShiftLeft', 'ShiftRight']], ['brake', 'Hamulec ręczny', ['Space', '']], ['use', 'Wsiądź / wysiądź', ['KeyE', '']],
+  ['fast', 'Bieg / turbo / gaz więcej', ['ShiftLeft', 'ShiftRight']], ['slow', 'Gaz mniej (samolot)', ['ControlLeft', 'ControlRight']], ['brake', 'Hamulec ręczny', ['Space', '']], ['use', 'Wsiądź / wysiądź', ['KeyE', '']],
   ['cam', 'Kamera', ['KeyC', '']], ['map', 'Mapa', ['KeyM', '']], ['mini', 'Minimapa', ['KeyK', '']], ['night', 'Noc / dzień', ['KeyN', '']],
   ['xray', 'Rentgen', ['KeyX', '']], ['pix', 'Pixel-art', ['KeyP', '']], ['reset', 'Powrót na start', ['KeyR', '']], ['help', 'Pomoc', ['KeyH', '']],
+  ['rudL', 'Ster kierunku w lewo (samolot)', ['KeyQ', '']], ['rudR', 'Ster kierunku w prawo (samolot)', ['KeyF', '']], ['gear', 'Podwozie (samolot)', ['KeyG', '']], ['flaps', 'Klapy (samolot)', ['KeyB', '']],
 ];
 const store = { get(k, d) { try { const v = localStorage.getItem('w3d.' + k); return v ? JSON.parse(v) : d; } catch { return d; } }, set(k, v) { try { localStorage.setItem('w3d.' + k, JSON.stringify(v)); } catch {} } };
 let BIND = Object.assign(Object.fromEntries(ACTIONS.map(([a, , k]) => [a, k.slice()])), store.get('keys', {}));
@@ -1590,8 +1623,10 @@ addEventListener('keydown', e => {
   if (e.code === 'Escape') { if (bigOpen) toggleBigMap(); else toggleOptions(); return; }
   if (optOpen) return;
   const a = actionOf(e.code);
-  if (a === 'use' && !e.repeat) { if (mode === 'rail') railDoors(); else useCar(); }
-  if (a === 'reset') { if (mode === 'rail') railReset(); else resetCar(); }
+  if (a === 'use' && !e.repeat) { if (mode === 'rail') railDoors(); else if (mode === 'air') air.work = 1 - air.work; else useCar(); }
+  if (a === 'reset') { if (mode === 'rail') railReset(); else if (mode === 'air') airReset(); else resetCar(); }
+  if (mode === 'air' && !e.repeat && a === 'gear') { air.c.gear = 1 - air.c.gear; flash('Podwozie: ' + (air.c.gear ? 'wypuszczanie' : 'chowanie')); }
+  if (mode === 'air' && !e.repeat && a === 'flaps') { air.c.flaps = 1 - air.c.flaps; flash('Klapy: ' + (air.c.flaps ? 'wypuszczone' : 'schowane')); }
   if (a === 'cam') camMode = (camMode + 1) % 3;
   if (a === 'night') setNight(!night);
   if (a === 'xray') setXray(!xray);
@@ -1651,6 +1686,7 @@ function findSpawn() {
 }
 
 function physics(dt) {
+  if (mode === 'air') airStep(dt);
   if (mode === 'foot') walk(dt);
   if (mode === 'rail') railStep(dt);
   for (const V of FLEET) {
@@ -1712,6 +1748,81 @@ function driveTank(dt, drive, V) {
   car.th += car.w * dt;
   const fx = Math.sin(car.th), fz = Math.cos(car.th);
   car.vx = fx * vf; car.vz = fz * vf; car.x += car.vx * dt; car.z += car.vz * dt; car.vf = vf;
+}
+
+/* =========================================================================
+   SAMOLOT (AirKit z GameLaboratory i zachowanie „lot w atmosferze”): Spitfire Mk I na progu drogi startowej Okęcia
+   W/S — drążek (pchnij / ciągnij), A/D — lotki (na ziemi także kółko ogonowe), Q/F — ster kierunku,
+   Shift / Ctrl — gaz, Spacja — hamulce kół, G — podwozie, B — klapy, E — owiewka, R — od nowa
+   ========================================================================= */
+const air = { V: null, sim: null, c: { throttle: 0, elevator: 0, aileron: 0, rudder: 0, flaps: 0, gear: 1, brake: 1 }, work: 0, ego: { x: 0, y: 0, z: 0, th: 0, vf: 0 }, spawn: null, off: null };
+let AIRK = null, FLY = null;
+function airSpawnPoint() {
+  const rw = (W.runways || []).slice().sort((a, b) => b.L - a.L)[0];
+  if (!rw) { const s = SPAWN || findSpawn(); return { x: s.x, z: s.z, th: s.th }; }
+  const [a, b] = rw.p0[0] > rw.p1[0] ? [rw.p0, rw.p1] : [rw.p1, rw.p0];   // próg po wschodniej stronie, start na zachód
+  const ux = (b[0] - a[0]) / rw.L, uz = (b[1] - a[1]) / rw.L;
+  let d = 50; while (d < rw.L - 600 && (Math.abs(a[0] + ux * d) > E - 60 || Math.abs(a[1] + uz * d) > E - 60)) d += 20;   // próg poza mapą: pierwszy kawałek na mapie
+  return { x: a[0] + ux * d, z: a[1] + uz * d, th: Math.atan2(ux, uz) };
+}
+function airReset() {
+  const sp = air.spawn, def = air.V.def, h = H(sp.x, sp.z);
+  air.sim = FLY.createFlight(def.flight, def.mass, { p: [sp.x, h + def.rest.y, sp.z], yaw: sp.th, pitch: -def.rest.pitch });
+  Object.assign(air.c, { throttle: 0, elevator: 0, aileron: 0, rudder: 0, flaps: 0, gear: 1, brake: 1 }); air.work = 0; air.off = null;
+  airSync();
+}
+async function startAir() {
+  if (!AIRK) [AIRK, FLY] = await Promise.all([import(GL + 'js/models/air/airkit.js'), import(GL + 'js/behaviors/air/flight.js')]);
+  air.V = AIRK.buildAircraft('spitfire', {}); prepModel(air.V.group); scene.add(air.V.group);
+  air.spawn = airSpawnPoint(); airReset();
+  mode = 'air'; ego = air.ego; if (PED) PED.g.visible = false;
+}
+function airSync() { const s = air.sim.state, e = air.ego, f = air.sim.qRot(s.q, [0, 0, 1]); e.x = s.p[0]; e.y = s.p[1]; e.z = s.p[2]; e.th = Math.atan2(f[0], f[2]); e.vf = s.ias; }
+function airStep(dt) {
+  const c = air.c, s = air.sim.state, k = 1 - Math.exp(-5 * dt);
+  const pitch = (on('back') ? 1 : 0) - (on('fwd') ? 1 : 0), roll = (on('right') ? 1 : 0) - (on('left') ? 1 : 0), yaw = (on('rudR') ? 1 : 0) - (on('rudL') ? 1 : 0);
+  c.elevator += (pitch * 0.7 - c.elevator) * k; c.aileron += (roll - c.aileron) * k;
+  c.rudder += ((yaw || (s.onGround ? roll : 0)) - c.rudder) * k;   // kółko ogonowe skręca ze sterem kierunku
+  if (on('fast')) c.throttle = Math.min(1, c.throttle + 0.5 * dt);
+  if (on('slow')) c.throttle = Math.max(0, c.throttle - 0.5 * dt);
+  c.brake = on('brake') ? 1 : 0;
+  for (let i = 0; i < 2; i++) air.sim.step(dt / 2, c, (x, z) => H(x, z));
+  if (!s.crashed) {   // ściana budynku (siatka kolizji) — rozbity
+    const a = collGrid.get(Math.floor(s.p[0] / COLL_CELL) * 100003 + Math.floor(s.p[2] / COLL_CELL));
+    if (a && a.some(sg => sg[4] === 0 && s.p[1] >= sg[5] && s.p[1] <= sg[6] && segDist(s.p[0], s.p[2], sg)[0] < 3)) s.crashed = true;
+  }
+  airSync();
+}
+function airPlace(dt) {
+  const s = air.sim.state, g = air.V.group, c = air.c;
+  g.position.set(s.p[0], s.p[1], s.p[2]); g.quaternion.set(s.q[1], s.q[2], s.q[3], s.q[0]);
+  air.V.update(carT, dt, { throttle: s.crashed ? 0 : c.throttle, engine: !s.crashed, aileron: c.aileron, elevator: c.elevator, rudder: c.rudder, flaps: c.flaps, gear: c.gear > 0.5, work: air.work, lights: night, speed: s.onGround ? Math.hypot(s.v[0], s.v[2]) : 0 });
+}
+function airHud() {
+  const s = air.sim.state, c = air.c;
+  return `Wys. ${Math.round(s.p[1] - H(s.p[0], s.p[2]))} m · gaz ${Math.round(c.throttle * 100)}% · klapy ${c.flaps ? 'wypuszczone' : 'schowane'} · podwozie ${c.gear ? 'wypuszczone' : 'schowane'}` +
+    (s.stall && !s.onGround ? ' · PRZECIĄGNIĘCIE' : '') + (s.crashed ? ' · ROZBITY (R — od nowa)' : '');
+}
+// kamera: za samolotem (C: bliżej / dalej) albo z kabiny — horyzont przechyla się z samolotem
+function airCamera(dt, snap) {
+  const s = air.sim.state, q = (v) => air.sim.qRot(s.q, v), f = q([0, 0, 1]), u = q([0, 1, 0]), g = air.V.group;
+  if (camMode === 2) {
+    g.updateMatrixWorld(true); const st = air.V.def.seat;
+    camPos.copy(g.localToWorld(new THREE.Vector3(st.x, st.y + 0.62, st.z)));
+    const tl = Math.max(-1.2, Math.min(1.2, -tilt)), d = q([Math.sin(orbit) * Math.cos(tl), Math.sin(tl), Math.cos(orbit) * Math.cos(tl)]);
+    camLook.set(camPos.x + d[0] * 20, camPos.y + d[1] * 20, camPos.z + d[2] * 20); camera.up.set(u[0], u[1], u[2]);
+    if (camera.near !== 0.05) { camera.near = 0.05; camera.updateProjectionMatrix(); }
+  } else {
+    const h = Math.atan2(f[0], f[2]) + orbit, far = camMode === 1;
+    const r = Math.hypot(far ? 40 : 16, far ? 12 : 4.5) * camDist, el = Math.max(-0.3, Math.min(1.4, Math.atan2(far ? 12 : 4.5, far ? 40 : 16) + tilt));
+    const want = new THREE.Vector3(-Math.sin(h) * Math.cos(el) * r, Math.sin(el) * r, -Math.cos(h) * Math.cos(el) * r);
+    if (!air.off || snap) air.off = want.clone(); else air.off.lerp(want, 1 - Math.exp(-4 * dt));   // przesunięcie względem samolotu: kamera nie zostaje w tyle przy prędkości
+    camPos.set(s.p[0] + air.off.x, s.p[1] + air.off.y, s.p[2] + air.off.z);
+    const gy = H(camPos.x, camPos.z) + 1.2; if (camPos.y < gy) camPos.y = gy;
+    camLook.set(s.p[0] + f[0] * 8, s.p[1] + 1 + f[1] * 8, s.p[2] + f[2] * 8); camera.up.set(0, 1, 0);
+    if (camera.near !== 0.3) { camera.near = 0.3; camera.updateProjectionMatrix(); }
+  }
+  camera.position.copy(camPos); camera.lookAt(camLook);
 }
 let bump = 0;
 /* ---------- pieszy: chód, bieg, zderzenia ze ścianami i z pojazdami ---------- */
@@ -2004,6 +2115,7 @@ canvas.addEventListener('pointermove', e => {
 canvas.addEventListener('wheel', e => { camDist = Math.min(4, Math.max(0.5, camDist * (e.deltaY > 0 ? 1.1 : 0.9))); e.preventDefault(); }, { passive: false });
 const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
 function updateCamera(dt, snap) {
+  if (mode === 'air') return airCamera(dt, snap);
   const onFoot = ego === ped;
   if (!dragging && !onFoot) { orbit *= Math.exp(-1.5 * dt); tilt *= Math.exp(-1.5 * dt); }   // pieszo kamera zostaje tam, gdzie ją ustawisz
   const th = (onFoot ? camYaw : ego.th) + orbit, fx = Math.sin(th), fz = Math.cos(th);
@@ -2089,7 +2201,7 @@ function hud(dt, fps) {
   if (streetT <= 0) {
     streetT = 0.25; let best = null, bd = 1e9; const k0x = Math.floor(ego.x / ROAD_CELL), k0z = Math.floor(ego.z / ROAD_CELL);
     for (let i = k0x - 1; i <= k0x + 1; i++) for (let j = k0z - 1; j <= k0z + 1; j++) { const a = roadGrid.get(i * 100003 + j); if (a) for (const s of a) { if (!s[4]) continue; const d = segDist(ego.x, ego.z, s)[0] - s[5] / 2; if (d < bd) { bd = d; best = s[4]; } } }
-    $('street').textContent = mode === 'rail' && rail.kind === 'tram' ? 'Nastawa ' + Math.round(rail.target * 3.6) + ' km/h' + (rail.derailed ? ' · WYKOLEJENIE (R)' : '') : best && bd < 12 ? best : '';
+    $('street').textContent = mode === 'air' ? airHud() : mode === 'rail' && rail.kind === 'tram' ? 'Nastawa ' + Math.round(rail.target * 3.6) + ' km/h' + (rail.derailed ? ' · WYKOLEJENIE (R)' : '') : best && bd < 12 ? best : '';
     $('fps').textContent = fps ? fps + ' fps' : '';
   }
   if (mm.style.display === 'none' || !W.ov) return;
@@ -2330,6 +2442,7 @@ function step(dt, draw) {
     V.v.update(carT, dt, o);
   }
   if (mode === 'rail') railPlace(dt);
+  if (mode === 'air') airPlace(dt);
   // pieszy
   if (PED) {
     PED.g.position.set(ped.x, ped.y, ped.z); PED.g.rotation.set(0, ped.th, 0);
@@ -2379,6 +2492,7 @@ async function main() {
     if (TERR_RAW) { const t = processTerrain(TERR_RAW, dtm ? null : buildingMask(DATA), dtm); HF = t.h; W.terrBase = t.base; }
     await frame();
     const st = buildWorld(DATA);
+    if (MAP) { document.querySelector('#start .sub').textContent = MAP.name + ' · wybierz, czym ruszasz'; }
     console.log('[W3D] stats', JSON.stringify(st));
     // ekran startowy: przelot nad miastem, modele wczytują się w tle (pasek na karcie trybu)
     status('Gotowe', 1); await frame();
@@ -2391,15 +2505,17 @@ async function main() {
     startAt(findSpawn());
     if (GFX.sketch) setSketch(true);
     $('modes').querySelector('.mload').remove();
-    $('modes').querySelector('[data-mode=foot]').disabled = false; $('modes').querySelector('[data-mode=rail]').disabled = false;
+    $('modes').querySelector('[data-mode=foot]').disabled = false; $('modes').querySelector('[data-mode=rail]').disabled = !!MAP; $('modes').querySelector('[data-mode=air]').disabled = false;
     const chosen = QS.get('mode') || await new Promise(res => { for (const b of $('modes').querySelectorAll('button:not(:disabled)')) b.onclick = (e) => res(b.dataset.mode === 'rail' ? 'rail:' + ((e.target.dataset && e.target.dataset.veh) || 'tram') : b.dataset.mode); });
     started = chosen;
     if (chosen === 'drive') { mode = 'car'; ego = car; if (PED) PED.g.visible = false; }   // od razu za kierownicą (doktor mapy)
+    if (chosen === 'air' && !MAP) { location.href = '?map=okecie&mode=air'; return; }   // samolot startuje z Okęcia (osobna mapa)
+    if (chosen === 'air') { $('mload3').style.display = 'flex'; await startAir(); }
     if (chosen.startsWith('rail')) { $('mload2').style.display = 'flex'; await startRail(chosen.split(':')[1] || 'tram'); }
     $('start').classList.add('out'); setTimeout(() => { $('start').style.display = 'none'; }, 650);
     $('hud').style.display = ''; $('minimap').style.display = ''; $('help').style.display = '';
     updateCamera(0, true);
-    window.__W3D = { step, get car() { return car; }, FLEET, ped, rail, startRail, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, E, R, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, version: APP_VERSION };
+    window.__W3D = { step, get car() { return car; }, FLEET, ped, rail, startRail, air, startAir, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, E, R, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, version: APP_VERSION };
     window.dispatchEvent(new Event('w3d-ready'));
   } catch (e) {
     console.error(e);
