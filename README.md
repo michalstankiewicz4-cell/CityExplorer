@@ -5,7 +5,7 @@ Spacer i jazda (FSO Polonez, czołg M1A2 Abrams, przegubowy Solaris Urbino 18) p
 **Graj:** https://michalstankiewicz4-cell.github.io/CityExplorer/
 
 ## Tryby
-Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy zaparkowanych pojazdach: Polonezie, czołgu i autobusie; **szynowy**, **łódź**, **samolot** — wkrótce.
+Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy zaparkowanych pojazdach: Polonezie, czołgu i autobusie; **szynowy** (czynny) — tramwaj PESA Swing 120Na albo pociąg (TrainKit) na torach z OSM: W napęd, S hamowanie / wstecz, Spacja hamowanie nagłe, E drzwi; **łódź**, **samolot** — wkrótce.
 
 ## Sterowanie
 | Klawisz | Akcja |

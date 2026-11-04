@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0 — 2026-11-04
+- **Tryb szynowy**: prowadzisz **tramwaj PESA Swing 120Na** (model z GameLaboratory — 5 członów, każdy człon na łuku toru, harmonijki się rozciągają, drzwi, wnętrze, nocą światła) albo **pociąg z TrainKit** (lokomotywa spalinowa, wagon drewniany i stalowy; zestawy kołowe się obracają) po prawdziwych torach z OSM. W — napęd, S — hamowanie (na postoju jazda wstecz), Spacja — hamowanie nagłe, E — drzwi na postoju; prędkość z masy, mocy, oporów i spadku toru, kozioł oporowy na końcu toru. Kamera C: widok z kabiny. Automatyczne składy znikają z toru gracza.
+- Na ekranie startowym karta „Szynowy” czynna: klik w miniaturę tramwaju albo pociągu wybiera skład.
+
 ## 0.5.1 — 2026-11-04
 - Pieszo: sterowanie jak w grach z kamerą za plecami — W A S D względem kamery (A/D krok w bok), postać obraca się w stronę ruchu, kamerę obraca się myszą (LPM) i zostaje tam, gdzie ją ustawisz. Wcześniej A/D obracały postać razem z kamerą.
 - Ekran startowy: miniatury pojazdów to gotowe obrazki (`img/`), widać je od razu, bez renderowania przy starcie.
