@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.5.0</title>
+<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.5.1</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams i przegubowym Solarisem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Warszawa 3D, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams i przegubowym Solarisem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams i przegubowym Solarisem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.5.0"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams i przegubowym Solarisem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.5.1"}
 </script>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#0d1014;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#e8e6e1}
@@ -120,8 +120,8 @@
     <div class="ttl">Warszawa 3D <small id="ver2"></small></div>
     <div class="sub">Prawdziwe Śródmieście z mapy · wybierz, czym ruszasz</div>
     <div id="modes">
-      <button data-mode="foot" disabled><i>Tryb 1</i><b>Pieszo i pojazdem</b><span>Spacer po mieście; przy starcie czekają FSO Polonez, M1A2 Abrams i przegubowy Solaris — wsiadasz i wysiadasz klawiszem E.</span><div class="thumbs" data-for="foot"></div><div class="mload"><em></em><u>Wczytuję modele…</u></div></button>
-      <button data-mode="rail" disabled><i>Wkrótce</i><b>Szynowy</b><span>Kolej i tramwaj.</span><div class="thumbs" data-for="rail"></div></button>
+      <button data-mode="foot" disabled><i>Tryb 1</i><b>Pieszo i pojazdem</b><span>Spacer po mieście; przy starcie czekają FSO Polonez, M1A2 Abrams i przegubowy Solaris — wsiadasz i wysiadasz klawiszem E.</span><div class="thumbs" data-for="foot"><img src="img/pieszy.jpg" alt="Pieszy" title="Pieszy"><img src="img/polonez.jpg" alt="FSO Polonez" title="FSO Polonez 1500"><img src="img/abrams.jpg" alt="M1A2 Abrams" title="M1A2 Abrams"><img src="img/urbino18.jpg" alt="Solaris Urbino 18" title="Solaris Urbino 18 electric"></div><div class="mload"><em></em><u>Wczytuję modele…</u></div></button>
+      <button data-mode="rail" disabled><i>Wkrótce</i><b>Szynowy</b><span>Kolej i tramwaj.</span><div class="thumbs" data-for="rail"><img src="img/tramwaj.jpg" alt="Tramwaj" title="Tramwaj"><img src="img/pociag.jpg" alt="Pociąg" title="Pociąg"></div></button>
       <button data-mode="boat" disabled><i>Wkrótce</i><b>Łódź</b><span>ORP Błyskawica na Wiśle.</span><div class="thumbs soon">model w przygotowaniu</div></button>
       <button data-mode="air" disabled><i>Wkrótce</i><b>Samolot i śmigłowiec</b><span>Spitfire i W-3 Sokół z Okęcia.</span><div class="thumbs soon">modele w przygotowaniu</div></button>
     </div>
@@ -171,7 +171,8 @@
 <div id="help" style="display:none">
   <div><b>E</b> wsiądź / wysiądź</div>
   <div><b>W / ↑</b> gaz, naprzód &nbsp; <b style="min-width:0">S / ↓</b> hamulec, wstecz</div>
-  <div><b>A D / ← →</b> skręt</div>
+  <div><b>A D / ← →</b> skręt (pieszo: w bok)</div>
+  <div><b>Mysz</b> pieszo: LPM obraca kamerę, idziesz tam, gdzie patrzy</div>
   <div><b>Spacja</b> ręczny (drift) &nbsp; <b style="min-width:0">Shift</b> turbo, bieg</div>
   <div><b>R</b> powrót na start &nbsp; <b style="min-width:0">C</b> kamera</div>
   <div><b>Esc</b> opcje: grafika, klawisze</div>
@@ -192,7 +193,7 @@ import * as THREE from 'three';
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
-const APP_VERSION = '0.5.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+const APP_VERSION = '0.5.1';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
 document.getElementById('ver').textContent = 'v' + APP_VERSION; document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
 const CENTER = { lat: +(QS.get('lat') || 52.23175), lon: +(QS.get('lon') || 21.00586) };
@@ -1554,12 +1555,12 @@ function sequence(dt) {
     const k = Math.min(1, seq / 0.5); ped.x += (dx - ped.x) * k; ped.z += (dz - ped.z) * k;
     ped.th = V.s.th - outward(V); ped.vf = seq < 0.5 ? 1 : 0;
     if (PED) PED.g.visible = seq < 0.85;
-    if (seq > T) { mode = 'car'; ACT = V; car = V.s; VDEF = V.def; ego = car; V.s.rest = false; }
+    if (seq > T) { mode = 'car'; ACT = V; car = V.s; VDEF = V.def; ego = car; V.s.rest = false; orbit = Math.atan2(Math.sin(camYaw + orbit - V.s.th), Math.cos(camYaw + orbit - V.s.th)); }
   } else {
     if (PED) PED.g.visible = seq > 0.35;
     ped.vf = seq > 0.35 && seq < 0.9 ? 1 : 0;
     if (seq > 0.35 && seq < 0.9) { ped.x += Math.sin(ped.th) * 0.9 * dt; ped.z += Math.cos(ped.th) * 0.9 * dt; }   // krok od pojazdu
-    if (seq > T) { mode = 'foot'; ego = ped; }
+    if (seq > T) { mode = 'foot'; ego = ped; camYaw = V.s.th + orbit; orbit = 0; }
   }
 }
 /* ---------- klawisze (do zmiany w opcjach, Esc) ---------- */
@@ -1614,7 +1615,7 @@ function startAt(s) {   // pojazdy zaparkowane rzędem wzdłuż ulicy, człowiek
   SPAWN = s;
   for (const V of FLEET) park(V, s, PARK[V.id] || 0);
   ACT = FLEET.find(V => V.id === 'polonez'); car = ACT.s; VDEF = ACT.def;
-  mode = 'foot'; ego = ped; resetCar();
+  mode = 'foot'; ego = ped; resetCar(); camYaw = s.th; orbit = 0;
 }
 function findSpawn() {
   // najbliższa główna ulica przy PKiN (preferowana Marszałkowska) z wolnym pasem na trzy pojazdy (−15…+25 m)
@@ -1707,11 +1708,14 @@ function driveTank(dt, drive, V) {
 let bump = 0;
 /* ---------- pieszy: chód, bieg, zderzenia ze ścianami i z pojazdami ---------- */
 function walk(dt) {
-  const up = on('fwd'), dn = on('back'), lf = on('left'), rt = on('right');
-  const run = on('fast');
-  const want = up ? (run ? 4.2 : 1.45) : dn ? -0.9 : 0;
-  ped.vf += (want - ped.vf) * Math.min(1, (Math.abs(want) > Math.abs(ped.vf) ? 4 : 7) * dt);
-  ped.th += ((lf ? 1 : 0) - (rt ? 1 : 0)) * (run && up ? 2.2 : 2.6) * dt;
+  // jak w grach z kamerą za plecami: W/S naprzód i w tył, A/D w bok — względem kamery; postać obraca się w stronę ruchu
+  const f = (on('fwd') ? 1 : 0) - (on('back') ? 1 : 0), sd = (on('left') ? 1 : 0) - (on('right') ? 1 : 0), run = on('fast');
+  let want = 0;
+  if (f || sd) {
+    const dir = camYaw + orbit + Math.atan2(sd, f), d = Math.atan2(Math.sin(dir - ped.th), Math.cos(dir - ped.th));
+    ped.th += d * Math.min(1, 9 * dt); want = (run ? 4.2 : 1.45) * Math.max(0.2, Math.cos(Math.min(Math.abs(d), 1.5)));
+  }
+  ped.vf += (want - ped.vf) * Math.min(1, (want > ped.vf ? 4 : 7) * dt);
   ped.x += Math.sin(ped.th) * ped.vf * dt; ped.z += Math.cos(ped.th) * ped.vf * dt;
   for (let it = 0; it < 2; it++) {
     const k0x = Math.floor(ped.x / COLL_CELL), k0z = Math.floor(ped.z / COLL_CELL);
@@ -1776,7 +1780,7 @@ function push(dx, dz, d, pen, drive) {
 }
 
 /* ---------- kamera ---------- */
-let started = null, camMode = 0, orbit = 0, tilt = 0, camDist = 1, dragging = false, lastX = 0, lastY = 0;
+let started = null, camYaw = 0, camMode = 0, orbit = 0, tilt = 0, camDist = 1, dragging = false, lastX = 0, lastY = 0;
 // LPM: pełne rozglądanie — poziomo (orbit) i w pionie (tilt)
 canvas.addEventListener('pointerdown', e => { if (e.button !== 0) return; dragging = true; lastX = e.clientX; lastY = e.clientY; canvas.setPointerCapture(e.pointerId); });
 canvas.addEventListener('pointerup', () => { dragging = false; });
@@ -1790,10 +1794,10 @@ canvas.addEventListener('pointermove', e => {
 canvas.addEventListener('wheel', e => { camDist = Math.min(4, Math.max(0.5, camDist * (e.deltaY > 0 ? 1.1 : 0.9))); e.preventDefault(); }, { passive: false });
 const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
 function updateCamera(dt, snap) {
-  if (!dragging) { orbit *= Math.exp(-1.5 * dt); tilt *= Math.exp(-1.5 * dt); }
-  const th = ego.th + orbit, fx = Math.sin(th), fz = Math.cos(th);
-  let dist, hgt, look;
   const onFoot = ego === ped;
+  if (!dragging && !onFoot) { orbit *= Math.exp(-1.5 * dt); tilt *= Math.exp(-1.5 * dt); }   // pieszo kamera zostaje tam, gdzie ją ustawisz
+  const th = (onFoot ? camYaw : ego.th) + orbit, fx = Math.sin(th), fz = Math.cos(th);
+  let dist, hgt, look;
   const CT = onFoot ? [3.6, 1.9] : TUNE[ACT.id].cam, big = CT[0] / 8.5;
   if (camMode === 0) { dist = CT[0] * camDist; hgt = CT[1] * camDist; look = onFoot ? 1.45 : 1.3 * Math.max(1, big); }
   else if (camMode === 1) { dist = (onFoot ? 11 : 26 * big) * camDist; hgt = (onFoot ? 6 : 13 * big) * camDist; look = onFoot ? 1.2 : 2 * big; }
@@ -2079,29 +2083,6 @@ function loop(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
   step(dt, true);
 }
-// miniatury pojazdów: każdy model renderowany osobno w rogu płótna gry i od razu kopiowany do obrazka
-function thumbnails() {
-  const ts = new THREE.Scene(); ts.environment = ENV;
-  ts.add(new THREE.HemisphereLight('#dfeaf5', '#6b6455', 2.2)); const dl = new THREE.DirectionalLight('#fff3df', 3.2); dl.position.set(5, 8, 6); ts.add(dl);
-  const cam = new THREE.PerspectiveCamera(28, 16 / 10, 0.1, 200), w = 320, hgt = 200, pr = renderer.getPixelRatio();
-  const shot = (obj) => {
-    const parent = obj.parent, p = obj.position.clone(), q = obj.quaternion.clone(), vis = obj.visible;
-    obj.position.set(0, 0, 0); obj.quaternion.identity(); obj.visible = true; ts.add(obj); obj.updateMatrixWorld(true);
-    const box = new THREE.Box3().setFromObject(obj), c = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3()).length();
-    cam.position.set(c.x + size * 0.95, c.y + size * 0.42, c.z + size * 1.15); cam.lookAt(c); cam.updateProjectionMatrix();
-    renderer.setScissorTest(true); renderer.setScissor(0, 0, w, hgt); renderer.setViewport(0, 0, w, hgt);
-    const bg = ts.background; ts.background = new THREE.Color('#2a3340'); renderer.render(ts, cam); ts.background = bg;
-    const cv = document.createElement('canvas'); cv.width = w * pr; cv.height = hgt * pr;
-    cv.getContext('2d').drawImage(renderer.domElement, 0, renderer.domElement.height - hgt * pr, w * pr, hgt * pr, 0, 0, w * pr, hgt * pr);
-    renderer.setScissorTest(false); renderer.setViewport(0, 0, innerWidth, innerHeight);
-    if (parent) parent.add(obj); obj.position.copy(p); obj.quaternion.copy(q); obj.visible = vis;
-    const img = new Image(); img.src = cv.toDataURL('image/jpeg', 0.86); return img;
-  };
-  const put = (key, img, title) => { img.title = title; img.alt = title; $('modes').querySelector('.thumbs[data-for=' + key + ']').appendChild(img); };
-  if (PED) put('foot', shot(PED.g), 'Pieszy');
-  for (const V of FLEET) put('foot', shot(V.v.group), V.def.name);
-  try { for (const [k, t] of [['tram', 'Tramwaj'], ['rail', 'Pociąg']]) { const g = makeTrainCar(TRAIN_T[k], true); prepModel(g); put('rail', shot(g), t); } } catch (e) { console.warn('[W3D] miniatury', e); }
-}
 // przelot nad miastem na ekranie startowym: wolny obrót wokół Pałacu Kultury
 let flyT = 0;
 function flyover(dt) {
@@ -2190,7 +2171,6 @@ async function main() {
     const ml = $('modes').querySelector('.mload u');
     await loadModels((f, t) => { ml.textContent = t + ' ' + Math.round(f * 100) + '%'; });
     startAt(findSpawn());
-    thumbnails();
     if (GFX.sketch) setSketch(true);
     $('modes').querySelector('.mload').remove();
     $('modes').querySelector('[data-mode=foot]').disabled = false;

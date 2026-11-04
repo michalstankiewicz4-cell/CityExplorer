@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1 — 2026-11-04
+- Pieszo: sterowanie jak w grach z kamerą za plecami — W A S D względem kamery (A/D krok w bok), postać obraca się w stronę ruchu, kamerę obraca się myszą (LPM) i zostaje tam, gdzie ją ustawisz. Wcześniej A/D obracały postać razem z kamerą.
+- Ekran startowy: miniatury pojazdów to gotowe obrazki (`img/`), widać je od razu, bez renderowania przy starcie.
+
 ## 0.5.0 — 2026-11-04
 - **Trzy pojazdy przy starcie** (modele z GameLaboratory): FSO Polonez, **czołg M1A2 Abrams** (gąsienice, obrót w miejscu, wieża i armata celują za kamerą, właz dowódcy) i **przegubowy Solaris Urbino 18** w barwach MZA (przegub jak naczepa, otwierane drzwi, wnętrze, nocą świecą lampy w środku i wyświetlacze). Wsiadasz do najbliższego klawiszem E.
 - Zderzenia pojazdów ze sobą, z pieszym i z miastem (okręgi wzdłuż nadwozia; autobus także członem tylnym).

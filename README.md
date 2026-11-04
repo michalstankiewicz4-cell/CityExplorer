@@ -14,7 +14,7 @@ Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy 
 | Esc | opcje: gra, grafika (m.in. styl „rysunek”), zmiana klawiszy |
 | W / ↑ | gaz / naprzód |
 | S / ↓ | hamulec, wsteczny / wstecz |
-| A D / ← → | skręt |
+| A D / ← → | skręt; pieszo: krok w bok (W A S D względem kamery, kamerę obraca LPM) |
 | Spacja | ręczny (drift) |
 | Shift | turbo / bieg |
 | R | autem: powrót na start; pieszo: do drzwi auta |
