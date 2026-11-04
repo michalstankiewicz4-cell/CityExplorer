@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.7.0</title>
+<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.7.1</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Warszawa 3D, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.7.0"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.7.1"}
 </script>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#0d1014;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#e8e6e1}
@@ -123,7 +123,7 @@
     <div class="sub">Prawdziwe Śródmieście z mapy · wybierz, czym ruszasz</div>
     <div id="modes">
       <button data-mode="foot" disabled><i>Tryb 1</i><b>Pieszo i pojazdem</b><span>Spacer po mieście; przy starcie czekają FSO Polonez, M1A2 Abrams i przegubowy Solaris — wsiadasz i wysiadasz klawiszem E.</span><div class="thumbs" data-for="foot"><img src="img/pieszy.jpg" alt="Pieszy" title="Pieszy"><img src="img/polonez.jpg" alt="FSO Polonez" title="FSO Polonez 1500"><img src="img/abrams.jpg" alt="M1A2 Abrams" title="M1A2 Abrams"><img src="img/urbino18.jpg" alt="Solaris Urbino 18" title="Solaris Urbino 18 electric"><span class="soonT">trolejbus 51<br>wkrótce</span></div><div class="mload"><em></em><u>Wczytuję modele…</u></div></button>
-      <button data-mode="rail" disabled><i>Tryb 2</i><b>Szynowy</b><span>Tramwaj PESA Swing na fizyce koło–szyna z aTrain albo pociąg po prawdziwych torach — kliknij, którym. Metro wkrótce.</span><div class="thumbs" data-for="rail"><img src="img/swing.jpg" alt="Tramwaj PESA Swing" title="Tramwaj PESA Swing 120Na" data-veh="tram"><img src="img/pociag.jpg" alt="Pociąg" title="Pociąg: lokomotywa i dwa wagony" data-veh="train"><span class="soonT">metro<br>wkrótce</span></div><div class="mload" id="mload2" style="display:none"><em></em><u>Wczytuję skład…</u></div></button>
+      <button data-mode="rail" disabled><i>Tryb 2</i><b>Szynowy</b><span>Tramwaj PESA Swing na fizyce koło–szyna z aTrain albo nasz pociąg na linii WKD w stronę Pruszkowa (na razie do końca mapy) — kliknij, którym.</span><div class="thumbs" data-for="rail"><img src="img/swing.jpg" alt="Tramwaj PESA Swing" title="Tramwaj PESA Swing 120Na" data-veh="tram"><img src="img/pociag.jpg" alt="Pociąg WKD" title="WKD w stronę Pruszkowa: nasz pociąg (lokomotywa i dwa wagony)" data-veh="train"><span class="soonT">metro<br>wkrótce</span></div><div class="mload" id="mload2" style="display:none"><em></em><u>Wczytuję skład…</u></div></button>
       <button data-mode="boat" disabled><i>Wkrótce</i><b>Łódź</b><span>ORP Błyskawica na Wiśle.</span><div class="thumbs soon">model w przygotowaniu</div></button>
       <button data-mode="air" disabled><i>Wkrótce</i><b>Samolot i śmigłowiec</b><span>Spitfire i W-3 Sokół z Okęcia.</span><div class="thumbs soon">modele w przygotowaniu</div></button>
     </div>
@@ -195,7 +195,7 @@ import * as THREE from 'three';
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
-const APP_VERSION = '0.7.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+const APP_VERSION = '0.7.1';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
 document.getElementById('ver').textContent = 'v' + APP_VERSION; document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
 const CENTER = { lat: +(QS.get('lat') || 52.23175), lon: +(QS.get('lon') || 21.00586) };
@@ -1016,7 +1016,7 @@ function buildTrains(lines) {
       const P = [];
       for (const e of seq) { const s = e.rev ? [...e.l.samples].reverse() : e.l.samples; for (const p of s) { const q = P[P.length - 1]; if (!q || Math.hypot(q[0] - p[0], q[1] - p[1]) > 0.5) P.push(p); } }
       const cum = [0]; for (let i = 1; i < P.length; i++) cum.push(cum[i - 1] + Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]));
-      const len = cum[cum.length - 1]; if (len >= T.minLen) chains.push({ P, cum, len });
+      const len = cum[cum.length - 1]; if (len >= T.minLen) chains.push({ P, cum, len, names: [...new Set(seq.map(e => e.l.t.name).filter(Boolean))] });
     }
     chains.sort((a, b) => b.len - a.len);
     RAIL_CHAINS[net] = chains;
@@ -1155,9 +1155,12 @@ function buildWorld(D) {
   for (const w of D.ways) {
     const t = w.t; if (!t) continue;
     if (t.indoor === 'yes' || t.highway === 'corridor' || t.highway === 'elevator') continue;
-    const isT = !!t.tunnel && t.tunnel !== 'no' && t.tunnel !== 'culvert', isB = !!t.bridge && t.bridge !== 'no';
+    const isB = !!t.bridge && t.bridge !== 'no';
+    // tory pod ziemią bez znacznika tunelu (stacja podziemna: level < 0 albo location=underground) to tunel
+    const isT = (!!t.tunnel && t.tunnel !== 'no' && t.tunnel !== 'culvert') || (!!t.railway && !isB && (num(t.level) < 0 || t.location === 'underground'));
     let L = num(t.layer);
     const passage = isT && !t.railway && (t.tunnel === 'building_passage' || isNaN(L));
+    if (!isT && !isB && L < 0 && t.railway) L = 0;   // tor w wykopie (layer −1 bez tunelu): zjazd z portalu w wykopie robią konstrukcje
     if (!isT && !isB && (L < 0 || num(t.level) < 0 || t.location === 'underground')) continue;
     if (isNaN(L)) L = isB ? 1 : (isT && !passage) ? -1 : 0;
     const ids = [], pts = []; for (const id of w.n) { const p = xyOf(id); if (p) { ids.push(id); pts.push(p); } }
@@ -1807,14 +1810,44 @@ function clipChain(ch) {
   return best;
 }
 const trackCache = new Map();
-function railTrack(ch) {   // opis toru (łuki, wysokości) dla ciągu — raz
-  if (!trackCache.has(ch)) { const pts = clipChain(ch); trackCache.set(ch, pts.length > 3 ? PATH.pathTrack(pts, { step: 4, smooth: 3 }) : null); }
-  return trackCache.get(ch);
+// ciąg torów tylko z odcinków o danej nazwie (np. WKD): łączenie końcami odcinków (wspólne węzły), najdłuższy ciąg
+function namedChain(re) {
+  const L = W.lines.filter(l => l.net === 'rail' && l.samples && l.samples.length > 1 && re.test(l.t.name || ''));
+  const ends = new Map(); for (const l of L) for (const [id, st] of [[l.ids[0], true], [l.ids[l.ids.length - 1], false]]) { let a = ends.get(id); if (!a) ends.set(id, a = []); a.push({ l, st }); }
+  const outDir = (l, st) => { const S = l.samples, a = st ? S[1] : S[S.length - 2], b = st ? S[0] : S[S.length - 1], d = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1; return [(b[0] - a[0]) / d, (b[1] - a[1]) / d]; };
+  let best = null;
+  for (const l0 of L) {
+    const used = new Set([l0]), seq = [{ l: l0, rev: false }];
+    for (const fwd of [true, false]) {
+      let cur = l0, atEnd = fwd;
+      for (let k = 0; k < 200; k++) {
+        const id = atEnd ? cur.ids[cur.ids.length - 1] : cur.ids[0], od = outDir(cur, !atEnd);
+        let nx = null, bs = 0.4;
+        for (const c of ends.get(id) || []) { if (used.has(c.l)) continue; const d = outDir(c.l, c.st), sc = -(od[0] * d[0] + od[1] * d[1]); if (sc > bs) { bs = sc; nx = c; } }
+        if (!nx) break; used.add(nx.l);
+        if (fwd) seq.push({ l: nx.l, rev: !nx.st }); else seq.unshift({ l: nx.l, rev: nx.st });
+        cur = nx.l; atEnd = nx.st;
+      }
+    }
+    const P = []; for (const e of seq) { const S = e.rev ? [...e.l.samples].reverse() : e.l.samples; for (const p of S) { const q = P[P.length - 1]; if (!q || Math.hypot(q[0] - p[0], q[1] - p[1]) > 0.5) P.push(p); } }
+    const cum = [0]; for (let i = 1; i < P.length; i++) cum.push(cum[i - 1] + Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]));
+    const ch = { P, cum, len: cum[cum.length - 1], names: [l0.t.name] };
+    if (!best || ch.len > best.len) best = ch;
+  }
+  return best;
+}
+function railTrack(ch, westward) {   // opis toru (łuki, wysokości) dla ciągu — raz; westward: s rośnie na zachód
+  const key = westward ? ch.P : ch;
+  if (!trackCache.has(key)) {
+    let pts = clipChain(ch); if (westward && pts.length && pts[0][0] < pts[pts.length - 1][0]) pts = pts.slice().reverse();
+    trackCache.set(key, pts.length > 3 ? PATH.pathTrack(pts, { step: 4, smooth: 3 }) : null);
+  }
+  return trackCache.get(key);
 }
 // szyny: na początek tylko na linii, po której jedzie gracz (pierwsza linia tramwajowa / kolejowa); reszta później
-async function buildRails(ch, net) {
+async function buildRails(T, net) {
   PTRACK = PTRACK || await import(GL + 'js/models/structures/railway/path-track.js');
-  const T = railTrack(ch); if (!T || T.L < 20) return;
+  if (!T || T.L < 20) return;
   scene.add(PTRACK.buildPathTrack(T, { lift: RAIL_LIFT[net], sleepers: net === 'rail', ballast: net === 'rail', step: 1.5 }));
 }
 async function loadRail(kind) {
@@ -1836,10 +1869,14 @@ async function startRail(kind) {
   const R = await loadRail(kind);
   const total = R.units.reduce((a, u) => a + u.L, 0) + R.gap * (R.units.length - 1);
   // ciąg: na mapie, zmieści się skład, jak najwięcej toru na powierzchni, blisko centrum
-  // miejsce startu: punkt toru na powierzchni (cały skład nad ziemią), najbliżej centrum, z zapasem toru przed składem
+  // WKD: linia Warszawskiej Kolei Dojazdowej, start na wschodnim końcu (Śródmieście WKD), czołem w stronę Pruszkowa — do końca mapy
   let at = null, bestD = 1e9, any = null;
+  if (kind === 'train') {
+    const ch = namedChain(/Kolej Dojazdowa/), T = ch && railTrack(ch, true);
+    if (T && T.L > total + 40) at = { ch, T, s: total + 15 };
+  }
   const above = (T, s) => { const p = T.station(s); return T.height(s) > H(p.px, p.pz) - 1.5; };
-  for (const ch of RAIL_CHAINS[net]) {
+  if (!at) for (const ch of RAIL_CHAINS[net]) {
     const T = railTrack(ch); if (!T || T.L < total + 80) continue;
     if (!any) any = { ch, T, s: total + 20 };
     for (let s = total + 20; s < T.L - 60; s += 5) {
@@ -1850,7 +1887,7 @@ async function startRail(kind) {
   at = at || any;
   if (!at) { flash('Brak toru na mapie'); return; }
   const s0 = at.s;
-  await buildRails(at.ch, net);
+  await buildRails(at.T, net);
   Object.assign(rail, { V: R, kind, ch: at.ch, T: at.T, s: s0, v: 0, total, lift: RAIL_LIFT[net], target: 0, derailed: false, sim: null });
   if (kind === 'tram') {
     rail.sim = TRAMPHYS.createTramSim(at.T, R.v.def, s0);
@@ -1890,7 +1927,7 @@ function railStep(dt) {
   if (R.doors > 0.5) a = -Math.sign(R.v) * Math.min(Math.abs(R.v) / dt, 3);
   const v0 = R.v; R.v += a * dt; if ((em || (!up && !dn) || R.doors > 0.5) && Math.sign(R.v) !== Math.sign(v0) && v0 !== 0) R.v = 0;
   R.v = Math.max(-5, Math.min(T.vmax, R.v)); R.s += R.v * dt;
-  if (R.s > R.T.L - 2) { R.s = R.T.L - 2; if (R.v > 0) { if (R.v > 2) bump = Math.min(1, R.v / 8); R.v = 0; flash('Koniec toru — S: jazda wstecz'); } }
+  if (R.s > R.T.L - 2) { R.s = R.T.L - 2; if (R.v > 0) { if (R.v > 2) bump = Math.min(1, R.v / 8); R.v = 0; flash('Koniec mapy — dalej trasa do Pruszkowa później. S: jazda wstecz'); } }
   if (R.s - R.total < 2) { R.s = R.total + 2; if (R.v < 0) { R.v = 0; flash('Koniec toru'); } }
   R.brake = (dn && R.v > 0.1) || em; R.vf = R.v;
 }
@@ -2027,6 +2064,8 @@ function setXray(on) {
   for (const m of [...(W.xrayMats || []), wallMat, roofMat]) { m.transparent = on; m.opacity = on ? (m === wallMat || m === roofMat ? 0.18 : 0.28) : 1; m.depthWrite = !on; m.needsUpdate = true; }
   for (const m of W.crowns || []) m.visible = !on;
   tubeMat.emissive = new THREE.Color(on ? '#3a3328' : '#000');
+  // tunele i mury też półprzezroczyste: w tunelu (pociąg, metro, tramwaj, auto) widać przez nie świat dookoła
+  for (const m of [tubeMat, concMat]) { m.transparent = on; m.opacity = on ? 0.4 : 1; m.depthWrite = !on; m.needsUpdate = true; }
 }
 
 /* ---------- noc ---------- */

@@ -1,9 +1,13 @@
 # Changelog
 
+## 0.7.1 — 2026-11-04
+- Pociąg jedzie linią **WKD**: start na stacji Śródmieście WKD (pod ziemią), czołem w stronę Pruszkowa — tunelem, za portalem wykopem w górę (tor się wznosi, teren przycięty pod tor) do końca mapy (dalsza trasa później); szyny na tej linii.
+- Mapa: tory w wykopie (OSM layer −1 bez tunelu) i na podziemnych stacjach (level < 0) nie znikają już z mapy — wykop i zjazd od portalu robią konstrukcje; stacja podziemna to tunel.
+- Rentgen (X): ściany tuneli i mury też półprzezroczyste — z pociągu w tunelu widać świat dookoła.
+
 ## 0.7.0 — 2026-11-04
 - **Tramwaj na pełnej fizyce z aTrain** (GameLaboratory: zachowanie „koło na szynie”): kontakt koła z szyną z profilu koła i przekroju szyny, zawieszenie, napęd i hamulec — tramwaj trzyma się toru wyłącznie siłami (bez przyklejania). Człony na wózkach stałych jadą na swoich zestawach kołowych, podwieszone wiszą na przegubach; widać przechył i kołysanie, za szybko w łuku — wykolejenie (R wraca na tor). W/S — nastawnik (prędkość zadana, widać ją w HUD), Spacja — hamulec.
 - **Szyny** na początek na linii, po której jedzie gracz — tramwajowej (w jezdni) albo kolejowej (na podsypce z podkładami); pozostałe linie później. Z tego samego opisu toru co fizyka; tory z OSM przycięte do mapy i wygładzone (także w pionie) — tor bez skoków.
-- Pociąg rusza na mapie, na szynach (w tym obszarze kolej biegnie tunelami: Tunel Średnicowy, WKD).
 - Ekran startowy: wyśrodkowane miniatury; w planie (wkrótce): metro — na początek linia M1, trolejbus linii 51 (1983–1995, Puławska).
 - **Doktor mapy**: sprawdza, czy z chodnika da się zejść do przejścia podziemnego (pieszy idzie od wejścia w głąb) — wejście jest w OSM, a w świecie gry brak schodów / rampy: „Wejście do podziemi niepodłączone”.
 
