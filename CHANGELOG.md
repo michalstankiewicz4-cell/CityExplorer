@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0 — 2026-11-04
+- Teren z NMT GUGiK (model gruntu bez budynków, oczko 5 m) zamiast Terrarium w centrum — skarpa, wykopy kolejowe, nasypy.
+- Wiadukty: pomosty z barierkami i filarami, wysokość z prześwitu nad drogami/torami, podjazdy na sąsiednich ulicach; można po nich jeździć i pod nimi przejeżdżać.
+- Tunele drogowe: zjazd w wykopie z murami oporowymi, wnętrze z oświetleniem, mury czołowe portali.
+- Przejazdy bramne pod kamienicami (tunnel=building_passage): prześwit w ścianie, wnętrze bramy.
+- Tunele kolejowe (Średnicowy, WKD), metro i przejścia podziemne; pociągi, metro i tramwaje jeżdżą po torach (kolizje z tramwajami).
+- X — tryb rentgen: przezroczysty grunt i budynki, widać tunele i metro.
+- Fizyka wielopoziomowa: nawierzchnia pod autem (teren/wiadukt/tunel), spadanie z krawędzi, kolizje zależne od wysokości.
+- Poprawka: tło poza mapą nie przykrywa już niższych terenów (Powiśle).
+
 ## 0.1.2 — 2026-11-04
 - LPM: pełne rozglądanie — dookoła oraz w górę i w dół (też z kamery z maski).
 - Kamera nie wchodzi w budynki, drzewa przy kamerze są wycinane.

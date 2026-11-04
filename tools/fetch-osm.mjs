@@ -65,5 +65,6 @@ for (const x of ways.values()) { const rel = relevantWay(x.tags); if (!rel && !n
 const N_ = {}, trees = [];
 for (const x of nodes.values()) { if (needN.has(x.id)) N_[x.id] = [+x.lat.toFixed(7), +x.lon.toFixed(7)]; if (x.tags && x.tags.natural === 'tree') trees.push([+x.lat.toFixed(7), +x.lon.toFixed(7)]); }
 const out = { meta: { lat: lat0, lon: lon0, R, SEG: null, created: new Date().toISOString(), attribution: '© OpenStreetMap contributors (ODbL)' }, osm: { v: 2, nodes: N_, ways: W_, rels: R_, trees }, terrain: null };
-writeFileSync('warszawa-centrum.json', JSON.stringify(out));
-console.log(`Zapisano: ${W_.length} dróg/obszarów, ${R_.length} relacji, ${trees.length} drzew`);
+const outName = R === 1000 ? 'warszawa-centrum.json' : `warszawa-r${R}.json`;
+writeFileSync(outName, JSON.stringify(out));
+console.log(`Zapisano ${outName}: ${W_.length} dróg/obszarów, ${R_.length} relacji, ${trees.length} drzew`);

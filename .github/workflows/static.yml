@@ -39,6 +39,10 @@ jobs:
         continue-on-error: true
         timeout-minutes: 15
         run: node tools/fetch-osm.mjs
+      - name: Pobierz dane OSM dla ?r=2000 (warszawa-r2000.json)
+        continue-on-error: true
+        timeout-minutes: 15
+        run: node tools/fetch-osm.mjs 52.23175 21.00586 2000
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

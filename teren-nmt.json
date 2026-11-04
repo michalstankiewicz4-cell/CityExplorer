@@ -1,0 +1,13 @@
+{
+ "ncols": 850,
+ "nrows": 850,
+ "west": 20.976,
+ "south": 52.211,
+ "dx": 7.2941176e-05,
+ "dy": 4.9411765e-05,
+ "base": 75.0,
+ "scale": 0.01,
+ "order": "rows from north, uint16 LE, h = base + v*scale",
+ "source": "GUGiK NMT (DTM_PL-EVRF2007-NH), EVRF2007",
+ "attribution": "\u0179r\u00f3d\u0142o: G\u0142\u00f3wny Urz\u0105d Geodezji i Kartografii (GUGiK)"
+}

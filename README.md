@@ -16,6 +16,7 @@ Jeżdżenie autem po prawdziwym centrum Warszawy, zbudowanym z danych OpenStreet
 | C | kamera (za autem / wysoko / z maski) |
 | M | duża mapa (klik = teleport, kółko = zoom) |
 | K | minimapa wł./wył. |
+| X | rentgen: przezroczysty grunt i budynki (tunele, metro, pociągi) |
 | N | noc / dzień |
 | P | filtr pixel-art |
 | H | ukryj pomoc |
@@ -31,7 +32,13 @@ Kolejność ładowania:
 2. pamięć przeglądarki (IndexedDB) – po pierwszym pobraniu,
 3. Overpass API, a gdy nie odpowiada – API OpenStreetMap (kafle).
 
-Wysokości terenu: kafle Terrarium (AWS Terrain Tiles), filtrowane, żeby usunąć „garby” po budynkach.
+Wysokości terenu: **NMT GUGiK** (`teren-nmt.bin`, model gruntu bez budynków, oczko 5 m, pokrywa ok. 2 km od PKiN; źródło: Główny Urząd Geodezji i Kartografii). Poza nim kafle Terrarium (AWS Terrain Tiles) z wycinaniem „garbów” po budynkach.
+
+## Wiadukty, tunele, przejazdy
+OSM podaje tylko poziom (`layer`), więc wysokości są liczone:
+- wiadukt: pomost między przyczółkami, podniesiony tak, by nad przecinaną drogą/torem był prześwit (5,3 m / 6,8 m), podjazd rozkłada się na sąsiednich ulicach (spadek 7%),
+- tunel: spąg = teren − głębokość zależna od `layer` i rodzaju (droga, kolej, metro, przejście); przy portalu brany jest pod uwagę wykop widoczny w NMT, brakujący zjazd powstaje na drodze dojazdowej (wykop z murami),
+- `tunnel=building_passage`: prześwit 4,2 m w ścianie budynku.
 Przycisk „Zapisz dane (JSON)” zapisuje komplet (OSM + teren) – taki plik wrzucony do repo jako `warszawa-centrum.json` też zadziała.
 
 ## Technika
