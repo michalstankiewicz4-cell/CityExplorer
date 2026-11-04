@@ -62,7 +62,7 @@
 const QS = new URLSearchParams(location.search);
 const MODEL_DOCTOR = QS.get('md') || 'https://michalstankiewicz4-cell.github.io/GameLaboratory/tools/doctor/modeldoctor.js';
 const frame = document.getElementById('game');
-frame.src = 'index.html' + (QS.get('r') ? '?r=' + QS.get('r') : '');
+frame.src = 'index.html?mode=drive' + (QS.get('r') ? '&r=' + QS.get('r') : '');
 const $ = id => document.getElementById(id);
 const status = t => { $('status').textContent = t; };
 

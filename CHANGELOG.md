@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 — 2026-11-04
+- **Ekran startowy z wyborem trybu**: 1 — pieszo i pojazdem (czynny); szynowy, łódź i samolot — wkrótce.
+- **Pieszy**: człowiek z laboratorium ludzi GameLaboratory (LifeKit — chód i bieg ze szkieletem), W/S/A/D, Shift — bieg; zderzenia ze ścianami, drzewami i autem.
+- **FSO Polonez 1500** z GameLaboratory (RoadKit) zamiast prostego auta: koła ze skrętem Ackermanna, zawieszenie na nawierzchni pod każdym kołem, przechył i „kucanie”, światła mijania nocą, światła stop i cofania, wnętrze; kamera C — widok zza kierownicy.
+- **Wsiadanie i wysiadanie (E)**: drzwi kierowcy otwierają się, człowiek wchodzi / wychodzi; wysiąść można po zatrzymaniu.
+- Gra używa Three.js r186 z GameLaboratory (jedna kopia dla gry i modeli).
+
 ## 0.3.0 — 2026-11-04
 - **Doktor mapy** (`doktor.html`): bada zbudowany świat — przejezdność dróg (przeszkody, uskoki, stromizny, skoki na skrzyżowaniach, prześwit pod wiaduktami, odcięte drogi), widoczność (jezdnia w budynku / pod terenem, tunel nad terenem, budynek w tunelu), ciągłość torów (przerwy, ślepe końce, skoki, spadki, ostre załamania), przejścia podziemne i bramy; modele (auto, tramwaj, metro, pociąg) bada doktor modeli z GameLaboratory. Klik w wynik przenosi tam auto i stawia znacznik; `window.doktorReport`.
 - Poprawki z doktora: nasyp/bariera rampy nie blokuje drugiej jezdni ulicy dwujezdniowej; boczne drogi przy rampach bez progów (krótki podjazd, maks. 25%); tunele kolejowe i metra z wygładzonym spągiem i przykryciem; kolizje ścian budynków od terenu przy każdej krawędzi (tunel pod budynkiem nie blokuje).
