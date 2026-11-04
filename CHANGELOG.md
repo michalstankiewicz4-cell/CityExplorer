@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 — 2026-11-04
+- LPM: pełne rozglądanie — dookoła oraz w górę i w dół (też z kamery z maski).
+- Kamera nie wchodzi w budynki, drzewa przy kamerze są wycinane.
+
 ## 0.1.1 — 2026-11-04
 - Teren: wycięcie budynków z modelu wysokości (PKiN nie stoi już na garbie), ładowanie działa w karcie w tle.
 

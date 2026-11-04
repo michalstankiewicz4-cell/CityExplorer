@@ -19,7 +19,7 @@ Jeżdżenie autem po prawdziwym centrum Warszawy, zbudowanym z danych OpenStreet
 | N | noc / dzień |
 | P | filtr pixel-art |
 | H | ukryj pomoc |
-| Mysz | przeciągnij = obrót kamery, kółko = zoom |
+| Mysz | LPM + przeciągnij = rozglądanie dookoła i w górę/dół, kółko = zoom |
 
 ## Parametry URL
 `?r=1500` – promień obszaru w metrach (300–2500, domyślnie 1000)
