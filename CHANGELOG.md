@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0 — 2026-11-04
+- **Trzy pojazdy przy starcie** (modele z GameLaboratory): FSO Polonez, **czołg M1A2 Abrams** (gąsienice, obrót w miejscu, wieża i armata celują za kamerą, właz dowódcy) i **przegubowy Solaris Urbino 18** w barwach MZA (przegub jak naczepa, otwierane drzwi, wnętrze, nocą świecą lampy w środku i wyświetlacze). Wsiadasz do najbliższego klawiszem E.
+- Zderzenia pojazdów ze sobą, z pieszym i z miastem (okręgi wzdłuż nadwozia; autobus także członem tylnym).
+- **Ekran startowy**: przelot nad Śródmieściem w tle, karty trybów z **miniaturami pojazdów** (renderowane z modeli), modele wczytują się w tle z paskiem postępu; ekran ładowania z kółkiem, paskiem i procentami.
+- **Opcje (Esc)** — gra pauzuje: noc, rentgen, pixel-art, minimapa, kamera; **grafika** (rozdzielczość, cienie, zasięg widoku, pole widzenia, jasność, **styl pojazdów: rysunek — krawędzie niebieskim długopisem, powierzchnie kredką kreskowaną po skosie**); **klawisze** do zmiany (po dwa na czynność). Ustawienia zostają w przeglądarce.
+
 ## 0.4.0 — 2026-11-04
 - **Ekran startowy z wyborem trybu**: 1 — pieszo i pojazdem (czynny); szynowy, łódź i samolot — wkrótce.
 - **Pieszy**: człowiek z laboratorium ludzi GameLaboratory (LifeKit — chód i bieg ze szkieletem), W/S/A/D, Shift — bieg; zderzenia ze ścianami, drzewami i autem.

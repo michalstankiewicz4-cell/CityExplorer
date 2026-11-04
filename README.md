@@ -1,16 +1,17 @@
 # CityExplorer — Warszawa 3D
 
-Spacer i jazda FSO Polonezem po prawdziwym centrum Warszawy, zbudowanym z danych OpenStreetMap: budynki z wysokościami (Pałac Kultury z częściami i iglicą), ulice, chodniki, przejścia, tory tramwajowe, parki, drzewa i rzeźba terenu.
+Spacer i jazda (FSO Polonez, czołg M1A2 Abrams, przegubowy Solaris Urbino 18) po prawdziwym centrum Warszawy, zbudowanym z danych OpenStreetMap: budynki z wysokościami (Pałac Kultury z częściami i iglicą), ulice, chodniki, przejścia, tory tramwajowe, parki, drzewa i rzeźba terenu.
 
 **Graj:** https://michalstankiewicz4-cell.github.io/CityExplorer/
 
 ## Tryby
-Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy zaparkowanym Polonezie; **szynowy**, **łódź**, **samolot** — wkrótce.
+Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy zaparkowanych pojazdach: Polonezie, czołgu i autobusie; **szynowy**, **łódź**, **samolot** — wkrótce.
 
 ## Sterowanie
 | Klawisz | Akcja |
 |---|---|
-| E | wsiądź / wysiądź (przy drzwiach kierowcy; wysiąść można po zatrzymaniu) |
+| E | wsiądź / wysiądź (przy drzwiach lub włazie najbliższego pojazdu; wysiąść można po zatrzymaniu) |
+| Esc | opcje: gra, grafika (m.in. styl „rysunek”), zmiana klawiszy |
 | W / ↑ | gaz / naprzód |
 | S / ↓ | hamulec, wsteczny / wstecz |
 | A D / ← → | skręt |
