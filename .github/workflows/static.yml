@@ -35,6 +35,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Sprawdź numer wersji
+        run: node tools/check-version.mjs
       - name: Pobierz dane OSM (warszawa-centrum.json)
         continue-on-error: true
         timeout-minutes: 15

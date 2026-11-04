@@ -45,3 +45,11 @@ Przycisk „Zapisz dane (JSON)” zapisuje komplet (OSM + teren) – taki plik w
 Jeden plik `index.html`, three.js z CDN (jsDelivr). Budynki są łączone w siatki po kwadratach 220 m. Ulice, place i trawniki są malowane na teksturze gruntu nałożonej na teren. Drzewa to instancje. Kolizje liczone są z obrysami budynków i pniami drzew. Wysokości: `height` / `building:levels` / `min_height` / `roof:shape` (pyramidal, dome, hipped). Gdy budynek ma części (`building:part`), rysowane są tylko części.
 
 Dane © OpenStreetMap contributors (ODbL).
+
+## Wersje
+Projekt używa [SemVer](https://semver.org/lang/pl/): **MAJOR.MINOR.PATCH**.
+- **MINOR** – nowa funkcja widoczna dla gracza (np. wiadukty, nowe dzielnice),
+- **PATCH** – poprawki błędów i drobne zmiany wydane osobno,
+- poprawki w trakcie prac nad tą samą wersją nie zmieniają numeru – trafiają do bieżącego wpisu w `CHANGELOG.md`.
+
+Numer jest w `APP_VERSION` (index.html), w `<title>`, w JSON-LD (`softwareVersion`) i na górze `CHANGELOG.md`. Workflow zatrzymuje publikację, gdy się nie zgadzają (`tools/check-version.mjs`).

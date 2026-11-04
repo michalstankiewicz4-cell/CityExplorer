@@ -3,13 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warszawa 3D — Centrum (PKiN)</title>
+<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.2.0</title>
+<meta name="description" content="Darmowa gra w przeglądarce: jedź autem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
+<meta name="keywords" content="Warszawa 3D, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
+<meta name="author" content="Michał Stankiewicz">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#0d1014">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/CityExplorer/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230d1014'/%3E%3Cpath d='M32 6l3 14h-6z' fill='%23e0b84a'/%3E%3Crect x='27' y='20' width='10' height='12' fill='%23c6ae7f'/%3E%3Crect x='23' y='32' width='18' height='12' fill='%23c6ae7f'/%3E%3Crect x='14' y='44' width='36' height='12' fill='%23c6ae7f'/%3E%3C/svg%3E">
+<!-- Open Graph (Facebook, LinkedIn, Messenger, WhatsApp, Wykop) -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pl_PL">
+<meta property="og:site_name" content="Warszawa 3D">
+<meta property="og:title" content="Warszawa 3D — jedź autem po centrum Warszawy">
+<meta property="og:description" content="Darmowa gra w przeglądarce: jedź autem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/CityExplorer/">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pałac Kultury i Nauki i wieżowce Śródmieścia w grze Warszawa 3D">
+<!-- X / Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Warszawa 3D — jedź autem po centrum Warszawy">
+<meta name="twitter:description" content="Darmowa gra w przeglądarce: jedź autem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
+<meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: jedź autem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.2.0"}
+</script>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#0d1014;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#e8e6e1}
   canvas#c{display:block;width:100%;height:100%}
   canvas#c.pix{image-rendering:pixelated}
   #loader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0d1014;z-index:20;gap:14px}
-  #loader h1{margin:0;font-weight:600;letter-spacing:.04em}
+  #loader .ttl{margin:0;font-size:32px;font-weight:600;letter-spacing:.04em}
   #loader .sub{opacity:.6;font-size:14px}
   #bar{width:340px;height:6px;background:#22272e;border-radius:3px;overflow:hidden}
   #bar>div{height:100%;width:0;background:#c6ae7f;transition:width .2s}
@@ -28,13 +54,21 @@
   button{background:#2a3038;color:#e8e6e1;border:1px solid #ffffff2a;border-radius:6px;padding:5px 9px;font-size:12px;cursor:pointer}
   button:hover{background:#353d47}
   #err{color:#ff9a8a}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
 </head>
 <body>
-<canvas id="c"></canvas>
+<main class="sr">
+  <h1>Warszawa 3D — jazda autem po centrum Warszawy</h1>
+  <p>Darmowa gra w przeglądarce. Jedziesz samochodem po trójwymiarowym Śródmieściu zbudowanym z prawdziwej mapy: Pałac Kultury i Nauki, Złote Tarasy, Marszałkowska, Aleje Jerozolimskie, Plac Defilad, Ogród Saski.</p>
+  <p>W grze są wiadukty (Chałubińskiego, Jana Pawła II, Wiadukt Markiewicza), tunele, przejazdy bramne pod kamienicami, Tunel Średnicowy, metro i jeżdżące tramwaje. Teren pochodzi z modelu NMT GUGiK, budynki i ulice z OpenStreetMap.</p>
+  <p>Sterowanie: W, A, S, D lub strzałki, Spacja — hamulec ręczny, Shift — turbo, M — mapa, X — widok podziemi (rentgen), N — noc.</p>
+</main>
+<noscript><p style="padding:20px;color:#fff">Warszawa 3D wymaga włączonego JavaScriptu i przeglądarki z obsługą WebGL.</p></noscript>
+<canvas id="c" aria-label="Widok 3D centrum Warszawy"></canvas>
 <div id="loader">
-  <h1>Warszawa 3D</h1>
+  <div class="ttl">Warszawa 3D <small id="ver" style="font-size:14px;opacity:.55;font-weight:500"></small></div>
   <div class="sub">Śródmieście · Pałac Kultury i Nauki · dane © OpenStreetMap</div>
   <div id="bar"><div></div></div>
   <div id="log">Start…</div>
@@ -43,6 +77,7 @@
   <div id="speed">0<small>km/h</small></div>
   <div id="street"></div>
   <div id="fps"></div>
+  <div id="verHud" style="font-size:11px;opacity:.45"></div>
 </div>
 <canvas id="minimap" width="440" height="440" style="display:none"></canvas>
 <canvas id="bigmap"></canvas>
@@ -69,6 +104,8 @@ import * as THREE from 'three';
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
+const APP_VERSION = '0.2.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+document.getElementById('ver').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
 const CENTER = { lat: +(QS.get('lat') || 52.23175), lon: +(QS.get('lon') || 21.00586) };
 const R = Math.min(2500, Math.max(300, +(QS.get('r') || 1000)));
@@ -524,7 +561,9 @@ function buildStructures(lines, ctx) {
     const l = tun[0], i = l.ids.indexOf(n.id), dir = i === 0 ? 1 : -1;
     let p = l.pts[i], acc = 0;
     for (let k = i + dir; k >= 0 && k < l.pts.length; k += dir) { const q = l.pts[k], d = Math.hypot(q[0] - p[0], q[1] - p[1]); if (acc + d >= 15) { const f = (15 - acc) / d; p = [p[0] + (q[0] - p[0]) * f, p[1] + (q[1] - p[1]) * f]; acc = 15; break; } acc += d; p = q; }
-    const o = net === 'foot' ? 0 : Math.min(0, H(p[0], p[1]) - D - H(n.x, n.z));
+    // wjazdy do garaży podziemnych i przejścia: zjazd tylko w samym tunelu, bez wykopu na ulicy
+    const minor = net === 'foot' || (net === 'road' && tun.every(t => (t.rank || 0) <= 1));
+    const o = minor ? 0 : Math.min(0, H(p[0], p[1]) - D - H(n.x, n.z));
     off.set(K(net, n.id), o); n.portal = true;
     if (o < -0.15) sources.push([net, n.id, o]);
   }
@@ -533,7 +572,10 @@ function buildStructures(lines, ctx) {
   // indeks linii "pod spodem" do szukania skrzyżowań
   const under = new Map(), UC = 25;
   for (const l of lines) if (l.kind !== 'bridge' && l.kind !== 'tunnel' && l.net) for (let i = 0; i < l.pts.length - 1; i++) gridAdd(under, UC, l.pts[i][0], l.pts[i][1], l.pts[i + 1][0], l.pts[i + 1][1], 0, [l, i]);
-  const segX = (a, b, c, d) => { const r = [b[0] - a[0], b[1] - a[1]], s = [d[0] - c[0], d[1] - c[1]], den = r[0] * s[1] - r[1] * s[0]; if (Math.abs(den) < 1e-9) return null; const t = ((c[0] - a[0]) * s[1] - (c[1] - a[1]) * s[0]) / den, u = ((c[0] - a[0]) * r[1] - (c[1] - a[1]) * r[0]) / den; return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? t : null; };
+  const segX = (a, b, c, d) => { const r = [b[0] - a[0], b[1] - a[1]], s = [d[0] - c[0], d[1] - c[1]], den = r[0] * s[1] - r[1] * s[0]; if (Math.abs(den) < 1e-9) return null; const t = ((c[0] - a[0]) * s[1] - (c[1] - a[1]) * s[0]) / den, u = ((c[0] - a[0]) * r[1] - (c[1] - a[1]) * r[0]) / den; return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [t, u] : null; };
+  const pointAt = (l, d) => { d = Math.max(0, Math.min(l.len, d)); let i = 1; while (i < l.cum.length - 1 && l.cum[i] < d) i++; const a = l.pts[i - 1], b = l.pts[i], f = (d - l.cum[i - 1]) / ((l.cum[i] - l.cum[i - 1]) || 1); return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f]; };
+  // NMT pod wiaduktem jest interpolowany (skaner nie widzi gruntu) — wysokość drogi pod spodem bierzemy z terenu obok
+  const underCuts = new Map();
   for (const net in nets) {
     const N = nets[net], seen = new Set();
     for (const start of N.values()) {
@@ -564,12 +606,26 @@ function buildStructures(lines, ctx) {
         for (const [o, j] of cand) {
           if (o === l || (num(o.L) >= l.L)) continue;
           if (o.ids.includes(l.ids[i]) || o.ids.includes(l.ids[i + 1])) continue;
-          const t = segX(a, b, o.pts[j], o.pts[j + 1]); if (t == null) continue;
+          const tu = segX(a, b, o.pts[j], o.pts[j + 1]); if (tu == null) continue;
+          const [t, u] = tu;
           const px = a[0] + (b[0] - a[0]) * t, pz = a[1] + (b[1] - a[1]) * t;
           const deck = abs.get(K(net, l.ids[i])) * (1 - t) + abs.get(K(net, l.ids[i + 1])) * t;
-          const req = H(px, pz) + (CLEAR[o.net] || 5.3) + 6 * Math.max(0, l.L - 1 - Math.max(0, num(o.L) || 0));
-          need = Math.max(need, req - deck);
+          const clr = (CLEAR[o.net] || 5.3) + 6 * Math.max(0, l.L - 1 - Math.max(0, num(o.L) || 0));
+          const sc = o.cum[j] + (o.cum[j + 1] - o.cum[j]) * u, half = (l.wd || 8) / 2 + 14;
+          const q1 = pointAt(o, sc - half), q2 = pointAt(o, sc + half), h1 = H(q1[0], q1[1]), h2 = H(q2[0], q2[1]), hOut = Math.min(h1, h2);
+          if (deck - hOut >= clr - 0.6) {   // wiadukt nad zagłębieniem: obniżamy drogę/tor pod spodem zamiast podnosić pomost
+            if (deck - H(px, pz) < clr) { let a2 = underCuts.get(o); if (!a2) underCuts.set(o, a2 = []); a2.push([sc - half, sc + half, h1, h2, deck - clr]); }
+            continue;
+          }
+          const req = hOut + clr;
+          if (req - deck > need) { need = req - deck; for (const bl of bLines) bl.dbg = { need: +need.toFixed(1), by: (o.t.name || o.hw || o.rail) + '/' + o.net + '/L' + o.L + '/' + o.kind, at: [px | 0, pz | 0], H: +H(px, pz).toFixed(1), deck: +deck.toFixed(1) }; }
         }
+      }
+      // chodnik na wiadukcie obok jezdni: nie podnosimy osobno (jezdnia obok decyduje)
+      if (net === 'foot' && need > 0.05) {
+        const mid = [...bLines][0], mp = mid.pts[Math.floor(mid.pts.length / 2)];
+        const near = lines.some(o => o.kind === 'bridge' && o.net !== 'foot' && o.pts.some((p, k) => k < o.pts.length - 1 && segDist(mp[0], mp[1], [p[0], p[1], o.pts[k + 1][0], o.pts[k + 1][1]])[0] < 15));
+        if (near) need = 0;
       }
       if (need > 0.05) {
         setAbs(need);
@@ -578,26 +634,33 @@ function buildStructures(lines, ctx) {
     }
   }
 
-  /* ---------- podjazdy / zjazdy: propagacja przesunięć po zwykłych drogach ---------- */
-  for (const sign of [1, -1]) {
-    const best = new Map(), pq = [];
-    for (const [net, id, o] of sources) if (Math.sign(o) === sign) { const k = K(net, id), v = Math.abs(o); if (v > (best.get(k) || 0)) { best.set(k, v); pq.push([v, net, id]); } }
-    while (pq.length) {
-      let mi = 0; for (let i = 1; i < pq.length; i++) if (pq[i][0] > pq[mi][0]) mi = i;
-      const [v, net, id] = pq.splice(mi, 1)[0]; if (v < (best.get(K(net, id)) || 0) - 1e-6) continue;
-      const n = nets[net].get(id), slope = NET_SLOPE[net] || 0.07;
-      for (const l of n.ways) {
-        if (l.kind !== 'free') continue;
-        const i = l.ids.indexOf(id);
-        for (const j of [i - 1, i + 1]) {
-          if (j < 0 || j >= l.ids.length) continue;
-          const nid = l.ids[j], nv = v - slope * Math.abs(l.cum[j] - l.cum[i]); if (nv <= 0.02) continue;
-          const nk = K(net, nid); if (abs.has(nk) || (nets[net].get(nid).ways.some(w => w.kind === 'tunnel'))) continue;
-          if (nv > (best.get(nk) || 0)) { best.set(nk, nv); pq.push([nv, net, nid]); }
+  /* ---------- podjazdy / zjazdy: przesunięcie maleje wzdłuż drogi (na wprost, bez skręcania w boczne ulice) ---------- */
+  const dirOf = (l, i, j) => { const a = l.pts[i], b = l.pts[j]; const dx = b[0] - a[0], dz = b[1] - a[1], d = Math.hypot(dx, dz) || 1; return [dx / d, dz / d]; };
+  for (const [net, sid, o0] of sources) {
+    const N = nets[net], slope = NET_SLOPE[net] || 0.07, sign = Math.sign(o0);
+    for (const l0 of N.get(sid).ways) {
+      if (l0.kind !== 'free') continue;
+      const i0 = l0.ids.indexOf(sid);
+      for (const step of [1, -1]) {
+        let l = l0, i = i0, st = step, v = Math.abs(o0), guard = 0;
+        if (i + st < 0 || i + st >= l.ids.length) continue;
+        while (v > 0.02 && guard++ < 500) {
+          const j = i + st;
+          if (j < 0 || j >= l.ids.length) {
+            // koniec drogi: kontynuacja w najbardziej "prostą" drogę
+            const id = l.ids[i], n = N.get(id), d0 = dirOf(l, i - st, i); let best = null, bs = 0.7;
+            for (const w of n.ways) { if (w === l || w.kind !== 'free') continue; const k = w.ids.indexOf(id); for (const s2 of [1, -1]) { const k2 = k + s2; if (k2 < 0 || k2 >= w.ids.length) continue; const d1 = dirOf(w, k, k2), sc = d0[0] * d1[0] + d0[1] * d1[1]; if (sc > bs) { bs = sc; best = [w, k, s2]; } } }
+            if (!best) break;
+            [l, i, st] = best; continue;
+          }
+          const nid = l.ids[j], k = K(net, nid);
+          if (abs.has(k) || N.get(nid).ways.some(w => w.kind === 'tunnel')) break;
+          v -= slope * Math.abs(l.cum[j] - l.cum[i]); if (v <= 0.02) break;
+          const cur = off.get(k) || 0; if (sign > 0 ? v > cur : -v < cur) off.set(k, sign * v);
+          i = j;
         }
       }
     }
-    for (const [k, v] of best) { if (abs.has(k)) continue; const cur = off.get(k) || 0; if (sign > 0 ? v > cur : -v < cur) off.set(k, sign * v); }
   }
 
   /* ---------- próbki co ~4 m z wysokością ---------- */
@@ -615,6 +678,8 @@ function buildStructures(lines, ctx) {
         if (va.a != null && vb.a != null) y = va.a + (vb.a - va.a) * t;
         else { const oa = va.o ?? (va.a - H(a[0], a[1])), ob = vb.o ?? (vb.a - H(b[0], b[1])); y = h + oa + (ob - oa) * t; }
         if (l.kind === 'tunnel') y = Math.min(y, h - 0.4);
+        const uc = underCuts.get(l);
+        if (uc) { const d = l.cum[i] + (l.cum[i + 1] - l.cum[i]) * t; for (const [s0, s1, h1, h2, ymax] of uc) if (d > s0 && d < s1) { const f = (d - s0) / (s1 - s0), yl = Math.min(h1 + (h2 - h1) * f, ymax); y = Math.min(y, yl); } }
         S.push([x, z, y, h]); maxOff = Math.max(maxOff, Math.abs(y - h));
       }
     }
@@ -985,7 +1050,7 @@ function buildWorld(D) {
   lines.forEach(l => { l.ground = !l.isB && !l.isTun && !l.passage; });
   status('Liczę wiadukty i tunele…', 0.68);
   const STR = buildStructures(lines);
-  W.structStats = STR.stats;
+  W.structStats = STR.stats; W.lines = lines;
   const strokePts = (pts, wd, col, dash) => {
     g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(PX(p[0]), PX(p[1])) : g.moveTo(PX(p[0]), PX(p[1])));
     g.lineWidth = Math.max(1, wd * sc); g.strokeStyle = col; g.lineCap = dash ? 'butt' : 'round'; g.lineJoin = 'round'; g.setLineDash(dash ? dash.map(d => d * sc) : []); g.stroke(); g.setLineDash([]);
@@ -1621,6 +1686,7 @@ async function main() {
     console.log('[W3D] stats', JSON.stringify(st));
     car.spawn = findSpawn(); resetCar();
     status('Gotowe!', 1); await frame();
+    $('verHud').textContent = 'Warszawa 3D v' + APP_VERSION;
     $('loader').style.display = 'none'; $('hud').style.display = ''; $('minimap').style.display = ''; $('help').style.display = '';
     updateCamera(0, true);
     window.__W3D = { car, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid };
