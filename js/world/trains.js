@@ -1,4 +1,4 @@
-// Warszawa 3D — Składy AI: pociągi, metro, tramwaje jeżdżące po ciągach torów.
+// Wielka Kradzież Aut VI — Składy AI: pociągi, metro, tramwaje jeżdżące po ciągach torów.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* =========================================================================

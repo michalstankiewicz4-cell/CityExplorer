@@ -1,10 +1,10 @@
-// Warszawa 3D — Samolot (AirKit, zachowanie „lot w atmosferze”): postój, lot, wysiadanie, kamera, HUD.
+// Wielka Kradzież Aut VI — Samolot (AirKit, zachowanie „lot w atmosferze”): postój, lot, wysiadanie, kamera, HUD.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* =========================================================================
    SAMOLOT (AirKit z GameLaboratory i zachowanie „lot w atmosferze”): Spitfire Mk I na progu drogi startowej Okęcia
-   W/S — drążek (pchnij / ciągnij), A/D — lotki (na ziemi także kółko ogonowe), Q/F — ster kierunku,
-   Shift / Ctrl — gaz, Spacja — hamulce kół, G — podwozie, B — klapy, E — owiewka, R — od nowa
+   klawisze: js/core/input.js (ACTIONS) — drążek, lotki (na ziemi także kółko ogonowe), ster kierunku, gaz, hamulce kół,
+   podwozie, klapy, zrzut bomby; wsiądź / wysiądź (owiewka otwiera się przy wysiadaniu)
    ========================================================================= */
 const air = { V: null, sim: null, c: { throttle: 0, elevator: 0, aileron: 0, rudder: 0, flaps: 0, gear: 1, brake: 1 }, work: 0, ego: { x: 0, y: 0, z: 0, th: 0, vf: 0 }, spawn: null, off: null };
 let AIRK = null, FLY = null;
@@ -23,7 +23,7 @@ function airReset() {
   if (typeof bombsArm === 'function' && BOMBS.armedOnce) bombsArm();
   airSync();
 }
-// samolot stoi na swoim miejscu (próg drogi startowej Okęcia) od chwili zbudowania Okęcia — wsiadasz E albo trybem Samolot
+// samolot stoi na swoim miejscu (próg drogi startowej Okęcia) od chwili zbudowania Okęcia — wsiadasz (wsiądź / wysiądź) albo trybem Samolot
 async function parkAir() {
   if (air.V) return;
   if (!AIRK) [AIRK, FLY] = await Promise.all([import(GL + 'js/models/air/airkit.js'), import(GL + 'js/behaviors/air/flight.js')]);
@@ -56,7 +56,7 @@ function airPlace(dt) {
   const on_ = mode === 'air';
   air.V.update(carT, dt, { throttle: s.crashed || !on_ ? 0 : c.throttle, engine: !s.crashed && on_, aileron: c.aileron, elevator: c.elevator, rudder: c.rudder, flaps: c.flaps, gear: c.gear > 0.5, work: on_ ? 0 : air.work, lights: night, speed: s.onGround && on_ ? Math.hypot(s.v[0], s.v[2]) : 0 });
 }
-// E w samolocie: na ziemi po zatrzymaniu wysiadasz (owiewka się otwiera); E przy kabinie — wsiadasz
+// „wsiądź / wysiądź” w samolocie: na ziemi po zatrzymaniu wysiadasz (owiewka się otwiera); E przy kabinie — wsiadasz
 function airExit() {
   const s = air.sim.state;
   if (!s.onGround || Math.hypot(s.v[0], s.v[2]) > 1) { flash(s.onGround ? 'Zatrzymaj samolot, żeby wysiąść' : 'Najpierw wyląduj'); return; }
@@ -68,7 +68,7 @@ function airDoorAt() { const d = air.V.def.doorAt, g = air.V.group; g.updateMatr
 function airHud() {
   const s = air.sim.state, c = air.c;
   return `Wys. ${Math.round(s.p[1] - H(s.p[0], s.p[2]))} m · gaz ${Math.round(c.throttle * 100)}% · klapy ${c.flaps ? 'wypuszczone' : 'schowane'} · podwozie ${c.gear ? 'wypuszczone' : 'schowane'}` +
-    ` · bomby ${BOMBS.hung.filter(Boolean).length}` + (s.stall && !s.onGround ? ' · PRZECIĄGNIĘCIE' : '') + (s.crashed ? ' · ROZBITY (R — od nowa)' : '');
+    ` · bomby ${BOMBS.hung.filter(Boolean).length}` + (s.stall && !s.onGround ? ' · PRZECIĄGNIĘCIE' : '') + (s.crashed ? ' · ROZBITY (' + kb('reset') + ' — od nowa)' : '');
 }
 // kamera: za samolotem (C: bliżej / dalej) albo z kabiny — horyzont przechyla się z samolotem
 function airCamera(dt, snap) {

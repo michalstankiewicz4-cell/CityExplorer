@@ -1,6 +1,7 @@
-// Warszawa 3D — Dane OpenStreetMap: filtr znaczników, Overpass, API OSM (kafle), plik z deployu.
+// Wielka Kradzież Aut VI — Dane OpenStreetMap: filtr znaczników, Overpass, API OSM (kafle), plik z deployu.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
+let DATA = null, TERR_RAW = null;   // dane OSM i surowe wysokości bieżącego obszaru
 /* =========================================================================
    DANE OSM
    ========================================================================= */

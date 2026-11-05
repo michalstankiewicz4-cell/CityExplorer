@@ -1,4 +1,4 @@
-// Warszawa 3D — Wspólny świat: dokładne obszary przebudowywane w locie, pojazdy na swoich miejscach, wczytanie obszaru.
+// Wielka Kradzież Aut VI — Wspólny świat: dokładne obszary przebudowywane w locie, pojazdy na swoich miejscach, wczytanie obszaru.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 // zwolnienie dokładnej mapy (obiekty sceny, siatki zderzeń, dróg, nawierzchni, składy AI); kafle też — wczytają się na nowo
@@ -30,7 +30,7 @@ async function switchArea(a) {
     if (mode !== 'air') { for (const V of FLEET) V.s.y = surfaceAt(V.s.x, V.s.z, V.s.y + 2); ped.y = surfaceAt(ped.x, ped.z, ped.y + 2); }
     camPos.x -= dx; camPos.z -= dz; if (air.off == null) {}
     for (const R of Object.values(RAILS)) for (const o of R.objs || []) o.visible = R.area === AREA;
-    await homeVehicles(t => status('Na swoje miejsce: ' + t, 0.95));
+    await homeVehicles(t => status('Ustawiam pojazdy na ich miejscach: ' + t, 0.95));
     if (sk) setSketch(true); if (xray) setXray(true); setNight(night);
     if (bigOpen) { bmPan = null; drawBigMap(); }
   } catch (e) { console.error('[W3D] zmiana obszaru', e); flash('Nie udało się wczytać: ' + a.name); }
@@ -51,11 +51,11 @@ function areaCheck(dt) {
 async function homeVehicles(progress = () => {}) {
   if (AREA === AREAS.centrum) {
     if (!FLEET.homed && FLEET.length) { const sp = findSpawn(); SPAWN = sp; for (const V of FLEET) { park(V, sp, PARK[V.id] || 0); V.v.group.visible = true; } FLEET.homed = true; }
-    for (const k of ['tram', 'train']) if (!RAILS[k].V) { progress(k === 'tram' ? 'Tramwaj…' : 'Pociąg WKD…'); try { await parkRail(k); } catch (e) { console.warn('[W3D] skład', k, e); } }
+    for (const k of ['tram', 'train']) if (!RAILS[k].V) { progress(k === 'tram' ? 'tramwaj…' : 'pociąg WKD…'); try { await parkRail(k); } catch (e) { console.warn('[W3D] skład', k, e); } }
     for (const R of Object.values(RAILS)) if (R.V && R.area === AREA) for (const tr of trains) if (tr.ch && chKey(tr.ch) === R.chKey) { tr.off = true; for (const m of tr.cars) m.visible = false; }
   }
-  if (AREA === AREAS.okecie && !air.V) { progress('Samolot…'); try { await parkAir(); } catch (e) { console.warn('[W3D] samolot', e); } }
-  if (AREA === AREAS.wisla && !boat.V) { progress('Okręt…'); try { await parkBoat(); } catch (e) { console.warn('[W3D] okręt', e); } }
+  if (AREA === AREAS.okecie && !air.V) { progress('samolot…'); try { await parkAir(); } catch (e) { console.warn('[W3D] samolot', e); } }
+  if (AREA === AREAS.wisla && !boat.V) { progress('okręt…'); try { await parkBoat(); } catch (e) { console.warn('[W3D] okręt', e); } }
 }
 /* ---------- dokładny obszar: dane, teren, budowa świata ---------- */
 async function loadArea() {

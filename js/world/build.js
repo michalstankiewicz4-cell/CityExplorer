@@ -1,4 +1,4 @@
-// Warszawa 3D — Budowa dokładnej mapy z danych OSM: grunt, drogi, lotnisko, budynki, drzewa, teren, nakładki mapy.
+// Wielka Kradzież Aut VI — Budowa dokładnej mapy z danych OSM: grunt, drogi, lotnisko, budynki, drzewa, teren, nakładki mapy.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 function buildWorld(D) {

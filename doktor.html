@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Doktor mapy — Warszawa 3D</title>
+<title>Doktor mapy — Wielka Kradzież Aut VI</title>
 <meta name="robots" content="noindex">
 <style>
   html,body{margin:0;height:100%;background:#0d1014;color:#e8e6e1;font:13px/1.45 system-ui,Segoe UI,Roboto,sans-serif;overflow:hidden}
@@ -39,7 +39,7 @@
   <div id="side">
     <header>
       <h1>Doktor mapy</h1>
-      <div class="sub" id="ver">Warszawa 3D — sprawdza przejezdność, widoczność, tory, przejścia i modele</div>
+      <div class="sub" id="ver">Wielka Kradzież Aut VI — sprawdza przejezdność, widoczność, tory, przejścia i modele</div>
     </header>
     <div id="sum"></div>
     <div id="bar">
@@ -48,10 +48,10 @@
       <button id="bClear">Usuń znacznik</button>
     </div>
     <div id="list"></div>
-    <div id="about">Kliknij wynik: auto przeniesie się na miejsce, a czerwony słup je wskaże. Doktor modeli pochodzi z GameLaboratory (tools/doctor/modeldoctor.js).</div>
+    <div id="about">Kliknij wynik: auto przeniesie się na miejsce, a czerwony słup je wskaże. Doktor modeli pochodzi z GameLaboratory (kopia w lab/tools/doctor/modeldoctor.js).</div>
     <div id="status">Ładuję grę…</div>
   </div>
-  <iframe id="game" title="Warszawa 3D"></iframe>
+  <iframe id="game" title="Wielka Kradzież Aut VI"></iframe>
 </div>
 <script type="module">
 /* =========================================================================
@@ -305,7 +305,7 @@ async function checkModels() {
 /* ---------- 6. kafle mapy poza dokładną mapą (podstawowo): plik, budowa, luki na trasie centrum — Okęcie ---------- */
 async function checkTiles() {
   const TS = G.TS;
-  if (!TS || !TS.TL) { add('kafle', 'w', 'Kafle niedostępne', 'Nie wczytał się moduł js/tiles.mjs', null); return; }
+  if (!TS || !TS.TL) { add('kafle', 'w', 'Kafle niedostępne', 'Nie wczytał się moduł js/shared/tiles.mjs', null); return; }
   const TL = TS.TL, T = TL.T, idx = TS.index || new Set();
   add('kafle', idx.size ? 'i' : 'w', `Gotowe kafle Warszawy: ${idx.size}`, idx.size ? 'tiles/index.json' : 'Brak tiles/index.json — kafle tylko z Overpass na żywo (powstają przy deployu)', null);
   // luki na trasie centrum (PKiN) — Okęcie
@@ -386,7 +386,7 @@ $('bClear').onclick = () => { if (marker) marker.visible = false; sel = null; re
 $('bCopy').onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(window.doktorReport, null, 1)); status('Raport skopiowany.'); } catch (e) { status('Nie udało się skopiować: ' + e.message); } };
 frame.addEventListener('load', () => {
   const w = frame.contentWindow;
-  const go = () => { G = w.__W3D; try { w.document.getElementById('help').style.display = 'none'; } catch (e) { } $('ver').textContent = `Warszawa 3D v${G.version} · teren: ${G.stats.terrain} · budynki: ${G.stats.buildings}`; examine(); };
+  const go = () => { G = w.__W3D; try { w.document.getElementById('help').style.display = 'none'; } catch (e) { } $('ver').textContent = `Wielka Kradzież Aut VI v${G.version} · teren: ${G.stats.terrain} · budynki: ${G.stats.buildings}`; examine(); };
   if (w.__W3D) go(); else w.addEventListener('w3d-ready', go, { once: true });
   status('Gra się ładuje (dane OSM, teren)…');
 });

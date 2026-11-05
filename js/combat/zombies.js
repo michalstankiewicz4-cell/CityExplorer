@@ -1,4 +1,4 @@
-// Warszawa 3D — Zombie: pojawianie się, pościg, atak (bez szkód), śmierć, ciała, krew; efekty (cząstki, smugacze, wybuchy).
+// Wielka Kradzież Aut VI — Zombie: pula, pojawianie się, pościg, atak (bez szkód), śmierć, ciała, krew; efekty (cząstki, smugacze, wybuchy, jedno światło wybuchów).
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* =========================================================================
@@ -7,8 +7,7 @@
    robią szkód. Pieszo: karabinek Beryl (WeaponKit) i latarka (GearKit); czołg: armata albo karabin maszynowy
    (Tab), reflektor szperacz (L). Rozjechane i zastrzelone zombie zostają na ziemi z krwią.
    ========================================================================= */
-const ZB = { list: [], corpses: [], decals: [], t: 0, def: null, LK: null, spawnT: 0, kills: 0 };
-const WPN = { armed: true, rifle: null, fireT: 0, light: null, lightOn: false, holder: null, tankGun: 'cannon', reload: 0, mgT: 0, search: false, WK: null, GK: null };
+const ZB = { pool: [], list: [], corpses: [], decals: [], t: 0, def: null, LK: null, spawnT: 0, kills: 0 };
 const FX = { tracers: [], booms: [], parts: null, pv: [], pi: 0 };
 const zMax = () => night ? 22 : 7;
 const zSpeedOf = () => night ? 2.4 + Math.random() * 1.0 : 0.4 + Math.random() * 0.3;
@@ -47,7 +46,9 @@ function tracer(a, b, col = 0xffd27a) {
 function boom(x, y, z, r) {
   const fl = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), new THREE.MeshBasicMaterial({ color: 0xffb050, transparent: true, opacity: 1, depthWrite: false, blending: THREE.AdditiveBlending }));
   fl.position.set(x, y + 0.5, z); scene.add(fl);
-  const L = new THREE.PointLight(0xffa040, 40000, r * 12, 2); L.position.set(x, y + 2, z); scene.add(L);
+  // jedno stałe światło wybuchów (dodawanie świateł do sceny przebudowuje wszystkie shadery — przycięcie gry)
+  if (!FX.light) { FX.light = new THREE.PointLight(0xffa040, 0, 150, 2); scene.add(FX.light); }
+  const L = FX.light; L.distance = r * 12; L.position.set(x, y + 2, z);
   const smoke = []; for (let k = 0; k < 9; k++) { const s = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), new THREE.MeshStandardMaterial({ color: 0x3b3835, transparent: true, opacity: 0.75, depthWrite: false, roughness: 1 })); s.position.set(x + (Math.random() - 0.5) * r * 0.6, y + 0.5 + Math.random() * r * 0.4, z + (Math.random() - 0.5) * r * 0.6); s.userData.v = [(Math.random() - 0.5) * 2, 1.5 + Math.random() * 2, (Math.random() - 0.5) * 2]; scene.add(s); smoke.push(s); }
   FX.booms.push({ fl, L, smoke, t: 0, r });
   decal(SCORCH_TEX, x, z, r * 0.9, r * 0.9, Math.random() * 6.28);
@@ -64,9 +65,9 @@ function fxStep(dt) {
   for (let i = FX.tracers.length - 1; i >= 0; i--) { const t = FX.tracers[i]; t.life -= dt; t.m.material.opacity = Math.max(0, t.life / 0.07); if (t.life <= 0) { scene.remove(t.m); t.m.geometry.dispose(); t.m.material.dispose(); FX.tracers.splice(i, 1); } }
   for (let i = FX.booms.length - 1; i >= 0; i--) {
     const b = FX.booms[i]; b.t += dt; const k = b.t / 0.35;
-    b.fl.scale.setScalar(b.r * (0.3 + 0.9 * Math.min(1, k))); b.fl.material.opacity = Math.max(0, 1 - k); b.L.intensity = Math.max(0, 40000 * (1 - b.t / 0.3));
+    b.fl.scale.setScalar(b.r * (0.3 + 0.9 * Math.min(1, k))); b.fl.material.opacity = Math.max(0, 1 - k); if (b.L === FX.light && FX.booms[FX.booms.length - 1] === b) b.L.intensity = Math.max(0, 40000 * (1 - b.t / 0.3));
     for (const s of b.smoke) { s.position.x += s.userData.v[0] * dt; s.position.y += s.userData.v[1] * dt; s.position.z += s.userData.v[2] * dt; s.scale.setScalar(b.r * 0.25 * (1 + b.t)); s.material.opacity = Math.max(0, 0.75 * (1 - b.t / 3)); }
-    if (b.t > 3) { scene.remove(b.fl, b.L); b.fl.geometry.dispose(); b.fl.material.dispose(); for (const s of b.smoke) { scene.remove(s); s.geometry.dispose(); s.material.dispose(); } FX.booms.splice(i, 1); }
+    if (b.t > 3) { scene.remove(b.fl); b.fl.geometry.dispose(); b.fl.material.dispose(); for (const s of b.smoke) { scene.remove(s); s.geometry.dispose(); s.material.dispose(); } FX.booms.splice(i, 1); }
   }
 }
 /* ---------- zombie ---------- */
@@ -84,13 +85,19 @@ function zBuild() {
 }
 // zmiana obszaru: zombie, ciała i plamy znikają (nowy obszar zaludni się sam)
 function zClearAll() { for (const z of ZB.list) zFree(z); ZB.list.length = 0; ZB.corpses.length = 0; for (const m of ZB.decals) { scene.remove(m); m.material.dispose(); } ZB.decals.length = 0; }
-function zFree(z) { scene.remove(z.c.group); z.c.group.traverse(o => { if (o.isMesh) o.geometry.dispose(); }); }
+// zombie wracają do puli zamiast znikać (budowa nowego człowieka zajmuje chwilę — przycięcie przy pojawianiu)
+function zFree(z) {
+  if (ZB.pool.length < 26) { z.c.group.visible = false; z.c.group.rotation.set(0, 0, 0); ZB.pool.push(z.c); return; }
+  scene.remove(z.c.group); z.c.group.traverse(o => { if (o.isMesh) o.geometry.dispose(); });
+}
+// pula na start (w trakcie wczytywania): kilka gotowych zombie
+function zPrebuild(n) { for (let i = 0; i < n; i++) { const c = zBuild(); if (!c) return; c.group.visible = false; ZB.pool.push(c); } }
 function zSpawn() {
   for (let k = 0; k < 12; k++) {
     const a = Math.random() * 6.28, d = mode === 'air' ? 80 + Math.random() * 300 : 45 + Math.random() * 70, x = ego.x + Math.sin(a) * d, z = ego.z + Math.cos(a) * d;
     if (W.inBuilding && W.inBuilding(x, z)) continue; if (boat.mask && isWater(x, z)) continue;
     if (zWall(x, z, H(x, z) + 1)) continue;
-    const c = zBuild(); if (!c) return;
+    const c = ZB.pool.pop() || zBuild(); if (!c) return; c.group.visible = true; c.group.rotation.set(0, 0, 0);
     const y = surfaceAt(x, z, H(x, z) + 1);
     ZB.list.push({ c, x, z, y, th: Math.random() * 6.28, sp: zSpeedOf(), hp: 2, wander: Math.random() * 6.28, atk: 0, t0: Math.random() * 10 });
     return;

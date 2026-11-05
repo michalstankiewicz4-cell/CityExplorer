@@ -1,13 +1,13 @@
-// Warszawa 3D — Pieszy: chód i bieg względem kamery, zderzenia ze ścianami i pojazdami.
+// Wielka Kradzież Aut VI — Pieszy: chód i bieg względem kamery, zderzenia ze ścianami i pojazdami.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* ---------- pieszy: chód, bieg, zderzenia ze ścianami i z pojazdami ---------- */
 function walk(dt) {
   // jak w grach z kamerą za plecami: W/S naprzód i w tył, A/D w bok — względem kamery; postać obraca się w stronę ruchu
-  const f = (on('fwd') ? 1 : 0) - (on('back') ? 1 : 0), sd = (on('left') ? 1 : 0) - (on('right') ? 1 : 0), aim = on('aim') && WPN.armed, crouch = on('slow');
+  const f = (on('fwd') ? 1 : 0) - (on('back') ? 1 : 0), sd = (on('left') ? 1 : 0) - (on('right') ? 1 : 0), aim = (on('aim') || on('fire')) && WPN.armed, crouch = on('slow');
   const run = on('fast') && !aim && !crouch, camDir = camYaw + orbit;
   let want = 0; ped.side = 0;
-  if (aim) {   // celowanie: postać patrzy tam, gdzie kamera, a chodzi bokiem i tyłem (jak w GTA V)
+  if (aim) {   // celowanie: postać patrzy tam, gdzie kamera, a chodzi bokiem i tyłem
     const d = Math.atan2(Math.sin(camDir - ped.th), Math.cos(camDir - ped.th)); ped.th += d * Math.min(1, 14 * dt);
     if (f || sd) { const dir = camDir + Math.atan2(sd, f); want = crouch ? 0.8 : 1.3; ped.mx = Math.sin(dir); ped.mz = Math.cos(dir); }
   } else if (f || sd) {

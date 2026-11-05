@@ -1,6 +1,7 @@
-// Warszawa 3D — Broń: karabinek pieszego, armata i karabin maszynowy czołgu, latarka, reflektor, celownik.
+// Wielka Kradzież Aut VI — Broń: karabinek (pieszo i z okna), armata i karabin maszynowy czołgu, karabiny i bomby samolotu, latarka, reflektor, celownik; rozgrzanie shaderów.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
+const WPN = { armed: true, rifle: null, fireT: 0, light: null, lightOn: false, holder: null, tankGun: 'cannon', reload: 0, mgT: 0, search: false, WK: null, GK: null };
 /* ---------- strzał: promień z kamery przez środek ekranu (celownik) ---------- */
 function rayHit(o, d, maxD) {
   let best = maxD, hz = null;
@@ -18,7 +19,8 @@ function rayHit(o, d, maxD) {
 function aimRay() { const d = new THREE.Vector3(); camera.getWorldDirection(d); return { o: camera.position.clone(), d }; }
 function fireRifle() {
   if (WPN.fireT > 0 || !WPN.rifle) return; WPN.fireT = 1 / WPN.rifle.info.rate;
-  const { o, d } = aimRay(); d.x += (Math.random() - 0.5) * 0.006; d.y += (Math.random() - 0.5) * 0.006; d.normalize();
+  const sp = mode === 'foot' && CAM.aim < 0.5 ? 0.03 : 0.006;   // z biodra rozrzut większy niż przy celowaniu
+  const { o, d } = aimRay(); d.x += (Math.random() - 0.5) * sp; d.y += (Math.random() - 0.5) * sp; d.normalize();
   const h = rayHit(o, d, 400), m = mode === 'car' ? new THREE.Vector3(car.x + Math.sin(car.th) * 0.5, car.y + 1.3, car.z + Math.cos(car.th) * 0.5) : WPN.rifle.parts.flash.getWorldPosition(new THREE.Vector3());
   tracer(m, h.p); WPN.rifle.update(carT, 0, { fire: true }); bump = Math.max(bump, 0.08);
   if (h.z) zHit(h.z, h.p); else burst(h.p.x, h.p.y, h.p.z, 6, 0x8a8070, 2);
@@ -46,7 +48,7 @@ function fireTank() {
     if (h.z) zHit(h.z, h.p); else burst(h.p.x, h.p.y, h.p.z, 4, 0x8a8070, 2);
   }
 }
-// mysz zależnie od tego, czym sterujesz (jak w GTA V): pieszo LPM strzał, PPM celowanie, kółko — broń (Beryl / bez broni);
+// mysz zależnie od tego, czym sterujesz: pieszo LPM strzał, PPM celowanie, kółko — broń (Beryl / bez broni);
 // samochód i autobus: PPM celowanie przez okno, LPM strzał; czołg: LPM strzał, PPM przybliżenie, kółko — działo / karabin;
 // samolot: LPM — 8 karabinów Browning w skrzydłach; tramwaj, pociąg, okręt: tylko kamera
 const isTank = () => mode === 'car' && ACT && ACT.id === 'abrams';
@@ -58,7 +60,7 @@ function fire() {
   else if (mode === 'car' && on('aim')) fireRifle();   // strzał z okna
   else if (mode === 'air') firePlane();
 }
-// bomby pod skrzydłami samolotu (2 × 250 lb z WeaponKit): PPM / Z — zrzut; spadają z prędkością samolotu (grawitacja,
+// bomby pod skrzydłami samolotu (2 × 250 lb z WeaponKit): celowanie (PPM) albo „zrzut bomby” — zrzut; spadają z prędkością samolotu (grawitacja,
 // opór), obracają się wzdłuż lotu, wybuchają na ziemi, budynku albo ścianie; uzbrajane ponownie na postoju na ziemi
 const BOMBS = { racks: [[1.55, -0.62, 0.35], [-1.55, -0.62, 0.35]], hung: [], falling: [] };
 function bombsArm() {
@@ -99,6 +101,19 @@ function firePlane() {
     if (h.z) zHit(h.z, h.p); else if (h.t < 599) burst(h.p.x, h.p.y, h.p.z, 3, 0x8a8070, 2);
   }
 }
+// rozgrzanie shaderów efektów (wybuch, dym, smugacz, cząstki, plamy) w trakcie wczytywania — pierwszy strzał bez przycięcia
+function fxWarm() {
+  const g = new THREE.Group(), p = camera.position.clone().add(new THREE.Vector3(0, -500, 0));
+  g.position.copy(p); scene.add(g);
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(1, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffb050, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })));
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(1, 8, 6), new THREE.MeshStandardMaterial({ color: 0x3b3835, transparent: true, opacity: 0.7, depthWrite: false, roughness: 1 })));
+  for (const t of [BLOOD_TEX, SCORCH_TEX]) g.add(new THREE.Mesh(decalGeo, new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })));
+  g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0, 1, 0)]), new THREE.LineBasicMaterial({ color: 0xffd27a, transparent: true })));
+  if (!FX.parts) fxInit();
+  if (!FX.light) { FX.light = new THREE.PointLight(0xffa040, 0, 150, 2); scene.add(FX.light); }
+  try { renderer.compile(scene, camera); } catch (e) { console.warn('[W3D] rozgrzanie', e); }
+  scene.remove(g);   // materiałów nie zwalniamy: zwolnienie usunęłoby skompilowane programy
+}
 // broń i latarka pieszego (z GameLaboratory), raz
 async function weaponsInit() {
   try {
@@ -107,7 +122,9 @@ async function weaponsInit() {
     if (PED) { PED.c.rig.chest.add(WPN.rifle.group); WPN.rifle.group.position.set(-0.08, 0.02, 0.28); WPN.rifle.group.rotation.set(0.05, 0.08, 0); }
     WPN.light = WPN.GK.makeItem('flashlight', {}); WPN.light.lights.forEach(l => { l.castShadow = false; });
     WPN.holder = new THREE.Object3D(); scene.add(WPN.holder); WPN.holder.add(WPN.light.group); WPN.light.group.position.set(0, 0, 0); WPN.light.group.rotation.set(0, Math.PI, 0);
-    WPN.holder.visible = false;
+    WPN.light.set({ power: 0 });   // latarka zawsze w scenie (bez przebudowy shaderów przy włączaniu), wyłączona — moc 0
+    WPN.light.group.traverse(o => { if (o.isMesh) o.visible = false; });
+    zPrebuild(6); fxWarm();
   } catch (e) { console.warn('[W3D] broń', e); }
 }
 function weaponsStep(dt) {
@@ -119,11 +136,13 @@ function weaponsStep(dt) {
   if (started && !optOpen && on('fire') && ((mode === 'foot' && WPN.armed) || (isTank() && WPN.tankGun === 'mg') || (mode === 'car' && !isTank() && on('aim')) || mode === 'air')) fire();
   // latarka: w dłoni przy piersi, świeci tam, gdzie patrzy kamera
   if (WPN.holder) {
-    const onF = WPN.lightOn && mode === 'foot'; WPN.holder.visible = onF;
+    const onF = WPN.lightOn && mode === 'foot';
+    if (onF !== WPN.lightWas) { WPN.lightWas = onF; WPN.light.set({ power: onF ? 1 : 0 }); WPN.light.group.traverse(o => { if (o.isMesh) o.visible = onF; }); }
     if (onF) { const fx = Math.sin(ped.th), fz = Math.cos(ped.th); WPN.holder.position.set(ped.x + fx * 0.3 + fz * 0.2, ped.y + 1.25, ped.z + fz * 0.3 - fx * 0.2);
       const d = new THREE.Vector3(); camera.getWorldDirection(d); WPN.holder.lookAt(WPN.holder.position.clone().add(d)); WPN.light.update(dt); }
   }
-  const cr = $('cross'); if (cr) cr.style.display = started && (mode === 'foot' ? CAM.aim > 0.5 || camMode === 2 : armed()) ? 'block' : 'none';
-  const wp = $('weap'); if (wp) { const t = mode === 'foot' ? (WPN.armed ? 'Beryl · PPM — celuj · LPM — strzał' : 'Bez broni') + ' · kółko — broń · latarka ' + (WPN.lightOn ? 'wł.' : 'wył.') : mode === 'car' && ACT && ACT.id === 'abrams' ? (WPN.tankGun === 'cannon' ? 'Działo 120 mm' + (WPN.reload > 0 ? ' · ładowanie ' + WPN.reload.toFixed(1) + ' s' : ' · gotowe') : 'Karabin maszynowy') + ' · LPM — strzał · PPM — przybliżenie · kółko — broń · reflektor ' + (WPN.search ? 'wł.' : 'wył.') : ''; wp.textContent = t ? t + ' · zombie: ' + ZB.kills : ''; wp.style.display = t ? 'block' : 'none'; }
+  // celownik: pieszo z bronią zawsze (bez celowania — mała kropka, przy celowaniu — pełny), w czołgu i przy strzale z okna
+  const cr = $('cross'); if (cr) { const show = started && !optOpen && (mode === 'foot' ? WPN.armed : armed()); cr.style.display = show ? 'block' : 'none';
+    if (show) { const full = mode !== 'foot' || CAM.aim > 0.5 || camMode === 2; cr.style.transform = full ? 'scale(1)' : 'scale(0.4)'; cr.style.opacity = full ? '1' : '0.75'; } }
+  const wp = $('weap'); if (wp) { const t = mode === 'foot' ? (WPN.armed ? 'Beryl · ' + kb('aim') + ' — celuj · ' + kb('fire') + ' — strzał' : 'Bez broni') + ' · kółko — broń · ' + kb('light') + ' — latarka ' + (WPN.lightOn ? 'wł.' : 'wył.') : mode === 'car' && ACT && ACT.id === 'abrams' ? (WPN.tankGun === 'cannon' ? 'Działo 120 mm' + (WPN.reload > 0 ? ' · ładowanie ' + WPN.reload.toFixed(1) + ' s' : ' · gotowe') : 'Karabin maszynowy') + ' · ' + kb('fire') + ' — strzał · ' + kb('aim') + ' — przybliżenie · kółko / ' + kb('weapon') + ' — broń · ' + kb('light') + ' — reflektor ' + (WPN.search ? 'wł.' : 'wył.') : ''; wp.textContent = t ? t + ' · zombie: ' + ZB.kills : ''; wp.style.display = t ? 'block' : 'none'; }
 }
-let bump = 0;

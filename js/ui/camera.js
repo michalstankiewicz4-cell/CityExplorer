@@ -1,9 +1,9 @@
-// Warszawa 3D — Kamera: za plecami / wysoko / oczami, rozglądanie myszą.
+// Wielka Kradzież Aut VI — Kamera TPP (pieszo przez prawe ramię, za pojazdem) i FPP, mysz (Pointer Lock), celowanie, spójrz za siebie.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* ---------- kamera ---------- */
 let started = null, camYaw = 0, camMode = 0, orbit = 0, tilt = 0, camDist = 1, dragging = false, lastX = 0, lastY = 0;
-// Mysz jak w GTA V: kliknięcie w grę łapie mysz (Pointer Lock) — ruch obraca kamerę bez trzymania przycisku,
+// Mysz kliknięcie w grę łapie mysz (Pointer Lock) — ruch obraca kamerę bez trzymania przycisku,
 // LPM strzela, PPM celuje; Esc puszcza mysz i otwiera opcje. Bez złapania (np. odmowa przeglądarki): LPM + przeciągnij.
 const SENS = 0.0022;
 canvas.addEventListener('contextmenu', e => e.preventDefault());
@@ -12,11 +12,11 @@ canvas.addEventListener('pointerdown', e => {
   if (e.button === 2) { mouse.aim = true; return; }
   if (e.button !== 0) return;
   if (started && !optOpen && !bigOpen && canvas.requestPointerLock) { try { const r = canvas.requestPointerLock(); if (r && r.catch) r.catch(() => {}); } catch { } }
-  dragging = true; lastX = e.clientX; lastY = e.clientY; canvas.setPointerCapture(e.pointerId);
+  dragging = true; lastX = e.clientX; lastY = e.clientY; try { canvas.setPointerCapture(e.pointerId); } catch { /* mysz już złapana (Pointer Lock) */ }
 });
 addEventListener('pointerup', e => { if (e.button === 0) { mouse.fire = false; dragging = false; } if (e.button === 2) mouse.aim = false; });
 canvas.addEventListener('pointercancel', () => { dragging = false; mouse.fire = mouse.aim = false; });
-const look = (dx, dy) => { orbit -= dx * SENS; tilt = Math.max(-1.5, Math.min(1.5, tilt + dy * SENS)); mouse.last = performance.now(); };
+const look = (dx, dy) => { const k = SENS * (1 - 0.45 * CAM.aim); orbit -= dx * k; tilt = Math.max(-1.5, Math.min(1.5, tilt + dy * k)); mouse.last = performance.now(); };   // przy celowaniu wolniej
 addEventListener('mousemove', e => { if (mouse.locked) look(e.movementX, e.movementY); });
 canvas.addEventListener('pointermove', e => {
   if (mouse.locked || !dragging) return;
@@ -35,17 +35,19 @@ canvas.addEventListener('wheel', e => {
   else if (isTank()) { WPN.tankGun = WPN.tankGun === 'cannon' ? 'mg' : 'cannon'; flash(WPN.tankGun === 'cannon' ? 'Działo 120 mm' : 'Karabin maszynowy'); }
   else camDist = Math.min(4, Math.max(0.5, camDist * (e.deltaY > 0 ? 1.1 : 0.9)));
 }, { passive: false });
-const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), CAM = { aim: 0, spd: 0 };
+const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), CAM = { aim: 0, spd: 0, back: 0 };
 function updateCamera(dt, snap) {
   if (mode === 'air') return airCamera(dt, snap);
   if (mode === 'boat') return boatCamera(dt, snap);
   const onFoot = ego === ped;
   // w pojeździe kamera sama wraca za pojazd 1,5 s po ruchu myszą, gdy jedzie (w czołgu nie: kamera celuje wieżą)
   if (!onFoot && !dragging && !(mode === 'car' && ACT && ACT.id === 'abrams') && performance.now() - mouse.last > 1500 && Math.abs(ego.vf || 0) > 1) { orbit *= Math.exp(-2.2 * dt); tilt *= Math.exp(-2.2 * dt); }
-  const back = !onFoot && on('lookBack') ? Math.PI : 0;   // spójrz za siebie
+  const back = !onFoot && on('lookBack') ? Math.PI : 0;   // spójrz za siebie (kamera przeskakuje od razu, bez przejazdu przez pojazd)
+  if (back !== CAM.back) { CAM.back = back; snap = true; }
   const th = (onFoot ? camYaw : ego.th) + orbit + back, fx = Math.sin(th), fz = Math.cos(th);
-  // pieszo: kamera przez prawe ramię (jak w GTA V), przy celowaniu bliżej i węższy kąt widzenia
-  const aimK = on('aim') && ((onFoot && WPN.armed) || mode === 'car') ? 1 : 0;   // w samolocie PPM to zrzut bomby CAM.aim += (aimK - CAM.aim) * Math.min(1, 10 * dt);
+  // pieszo: kamera przez prawe ramię, przy celowaniu bliżej i węższy kąt widzenia
+  const aimK = on('aim') && ((onFoot && WPN.armed) || mode === 'car') ? 1 : 0;   // w samolocie PPM to zrzut bomby
+  CAM.aim += (aimK - CAM.aim) * Math.min(1, 10 * dt);
   const side = onFoot && camMode !== 2 ? 0.42 + 0.2 * CAM.aim : 0, rx = -fz * side, rz = fx * side;
   // „feeling”: w pojeździe kąt widzenia rośnie z prędkością, kamera lekko odjeżdża i drży przy dużej prędkości
   const spd = onFoot ? 0 : Math.abs(ego.vf || 0); CAM.spd += (spd - CAM.spd) * Math.min(1, 2 * dt);

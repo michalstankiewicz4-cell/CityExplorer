@@ -1,4 +1,4 @@
-// Warszawa 3D — Pętla gry: krok fizyki, przelot na ekranie startowym, rysowanie.
+// Wielka Kradzież Aut VI — Pętla gry: krok fizyki, przelot na ekranie startowym, rysowanie.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* ---------- pętla ---------- */
@@ -47,6 +47,8 @@ function step(dt, draw) {
     PED.g.position.set(ped.x, ped.y, ped.z); PED.g.rotation.set(0, ped.th, 0);
     const sp = Math.abs(ped.vf);
     PED.c.animate(carT, dt, { gait: sp < 0.15 ? 'idle' : sp > 2.6 ? 'run' : 'walk', speed: Math.max(0.6, sp), layers: { aim: WPN.rifle && WPN.armed ? 1 : 0, sneak: ped.crouch ? 1 : 0 } });
+    // celowanie tułów z bronią pochyla się w górę i w dół za celownikiem
+    if (WPN.armed && mode === 'foot' && (on('aim') || on('fire'))) { const d = new THREE.Vector3(); camera.getWorldDirection(d); const p = Math.asin(Math.max(-0.9, Math.min(0.9, d.y))); PED.c.rig.chest.rotation.x -= p * 0.6; PED.c.rig.spine.rotation.x -= p * 0.35; }
   }
   zombiesStep(dt); weaponsStep(dt); fxStep(dt);
   updateCamera(dt); sketchFrame();

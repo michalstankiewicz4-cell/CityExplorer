@@ -1,4 +1,4 @@
-// Warszawa 3D — start: Three.js (r186 z lab/vendor, ta sama kopia co modele z GameLaboratory) jako window.THREE,
+// Wielka Kradzież Aut VI — start: Three.js (r186 z lab/vendor, ta sama kopia co modele z GameLaboratory) jako window.THREE,
 // potem skrypty gry po kolei (skrypty klasyczne dzielą zakres globalny, więc kolejność ma znaczenie).
 import * as THREE from 'three';
 window.THREE = THREE;

@@ -1,4 +1,4 @@
-// Warszawa 3D — Teren: kafle wysokości Terrarium, NMT GUGiK, maska budynków, obróbka wysokości.
+// Wielka Kradzież Aut VI — Teren: kafle wysokości Terrarium, NMT GUGiK, maska budynków, obróbka wysokości.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* =========================================================================

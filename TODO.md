@@ -1,4 +1,4 @@
-# TODO — Warszawa 3D (CityExplorer)
+# TODO — Wielka Kradzież Aut VI (CityExplorer)
 
 ## Ustalone, na później
 - Tory: poprawienie torów (ciągłość, łuki pod fizykę kół); pozostałe linie tramwajowe i kolejowe.
@@ -12,11 +12,12 @@
 
 ## Propozycje (czekają na decyzję)
 - Schody / rampy przy wejściach do podziemi, które doktor mapy zgłasza jako niepodłączone.
-- Tekstura gruntu 8192 px na dużych mapach (Okęcie, `?r=2000`) — na słabszym sprzęcie może być czarna; mniejsza tekstura albo podział na kawałki.
+- Tekstura gruntu 8192 px na dużych obszarach (Okęcie, Wisła, `?r=2000`) — na słabszym sprzęcie może być czarna; mniejsza tekstura albo podział na kawałki.
 - Zderzenia okrętu z mostami (maszt przechodzi przez pomost).
 - Przebudowa dokładnego obszaru bez kilkusekundowej przerwy (budowa w tle).
 - Woda: mokry pas na kadłubie, piana z pamięcią (kilwater zostający za okrętem), odbicia brzegów — z laboratorium wody.
 - GameLaboratory: ruch okrętu w laboratorium wody, lot samolotu w laboratorium pojazdów (zachowanie testowane w laboratorium swojego środowiska).
+- Skrypty gry jako moduły ES (z jawnym wspólnym stanem zamiast zakresu globalnego).
 - Zombie: zdrowie pieszego i obrażenia od ataku (teraz atak bez szkód), dźwięki strzałów i wybuchów, amunicja i przeładowanie karabinka.
 
 ## Ustalone, że nie robimy

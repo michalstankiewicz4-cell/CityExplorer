@@ -1,4 +1,4 @@
-// Kafle mapy całej Warszawy (1 km × 1 km, js/tiles.mjs) do wczytywania w trakcie gry. Uruchamiane w GitHub Actions.
+// Kafle mapy całej Warszawy (1 km × 1 km, js/shared/tiles.mjs) do wczytywania w trakcie gry. Uruchamiane w GitHub Actions.
 // Pobiera z Overpass blokami 2 × 2 km, najpierw wzdłuż trasy centrum — Okęcie, potem coraz dalej. Kafle już zapisane
 // (np. z cache poprzedniego deployu) są pomijane, więc kolejne deploye dopełniają mapę; limit czasu jednego uruchomienia:
 // TILE_MINUTES (domyślnie 25). Na końcu zapisuje tiles/index.json (lista gotowych kafli).

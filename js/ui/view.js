@@ -1,4 +1,4 @@
-// Warszawa 3D — Rentgen (X) i noc (N).
+// Wielka Kradzież Aut VI — Rentgen (X) i noc (N).
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* ---------- rentgen (X): przezroczysty grunt i budynki ---------- */

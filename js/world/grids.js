@@ -1,4 +1,4 @@
-// Warszawa 3D — Siatki świata: zderzenia, drogi, nawierzchnie (pomosty, tunele), przejścia; surfaceAt().
+// Wielka Kradzież Aut VI — Siatki świata: zderzenia (collGrid, collAdd), drogi (roadGrid), nawierzchnie i przejścia; szerokości dróg.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* =========================================================================

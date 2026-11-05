@@ -1,11 +1,11 @@
-// Warszawa 3D — Tryb szynowy: tramwaj (fizyka koło–szyna z aTrain) i pociąg WKD, tory, drzwi, wysiadanie.
+// Wielka Kradzież Aut VI — Tryb szynowy: tramwaj (fizyka koło–szyna z aTrain) i pociąg WKD, tory, drzwi, wysiadanie.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* =========================================================================
    TRYB SZYNOWY: tramwaj PESA Swing 120Na (TramKit) w fizyce z aTrain (koło–szyna: tylko siły kontaktu, bez przyklejania
    do toru) i pociąg (TrainKit) po wygładzonym torze. Tory z OSM: przycięte do mapy, wygładzone (także wysokości),
    zamienione na łuki i proste (GameLaboratory: js/behaviors/rail/path.js); szyny z tego samego opisu.
-   W / S — nastawa prędkości (nastawnik), Spacja — hamulec, E — drzwi (na postoju)
+   klawisze: js/core/input.js (ACTIONS) — naprzód / wstecz: nastawa, hamulec ręczny: hamulec, wsiądź / wysiądź: drzwi
    ========================================================================= */
 const RAIL_CHAINS = { tram: [], subway: [], rail: [] };   // wszystkie ciągi torów (buildTrains)
 let TK = null, TRAINKIT = null, PATH = null, TRAMPHYS = null, PTRACK = null;
@@ -153,7 +153,7 @@ function railStep(dt) {
   if (R.doors > 0.5) a = -Math.sign(R.v) * Math.min(Math.abs(R.v) / dt, 3);
   const v0 = R.v; R.v += a * dt; if ((em || (!up && !dn) || R.doors > 0.5) && Math.sign(R.v) !== Math.sign(v0) && v0 !== 0) R.v = 0;
   R.v = Math.max(-5, Math.min(T.vmax, R.v)); R.s += R.v * dt;
-  if (R.s > R.T.L - 2) { R.s = R.T.L - 2; if (R.v > 0) { if (R.v > 2) bump = Math.min(1, R.v / 8); R.v = 0; flash('Koniec mapy — dalej trasa do Pruszkowa później. S: jazda wstecz'); } }
+  if (R.s > R.T.L - 2) { R.s = R.T.L - 2; if (R.v > 0) { if (R.v > 2) bump = Math.min(1, R.v / 8); R.v = 0; flash('Koniec mapy — dalej trasa do Pruszkowa później. ' + kb('back') + ': jazda wstecz'); } }
   if (R.s - R.total < 2) { R.s = R.total + 2; if (R.v < 0) { R.v = 0; flash('Koniec toru'); } }
   R.brake = (dn && R.v > 0.1) || em; R.vf = R.v;
 }
@@ -179,7 +179,7 @@ function railPhysics(dt) {
   let off = 0;
   sim.bodies.forEach((b, i) => { if (!b.Rw) return; const p = T.station(R.bodyS[i]), lat = Math.abs((b.p[0] - p.px) * -p.tz + (b.p[2] - p.pz) * p.tx); off = Math.max(off, lat, b.Rw - 0.06 - b.p[1] > 0 ? 1 : 0); });
   R.offset = off;
-  if (!R.derailed && (off > 0.25 || sim.broken)) { R.derailed = true; flash('Wykolejenie! R — z powrotem na tor'); }
+  if (!R.derailed && (off > 0.25 || sim.broken)) { R.derailed = true; flash('Wykolejenie! ' + kb('reset') + ' — z powrotem na tor'); }
 }
 function railReset() {   // R w trybie szynowym: skład z powrotem na tor
   if (rail.kind !== 'tram') return;
@@ -214,11 +214,11 @@ function railPlace(dt) {
   });
 }
 function railDoors() { if (Math.abs(rail.v) > 0.2) { flash('Zatrzymaj się, żeby otworzyć drzwi'); return; } rail.doors = rail.doors > 0.5 ? 0 : 1; }
-// E w składzie: na postoju otwiera drzwi, przy otwartych — wysiadasz (prawa strona czoła); E przy drzwiach — wsiadasz z powrotem
+// „wsiądź / wysiądź” w składzie: na postoju otwiera drzwi, przy otwartych — wysiadasz (prawa strona czoła); E przy drzwiach — wsiadasz z powrotem
 const railDoorAt = (R = rail) => toWorld({ x: R.x, z: R.z, th: R.th }, -2.6, R.kind === 'tram' ? 2.5 : -3);
 function railUse() {
   if (Math.abs(rail.v) > 0.2) { flash('Zatrzymaj się, żeby otworzyć drzwi'); return; }
-  if (rail.doors < 0.5) { rail.doors = 1; flash('Drzwi otwarte — E: wysiądź'); return; }
+  if (rail.doors < 0.5) { rail.doors = 1; flash('Drzwi otwarte — ' + kb('use') + ': wysiądź'); return; }
   const [x, z] = railDoorAt();
   Object.assign(ped, { x, z, th: rail.th, vf: 0, vy: 0 }); ped.y = surfaceAt(x, z, rail.y + 1);
   mode = 'foot'; ego = ped; camYaw = rail.th; orbit = 0; if (PED) PED.g.visible = true;

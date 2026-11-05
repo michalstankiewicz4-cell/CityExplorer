@@ -1,11 +1,11 @@
-// Warszawa 3D — Konfiguracja: obszar mapy (?map, ?lat, ?lon, ?r), karta ładowania, pamięć przeglądarki (IndexedDB).
+// Wielka Kradzież Aut VI — Konfiguracja: obszar mapy (?map, ?lat, ?lon, ?r), karta ładowania, pamięć przeglądarki (IndexedDB).
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* =========================================================================
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
-const APP_VERSION = '0.17.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+const APP_VERSION = '0.18.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
 document.getElementById('ver').textContent = 'v' + APP_VERSION; document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
 // dokładne obszary wspólnego świata: gra buduje dokładnie ten, w którym jesteś (przy wejściu w inny — przebudowa w locie);

@@ -1,4 +1,4 @@
-// Warszawa 3D — Pojazdy drogowe (RoadKit) i pieszy (LifeKit): wczytanie, wsiadanie i wysiadanie.
+// Wielka Kradzież Aut VI — Pojazdy drogowe (RoadKit) i pieszy (LifeKit): wczytanie, wsiadanie i wysiadanie, miejsca startowe.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* =========================================================================
@@ -55,7 +55,7 @@ async function loadModels(progress = () => {}) {
   }
   ACT = FLEET.find(V => V.id === 'polonez'); car = ACT.s; VDEF = ACT.def;
   // pieszy: człowiek z laboratorium ludzi (LifeKit, klasyczne skrypty na globalnym THREE)
-  progress(0.8, 'Człowiek z laboratorium ludzi…'); await frame();
+  progress(0.8, 'Pieszy (LifeKit)…'); await frame();
   try {
     await import(GL + 'js/core/three-global.js');
     for (const f of ['js/models/life/lifekit.js', 'js/models/human/walk.js', 'js/models/human/face.js', 'js/models/human/data/bust-head.js', 'js/models/human/data/human-head.js', 'js/models/human/human.js']) await import(GL + f);
@@ -76,7 +76,7 @@ let seq = 0, SEQV = null;              // wsiadanie / wysiadanie: postęp (s) i 
 const keys = {};
 const doorOf = (V) => toWorld(V.s, V.def.doorAt.x, V.def.doorAt.z);
 function nearVehicle() {
-  let best = null, bd = 3.6;   // jak w GTA: wsiadasz z większej odległości
+  let best = null, bd = 3.6;   // wsiadasz z większej odległości
   if (FLEET.homed) for (const V of FLEET) { const [dx, dz] = doorOf(V), d = Math.hypot(ped.x - dx, ped.z - dz); if (d < bd && Math.abs(ped.y - V.s.y) < 1.5) { bd = d; best = V; } }
   return best;
 }
@@ -123,4 +123,52 @@ function sequence(dt) {
     if (seq > 0.35 && seq < 0.9) { ped.x += Math.sin(ped.th) * 0.9 * dt; ped.z += Math.cos(ped.th) * 0.9 * dt; }   // krok od pojazdu
     if (seq > T) { mode = 'foot'; ego = ped; camYaw = V.s.th + orbit; orbit = 0; }
   }
+}
+
+/* ---------- miejsca startowe: parkowanie pojazdów, powrót na start, szukanie ulicy przy PKiN ---------- */
+function park(V, s0, along) {   // pojazd na swoim miejscu startowym
+  const fx = Math.sin(s0.th), fz = Math.cos(s0.th), x = s0.x + fx * along, z = s0.z + fz * along;
+  Object.assign(V.s, { x, z, th: s0.th, vx: 0, vz: 0, vy: 0, steer: 0, w: 0, vf: 0, rest: false, spawn: { x, z, th: s0.th } });
+  V.s.y = surfaceAt(x, z, H(x, z));
+}
+function resetCar() {
+  if (mode === 'foot' || mode === 'exit') {   // pieszy wraca do drzwi pojazdu
+    if (mode === 'exit') { mode = 'foot'; ego = ped; if (PED) PED.g.visible = true; }
+    const [dx, dz] = doorOf(ACT);
+    Object.assign(ped, { x: dx, z: dz, th: ACT.s.th, vf: 0, vy: 0 }); ped.y = surfaceAt(dx, dz, ACT.s.y + 0.5);
+    return;
+  }
+  const s = car.spawn; Object.assign(car, { x: s.x, z: s.z, th: s.th, vx: 0, vz: 0, vy: 0, steer: 0, w: 0, vf: 0 }); car.y = surfaceAt(s.x, s.z, H(s.x, s.z));
+}
+let SPAWN = null;
+function startAt(s) {   // pojazdy zaparkowane rzędem wzdłuż ulicy, człowiek przy drzwiach Poloneza
+  SPAWN = s;
+  for (const V of FLEET) park(V, s, PARK[V.id] || 0);
+  ACT = FLEET.find(V => V.id === 'polonez'); car = ACT.s; VDEF = ACT.def;
+  mode = 'foot'; ego = ped; resetCar(); camYaw = s.th; orbit = 0;
+}
+function findSpawn() {
+  // najbliższa główna ulica przy PKiN (preferowana Marszałkowska) z wolnym pasem na trzy pojazdy (−15…+25 m)
+  let best = null;
+  const free = (x, z, r) => { if (W.inBuilding(x, z)) return false; const a = collGrid.get(Math.floor(x / COLL_CELL) * 100003 + Math.floor(z / COLL_CELL)) || []; return !a.some(q => segDist(x, z, q)[0] < r); };
+  for (const l of W.veh || []) {
+    if (l.rank < 4 || !l.ground) continue;
+    const pref = /Marszałkowska/.test(l.t.name || '') ? 0 : 140;
+    for (let i = 0; i < l.pts.length - 1; i++) {
+      const s = [l.pts[i][0], l.pts[i][1], l.pts[i + 1][0], l.pts[i + 1][1]];
+      const L = Math.hypot(s[2] - s[0], s[3] - s[1]); if (L < 12) continue;
+      let dx = s[2] - s[0], dz = s[3] - s[1]; if (dz > 0) { dx = -dx; dz = -dz; }   // jedziemy na północ
+      dx /= L; dz /= L;
+      const th = Math.atan2(dx, dz), rx = -Math.cos(th), rz = Math.sin(th), off = Math.max(1.8, l.wd * 0.25);
+      for (let k = 0.1; k < 0.95; k += 0.1) {
+        const x = s[0] + (s[2] - s[0]) * k + rx * off, z = s[1] + (s[3] - s[1]) * k + rz * off;
+        const d = Math.hypot(x, z); if (d < 60) continue;
+        const score = d + pref; if (best && score >= best.score) continue;
+        let ok = true, y0 = H(x, z);
+        for (let a = -15; a <= 25 && ok; a += 2) { const px = x + dx * a, pz = z + dz * a; ok = free(px, pz, 2.2) && Math.abs(surfaceAt(px, pz, y0) - y0 - a * 0) < 2.5; }
+        if (ok) best = { score, x, z, th };
+      }
+    }
+  }
+  return best || { x: 0, z: 140, th: Math.PI };
 }

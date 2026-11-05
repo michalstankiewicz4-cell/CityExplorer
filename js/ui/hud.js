@@ -1,4 +1,4 @@
-// Warszawa 3D — HUD i minimapa.
+// Wielka Kradzież Aut VI — HUD i minimapa.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* ---------- HUD / minimapa ---------- */
@@ -8,7 +8,7 @@ function hud(dt, fps) {
   $('speed').firstChild.nodeValue = Math.round(Math.abs(ego.vf || 0) * 3.6);
   const nv = mode === 'foot' && FLEET.length ? (nearVehicle() || (nearOther() && { def: { name: nearOther().name } })) : null;
   if (flashT > 0) flashT -= dt;
-  else { const pr = $('prompt'), txt = nv ? '<b>E</b> — wsiądź: ' + nv.def.name : ''; if (pr.innerHTML !== txt) pr.innerHTML = txt; pr.style.display = txt ? 'block' : 'none'; }
+  else { const pr = $('prompt'), txt = nv ? '<b>' + kb('use') + '</b> — wsiądź: ' + nv.def.name : ''; if (pr.innerHTML !== txt) pr.innerHTML = txt; pr.style.display = txt ? 'block' : 'none'; }
   drawHelp();
   streetT -= dt;
   if (streetT <= 0) {

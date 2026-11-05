@@ -1,11 +1,11 @@
-// Warszawa 3D — Okręt (ShipKit, zachowanie „okręt na wodzie”) i woda z laboratorium wody (WaterKit), maska koryta.
+// Wielka Kradzież Aut VI — Okręt (ShipKit, zachowanie „okręt na wodzie”) i woda z laboratorium wody (WaterKit), maska koryta.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* =========================================================================
    OKRĘT: ORP Błyskawica (ShipKit z GameLaboratory) na Wiśle; woda z laboratorium wody (WaterKit), ruch: zachowanie
    „okręt na wodzie”. Woda jest liczona w układzie okrętu (jak w laboratorium: okręt w środku, woda płynie obok) i
    rysowana drugim przebiegiem z tą samą głębią; maska wody (rzeka z OSM) wycina ją do koryta.
-   W/S — telegraf (naprzód / wstecz), A/D — ster, Spacja — stop maszyn, E — przy brzegu wysiądź / wsiądź
+   klawisze: js/core/input.js (ACTIONS) — naprzód / wstecz: telegraf, w lewo / w prawo: ster, hamulec ręczny: stop maszyn, wsiądź / wysiądź: przy brzegu
    ========================================================================= */
 const boat = { V: null, sim: null, def: null, c: { throttle: 0, rudder: 0 }, ego: { x: 0, y: 0, z: 0, th: 0, vf: 0 }, yw: 0, waves: [], t: 0, u: null, wscene: null, wcam: null, mask: null, maskBusy: false, off: null, area: null };
 let WK = null, SHIPK = null, SHIPB = null;
@@ -120,7 +120,7 @@ function boatHud() {
   const s = boat.sim.state, c = boat.c, tel = c.throttle > 0.02 ? 'naprzód ' + Math.round(c.throttle * 100) + '%' : c.throttle < -0.02 ? 'wstecz ' + Math.round(-c.throttle * 250) + '%' : 'stop';
   return `${(s.vf / KN).toFixed(1)} w · telegraf: ${tel} · ster ${c.rudder > 0 ? 'prawo' : c.rudder < 0 ? 'lewo' : 'zero'}` + (s.aground ? ' · MIELIZNA' : '');
 }
-// E: na postoju przy brzegu wysiadasz na ląd (najbliższy suchy punkt z boku); E przy burcie — wsiadasz
+// „wsiądź / wysiądź”: na postoju przy brzegu wysiadasz na ląd (najbliższy suchy punkt z boku); przy burcie — wsiadasz
 function boatShore() {
   const s = boat.sim.state, fx = Math.sin(s.th), fz = Math.cos(s.th);
   for (let d = 8; d <= 70; d += 2) for (const sd of [1, -1]) for (const zz of [0, 20, -20]) {

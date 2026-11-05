@@ -1,4 +1,4 @@
-// Warszawa 3D — Duża mapa (M): przesuwanie, zoom, przeniesienie, dopracowanie obszarów.
+// Wielka Kradzież Aut VI — Duża mapa (M): przesuwanie, zoom, przeniesienie, dopracowanie obszarów.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* ---------- duża mapa (M) ---------- */
@@ -45,7 +45,7 @@ bm.addEventListener('click', e => {
   const x = (e.clientX - bmView.ox) / bmView.s - E, z = (e.clientY - bmView.oy) / bmView.s - E;
   if (W.inBuilding && W.inBuilding(x, z)) { $('bigmapHint').textContent = 'Tam stoi budynek — wybierz ulicę lub plac'; return; }
   if (mode === 'car') { Object.assign(car, { x, z, vx: 0, vz: 0, vy: 0 }); car.y = surfaceAt(x, z, H(x, z)); } else if (mode === 'foot') { Object.assign(ped, { x, z, vy: 0, vf: 0 }); ped.y = surfaceAt(x, z, H(x, z)); } updateCamera(0, true); toggleBigMap();
-  $('bigmapHint').textContent = 'Mapa — kliknij, aby się tam przenieść · przeciągnij = przesuwanie · kółko = zoom · M zamyka';
+  $('bigmapHint').textContent = 'Mapa — kliknij, aby się tam przenieść · przeciągnij = przesuwanie · kółko = zoom · ' + kb('map') + ' zamyka';
 });
 function drawBigMap() {
   if (!bigOpen) return;

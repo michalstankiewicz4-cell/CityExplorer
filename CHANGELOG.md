@@ -1,15 +1,27 @@
 # Changelog
 
+Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
+
+## 0.18.0 — 2026-11-05
+- **Ekran ładowania**: grafika na cały ekran, postęp (pasek, procent, etap) w prawym dolnym rogu; ta sama grafika jako miniatura strony (`og-image.jpg`). Z ekranu startowego usunięte linie „Wkrótce…”, „Sterowanie…” i podtytuł „Prawdziwe Śródmieście z mapy · wybierz, czym ruszasz”; karty trybów w kolejności 1–4.
+- **Klawisze — jedno źródło prawdy**: każdy opis klawisza (podpowiedź „wsiądź” przy pojeździe — wcześniej na stałe „E”, HUD broni, komunikaty tramwaju i samolotu, podpowiedź mapy, pomoc, ekran startowy) bierze nazwę z ustawień klawiszy.
+- **Celownik i celowanie**: pieszo z bronią celownik zawsze (bez celowania mała kropka, przy celowaniu pełny); naprawione celowanie PPM (zoom i celownik nie działały); przy strzale postać obraca się w stronę celownika, tułów z bronią pochyla się za celownikiem, z biodra większy rozrzut, przy celowaniu wolniejsza mysz.
+- Kamera: C (spójrz za siebie) przeskakuje od razu zamiast przejeżdżać przez pojazd (czołg). Naprawiony błąd w konsoli przy łapaniu myszy (`setPointerCapture`).
+- **Bez przycięć**: pierwszy strzał z czołgu i włączenie latarki nie przebudowują już shaderów (jedno stałe światło wybuchów, latarka zawsze w scenie, rozgrzanie shaderów efektów przy wczytywaniu); pula gotowych zombie zamiast budowania przy pojawianiu.
+- Napisy przy wczytywaniu: „Pieszy (LifeKit)…”, „Ustawiam pojazdy na ich miejscach: …”, „Broń, latarka, zombie, efekty…” (wszystkie modele są w `lab/`, gra nie pobiera ich z laboratorium).
+- **Nowa nazwa: „Wielka Kradzież Aut VI”** — w tytule strony, na ekranie ładowania i startowym, w HUD, SEO, dokumentacji i opisach w kodzie (wcześniej „Warszawa 3D”).
+- **Dokumentacja** w `docs/` (architektura, świat, pojazdy, zombie i broń, sterowanie, laboratorium, doktor mapy, publikacja); README skrócone i poprawione (nieaktualne: klawisz E, „osobna mapa” Okęcia, doktor modeli „z jego strony”, `APP_VERSION` w index.html, `js/tiles.mjs`); opisy w kodzie poprawione, fragmenty przeniesione do właściwych plików (miejsca startowe do `vehicles/fleet.js`, `DATA` do `world/osm.js`, `WPN` do `combat/weapons.js`, `bump` do `core/scene.js`).
+
 ## 0.17.0 — 2026-11-05
 - **Samolot: bomby** — dwie bomby 250 lb GP Mk IV (WeaponKit z GameLaboratory) pod skrzydłami Spitfire’a; zrzut PPM albo Z. Bomba spada z prędkością samolotu (grawitacja, opór), obraca się wzdłuż lotu i wybucha na ziemi, budynku albo ścianie: wybuch z dymem i osmaleniem, zabija zombie w promieniu 14 m. Po wylądowaniu i zatrzymaniu bomby są podwieszane od nowa; HUD pokazuje, ile zostało.
 - Karabiny w skrzydłach (LPM, 8 × Browning .303, zbieżność ok. 230 m) — jak dotąd.
 - Z samolotu zombie widać i pojawiają się dalej (do ok. 480 m), żeby było w co celować.
 
 ## 0.16.0 — 2026-11-05
-- **Sterowanie i kamera jak w GTA V**: mysz łapana kliknięciem w grę (ruch obraca kamerę bez trzymania przycisku), Esc puszcza mysz i otwiera opcje. Pieszo: kamera przez prawe ramię, W A S D — trucht, Shift — sprint, Ctrl — kucanie, Spacja — skok; PPM — celowanie (kamera bliżej, węższy kąt, postać patrzy tam, gdzie kamera, i chodzi bokiem), LPM — strzał, kółko — broń (Beryl / bez broni). F — wsiądź / wysiądź z większej odległości.
+- **Nowe sterowanie i kamera**: mysz łapana kliknięciem w grę (ruch obraca kamerę bez trzymania przycisku), Esc puszcza mysz i otwiera opcje. Pieszo: kamera przez prawe ramię, W A S D — trucht, Shift — sprint, Ctrl — kucanie, Spacja — skok; PPM — celowanie (kamera bliżej, węższy kąt, postać patrzy tam, gdzie kamera, i chodzi bokiem), LPM — strzał, kółko — broń (Beryl / bez broni). F — wsiądź / wysiądź z większej odległości.
 - **Kamera: dwa widoki** — V przełącza TPP (za plecami / za pojazdem) i FPP (oczami, z kabiny, z mostka). W pojeździe kamera sama wraca za pojazd 1,5 s po ruchu myszą; C — spójrz za siebie; kąt widzenia rośnie z prędkością, kamera lekko odjeżdża i drży przy dużej prędkości.
 - **Mysz zależnie od pojazdu**: samochód, autobus — PPM celowanie przez okno, LPM strzał; czołg — mysz kieruje wieżą, LPM strzał, PPM przybliżenie, kółko — działo / karabin; samolot — LPM: 8 karabinów Browning w skrzydłach; w pozostałych pojazdach kółko — odległość kamery.
-- **Klawisze**: nowy układ (GTA V) z grupami w opcjach (Ruch, Kamera i mapa, Broń, Samolot, Inne) i opisem myszy; „Domyślne” przywraca układ. **Pomoc w lewym dolnym rogu** pokazuje klawisze i mysz dla tego, czym teraz sterujesz, według ustawień klawiszy.
+- **Klawisze**: nowy układ z grupami w opcjach (Ruch, Kamera i mapa, Broń, Samolot, Inne) i opisem myszy; „Domyślne” przywraca układ. **Pomoc w lewym dolnym rogu** pokazuje klawisze i mysz dla tego, czym teraz sterujesz, według ustawień klawiszy.
 
 ## 0.15.0 — 2026-11-05
 - **Podział na pliki i foldery**: `index.html` to już tylko strona; wygląd w `css/game.css`, kod gry w `js/` (core, world, vehicles, player, combat, ui, render, shared) — opis w README, „Struktura plików”.

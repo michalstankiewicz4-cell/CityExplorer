@@ -1,4 +1,4 @@
-// Warszawa 3D — Fizyka jazdy: koła (auto, autobus), gąsienice (czołg).
+// Wielka Kradzież Aut VI — Krok fizyki wszystkich trybów (physics) i jazda: koła (auto, autobus), gąsienice (czołg).
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 function physics(dt) {

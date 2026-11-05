@@ -1,4 +1,4 @@
-// Warszawa 3D — Styl „rysunek”: krawędzie długopisem, powierzchnie kredką.
+// Wielka Kradzież Aut VI — Styl „rysunek”: krawędzie długopisem, powierzchnie kredką.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* ---------- styl pojazdów „rysunek”: krawędzie niebieskim długopisem, powierzchnie kredką kreskowaną po skosie ---------- */

@@ -1,4 +1,4 @@
-// Warszawa 3D — Konstrukcje: wiadukty, tunele, rampy, wykopy, przejazdy bramne, mosty nad wodą.
+// Wielka Kradzież Aut VI — Konstrukcje: wiadukty, tunele, rampy, wykopy, przejazdy bramne, mosty nad wodą; nawierzchnia pod nogami — surfaceAt().
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* =========================================================================

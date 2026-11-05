@@ -1,6 +1,7 @@
-// Warszawa 3D — Scena: renderer, kamera, światła, niebo i mgła, ustawienia grafiki; wysokość terenu H(); geometria i tekstury pomocnicze.
+// Wielka Kradzież Aut VI — Scena: renderer, kamera, światła, niebo i mgła, ustawienia grafiki; wysokość terenu H(); geometria i tekstury pomocnicze.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
+let bump = 0;   // wstrząs kamery (zderzenie, strzał, wybuch), wygasa w updateCamera
 /* =========================================================================
    SCENA
    ========================================================================= */

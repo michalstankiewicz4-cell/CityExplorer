@@ -1,5 +1,5 @@
-// Kafle mapy (1 km × 1 km) do wczytywania w trakcie gry — poza dokładną mapą (centrum / Okęcie).
-// Wspólne dla gry (index.html) i narzędzia tools/fetch-tiles.mjs (gotowe kafle Warszawy przy deployu).
+// Kafle mapy (1 km × 1 km) do wczytywania w trakcie gry — poza dokładnym obszarem (centrum, Okęcie, Wisła).
+// Wspólne dla gry (js/world/tiles.js) i narzędzia tools/fetch-tiles.mjs (gotowe kafle Warszawy przy deployu).
 // Siatka kafli w metrach od środka globalnego G0 (PKiN): x na wschód, z na południe; kafel (i, j) = [i·T, (i+1)·T] × [j·T, (j+1)·T].
 // Kafel: { i, j, b: budynki [[wys, min_wys, x0, z0, x1, z1, …]], l: linie [[klasa, szer, x0, z0, …]], a: obszary [[klasa, [rola, x0, z0, …], …]] }
 // współrzędne w decymetrach od rogu kafla (liczby całkowite).

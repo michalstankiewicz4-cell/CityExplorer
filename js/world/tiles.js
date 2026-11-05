@@ -1,8 +1,8 @@
-// Warszawa 3D — Kafle mapy wczytywane w locie (moduł shared/tiles.mjs): budowa, zwalnianie, podglądy.
+// Wielka Kradzież Aut VI — Kafle mapy wczytywane w locie (moduł shared/tiles.mjs): budowa, zwalnianie, podglądy.
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 /* =========================================================================
-   KAFLE MAPY POZA DOKŁADNĄ MAPĄ (js/tiles.mjs): wczytywanie w stronę ruchu, zwalnianie z pamięci za plecami
+   KAFLE MAPY POZA DOKŁADNĄ MAPĄ (js/shared/tiles.mjs): wczytywanie w stronę ruchu, zwalnianie z pamięci za plecami
    Źródła kafla: tiles/<i>_<j>.json (Warszawa, z deployu) → pamięć przeglądarki → Overpass na żywo (poza Warszawą).
    Uproszczone: płaski grunt z malowanymi drogami i obszarami, budynki z płaskimi dachami; bez tuneli, wiaduktów, torów do jazdy.
    ========================================================================= */
