@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.12.0</title>
+<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.13.0</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Warszawa 3D, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.12.0"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.13.0"}
 </script>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#0d1014;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#e8e6e1}
@@ -198,7 +198,7 @@ import * as THREE from 'three';
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
-const APP_VERSION = '0.12.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+const APP_VERSION = '0.13.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
 document.getElementById('ver').textContent = 'v' + APP_VERSION; document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
 // dokładne obszary wspólnego świata: gra buduje dokładnie ten, w którym jesteś (przy wejściu w inny — przebudowa w locie);
@@ -1600,7 +1600,7 @@ const keys = {};
 const doorOf = (V) => toWorld(V.s, V.def.doorAt.x, V.def.doorAt.z);
 function nearVehicle() {
   let best = null, bd = 2.6;
-  for (const V of FLEET) { const [dx, dz] = doorOf(V), d = Math.hypot(ped.x - dx, ped.z - dz); if (d < bd && Math.abs(ped.y - V.s.y) < 1.5) { bd = d; best = V; } }
+  if (FLEET.homed) for (const V of FLEET) { const [dx, dz] = doorOf(V), d = Math.hypot(ped.x - dx, ped.z - dz); if (d < bd && Math.abs(ped.y - V.s.y) < 1.5) { bd = d; best = V; } }
   return best;
 }
 const outward = (V) => Math.sign(V.def.doorAt.x) * Math.PI / 2;   // kierunek od pojazdu przy drzwiach (lewa: +, prawa: −)
@@ -1608,14 +1608,14 @@ const outward = (V) => Math.sign(V.def.doorAt.x) * Math.PI / 2;   // kierunek od
 function nearOther() {
   if (air.V && mode === 'foot') { const [x, z] = airDoorAt(); if (Math.hypot(ped.x - x, ped.z - z) < 3) return { kind: 'air', name: air.V.def.name }; }
   if (boat.V && mode === 'foot') { const s = boat.sim.state, fx = Math.sin(s.th), fz = Math.cos(s.th), dx = ped.x - s.x, dz = ped.z - s.z, al = dx * fx + dz * fz, ac = Math.abs(dx * fz - dz * fx); if (Math.abs(al) < 50 && ac < 30) return { kind: 'boat', name: boat.V.info.name }; }
-  if (rail.V && rail.area === AREA && mode === 'foot') { const [x, z] = railDoorAt(); if (Math.hypot(ped.x - x, ped.z - z) < 3.5) return { kind: 'rail', name: rail.kind === 'tram' ? 'tramwaj' : 'pociąg' }; }
+  if (mode === 'foot') for (const R of Object.values(RAILS)) if (R.V && R.area === AREA) { const [x, z] = railDoorAt(R); if (Math.hypot(ped.x - x, ped.z - z) < 3.5) return { kind: 'rail', R, name: R.kind === 'tram' ? 'tramwaj' : 'pociąg' }; }
   return null;
 }
 function useCar() {
   if (mode === 'foot') {
     const o = nearOther();
     if (o && o.kind === 'air') { mode = 'air'; ego = air.ego; air.work = 0; if (PED) PED.g.visible = false; air.off = null; return; }
-    if (o && o.kind === 'rail') { mode = 'rail'; ego = rail; if (PED) PED.g.visible = false; return; }
+    if (o && o.kind === 'rail') { rail = o.R; mode = 'rail'; ego = rail; if (PED) PED.g.visible = false; return; }
     if (o && o.kind === 'boat') { mode = 'boat'; ego = boat.ego; boat.off = null; if (PED) PED.g.visible = false; return; }
     const V = nearVehicle(); if (V) { SEQV = V; mode = 'enter'; seq = 0; }
   }
@@ -1735,7 +1735,7 @@ function physics(dt) {
   if (mode === 'boat') boatStep(dt);
   if (mode === 'foot') walk(dt);
   if (mode === 'rail') railStep(dt);
-  for (const V of FLEET) {
+  if (FLEET.homed) for (const V of FLEET) {
     const drive = mode === 'car' && V === ACT;
     if (!drive && V.s.rest) continue;          // stojący pojazd nie wymaga liczenia
     car = V.s; VDEF = V.def;
@@ -1814,11 +1814,16 @@ function airReset() {
   Object.assign(air.c, { throttle: 0, elevator: 0, aileron: 0, rudder: 0, flaps: 0, gear: 1, brake: 1 }); air.work = 0; air.off = null;
   airSync();
 }
-async function startAir() {
+// samolot stoi na swoim miejscu (próg drogi startowej Okęcia) od chwili zbudowania Okęcia — wsiadasz E albo trybem Samolot
+async function parkAir() {
+  if (air.V) return;
   if (!AIRK) [AIRK, FLY] = await Promise.all([import(GL + 'js/models/air/airkit.js'), import(GL + 'js/behaviors/air/flight.js')]);
   air.V = AIRK.buildAircraft('spitfire', {}); prepModel(air.V.group); scene.add(air.V.group);
-  air.spawn = airSpawnPoint(); airReset();
-  mode = 'air'; ego = air.ego; if (PED) PED.g.visible = false;
+  air.spawn = airSpawnPoint(); airReset(); air.work = 1;
+}
+async function startAir() {
+  if (!air.V) await parkAir();
+  mode = 'air'; ego = air.ego; air.work = 0; air.off = null; if (PED) PED.g.visible = false;
 }
 function airSync() { const s = air.sim.state, e = air.ego, f = air.sim.qRot(s.q, [0, 0, 1]); e.x = s.p[0]; e.y = s.p[1]; e.z = s.p[2]; e.th = Math.atan2(f[0], f[2]); e.vf = s.ias; }
 function airStep(dt) {
@@ -1913,7 +1918,8 @@ function isWater(x, z) {
   if (i < 0 || j < 0 || i >= m.S || j >= m.S) return false;
   return m.a[j * m.S + i] > 127;
 }
-async function startBoat() {
+async function parkBoat() {
+  if (boat.V) return;
   if (!WK) [WK, SHIPK, SHIPB] = await Promise.all([import(GL + 'js/envs/water/waterkit.js'), import(GL + 'js/models/ships-sea/index.js'), import(GL + 'js/behaviors/water/ship.js')]);
   const m = SHIPK.buildShip('blyskawica', {}); prepModel(m.group); scene.add(m.group); boat.V = m; boat.area = AREA;
   boat.def = SHIPB.shipDef(m, { mass: 2.144e6, power: 54000 * 745.7, vmax: 39 * KN });
@@ -1939,22 +1945,26 @@ async function startBoat() {
   boat.u = u; boat.wscene = new THREE.Scene(); boat.wscene.add(mesh);
   boat.wcam = new THREE.PerspectiveCamera(); boat.wcam.matrixAutoUpdate = false; boat.wcam.matrixWorldAutoUpdate = false;
   // miejsce: oś Wisły najbliżej środka obszaru, dziobem z nurtem; poziom wody z terenu w korycie
-  await boatMask(0, 0);
+  const wc = toXZ(AREAS.wisla.lat, AREAS.wisla.lon);   // miejsce okrętu: Wisła przy Moście Świętokrzyskim
+  await boatMask(wc[0], wc[1]);
   let best = null, bd = 1e9;
   if (TS.TL) for (let i = -2; i <= 2; i++) for (let j = -2; j <= 2; j++) {
-    const gi = Math.floor(-TS.OFF[0] / TS.TL.T) + i, gj = Math.floor(-TS.OFF[1] / TS.TL.T) + j, d = await tileData(gi + '_' + gj); if (!d) continue;
+    const gi = Math.floor((wc[0] - TS.OFF[0]) / TS.TL.T) + i, gj = Math.floor((wc[1] - TS.OFF[1]) / TS.TL.T) + j, d = await tileData(gi + '_' + gj); if (!d) continue;
     const ox = gi * TS.TL.T + TS.OFF[0], oz = gj * TS.TL.T + TS.OFF[1];
     for (const l of d.l) if (l[0] === 'river') for (let n = 2; n < l.length - 2; n += 2) {
-      const ax = ox + l[n] / 10, az = oz + l[n + 1] / 10, bx = ox + l[n + 2] / 10, bz = oz + l[n + 3] / 10, mx = (ax + bx) / 2, mz = (az + bz) / 2, dd = Math.hypot(mx, mz);
+      const ax = ox + l[n] / 10, az = oz + l[n + 1] / 10, bx = ox + l[n + 2] / 10, bz = oz + l[n + 3] / 10, mx = (ax + bx) / 2, mz = (az + bz) / 2, dd = Math.hypot(mx - wc[0], mz - wc[1]);
       if (dd < bd && isWater(mx, mz)) { bd = dd; best = { x: mx, z: mz, th: Math.atan2(bx - ax, bz - az) }; }
     }
   }
-  if (!best && boat.mask) { const M = boat.mask; for (let n = 0; n < M.S * M.S; n += 7) if (M.a[n] > 127) { const x = M.x0 + (n % M.S + 0.5) * M.SZ / M.S, z = M.z0 + (Math.floor(n / M.S) + 0.5) * M.SZ / M.S, dd = Math.hypot(x, z); if (dd < bd) { bd = dd; best = { x, z, th: 0 }; } } }
-  best = best || { x: 0, z: 0, th: 0 };
+  if (!best && boat.mask) { const M = boat.mask; for (let n = 0; n < M.S * M.S; n += 7) if (M.a[n] > 127) { const x = M.x0 + (n % M.S + 0.5) * M.SZ / M.S, z = M.z0 + (Math.floor(n / M.S) + 0.5) * M.SZ / M.S, dd = Math.hypot(x - wc[0], z - wc[1]); if (dd < bd) { bd = dd; best = { x, z, th: 0 }; } } }
+  best = best || { x: wc[0], z: wc[1], th: 0 };
   const hs = []; for (let a = -600; a <= 600; a += 25) for (let b = -600; b <= 600; b += 25) if (isWater(best.x + a, best.z + b)) hs.push(H(best.x + a, best.z + b));
   hs.sort((p, q) => p - q); boat.yw = (hs.length ? hs[Math.floor(hs.length * 0.9)] : H(best.x, best.z)) + 0.3;
   boat.spawn = best; boatReset();
-  mode = 'boat'; ego = boat.ego; if (PED) PED.g.visible = false;
+}
+async function startBoat() {
+  if (!boat.V) await parkBoat();
+  mode = 'boat'; ego = boat.ego; boat.off = null; if (PED) PED.g.visible = false;
 }
 function boatReset() { const sp = boat.spawn; boat.sim = SHIPB.createShip(boat.def, { x: sp.x, z: sp.z, th: sp.th }); boat.c.throttle = 0; boat.c.rudder = 0; boat.off = null; boatSync(); }
 function boatSync() { const s = boat.sim.state, e = boat.ego; e.x = s.x; e.z = s.z; e.y = boat.yw + 2; e.th = s.th; e.vf = s.vf; }
@@ -2108,7 +2118,10 @@ function push(dx, dz, d, pen, drive) {
 const RAIL_CHAINS = { tram: [], subway: [], rail: [] };   // wszystkie ciągi torów (buildTrains)
 let TK = null, TRAINKIT = null, PATH = null, TRAMPHYS = null, PTRACK = null;
 const RAIL_LIFT = { tram: 0.01, rail: 0.45 };            // główka szyny nad osią z OSM: tramwaj w jezdni, kolej na podsypce
-const rail = { V: null, kind: null, T: null, sim: null, s: 0, v: 0, x: 0, y: 0, z: 0, th: 0, vf: 0, doors: 0, brake: false, target: 0, poses: [], derailed: false };
+const mkRail = () => ({ V: null, kind: null, T: null, sim: null, s: 0, v: 0, x: 0, y: 0, z: 0, th: 0, vf: 0, doors: 0, brake: false, target: 0, poses: [], derailed: false });
+const RAILS = { tram: mkRail(), train: mkRail() };   // tramwaj i pociąg stoją na swoich torach w centrum; rail — ten, którym jedziesz
+let rail = RAILS.tram;
+const chKey = (ch) => (ch.names || []).join('|') + ':' + Math.round(ch.len);
 const RT = {
   tram: { vmax: 70 / 3.6, cam: [19, 6.5] },
   train: { acc: 0.6, power: 600e3, mass: 42000, brake: 1.0, emerg: 1.8, vmax: 60 / 3.6, cam: [17, 6.5] },
@@ -2160,24 +2173,32 @@ function railTrack(ch, westward) {   // opis toru (łuki, wysokości) dla ciągu
 async function buildRails(T, net) {
   PTRACK = PTRACK || await import(GL + 'js/models/structures/railway/path-track.js');
   if (!T || T.L < 20) return;
-  const tm = PTRACK.buildPathTrack(T, { lift: RAIL_LIFT[net], sleepers: net === 'rail', ballast: net === 'rail', step: 1.5 }); scene.add(tm); railObjs.push(tm);
+  const tm = PTRACK.buildPathTrack(T, { lift: RAIL_LIFT[net], sleepers: net === 'rail', ballast: net === 'rail', step: 1.5 }); scene.add(tm); (rail.objs = rail.objs || []).push(tm);
 }
-// skład gracza i jego tor należą do obszaru, w którym ruszył (centrum): w innym obszarze są ukryte, po powrocie — na swoim miejscu
-const railObjs = [];
+// skład i jego tor należą do obszaru, w którym stoi (centrum): w innym obszarze są ukryte, po powrocie — na swoim miejscu
 async function loadRail(kind) {
   if (kind === 'tram') {
     TK = TK || await import(GL + 'js/models/train/trams/tramkit.js');
     TRAMPHYS = TRAMPHYS || await import(GL + 'js/behaviors/rail/tram.js');
-    const v = TK.buildTram('swing', {}); prepModel(v.group); scene.add(v.group); railObjs.push(v.group);
+    const v = TK.buildTram('swing', {}); prepModel(v.group); scene.add(v.group); (rail.objs = rail.objs || []).push(v.group);
     return { kind, v, units: v.sections.map((s) => ({ L: s.L })), gap: v.def.gap };
   }
   await import(GL + 'js/core/three-global.js');
   TRAINKIT = TRAINKIT || await import(GL + 'js/models/train/trainkit.js');
   const g = TRAINKIT.buildTrain(TRAINKIT.DEFAULT_TRAIN); prepModel(g);
-  const cars = g.userData.vehicles; for (const c of cars) { g.remove(c); scene.add(c); railObjs.push(c); }
+  const cars = g.userData.vehicles; for (const c of cars) { g.remove(c); scene.add(c); (rail.objs = rail.objs || []).push(c); }
   return { kind, g, cars, units: cars.map((c) => ({ L: c.userData.halfLength * 2 - 0.02 })), gap: 0.02 };
 }
+async function parkRail(kind) {
+  const prev = rail; rail = RAILS[kind];
+  try { await parkRail_(kind); } finally { rail = prev; }
+}
 async function startRail(kind) {
+  if (!RAILS[kind].V) await parkRail(kind);
+  if (!RAILS[kind].V) return;
+  rail = RAILS[kind]; mode = 'rail'; ego = rail; if (PED) PED.g.visible = false;
+}
+async function parkRail_(kind) {
   const net = kind === 'tram' ? 'tram' : 'rail';
   PATH = PATH || await import(GL + 'js/behaviors/rail/path.js');
   const R = await loadRail(kind);
@@ -2202,14 +2223,13 @@ async function startRail(kind) {
   if (!at) { flash('Brak toru na mapie'); return; }
   const s0 = at.s;
   await buildRails(at.T, net);
-  Object.assign(rail, { area: AREA, V: R, kind, ch: at.ch, T: at.T, s: s0, v: 0, total, lift: RAIL_LIFT[net], target: 0, derailed: false, sim: null });
+  Object.assign(rail, { area: AREA, chKey: chKey(at.ch), V: R, kind, ch: at.ch, T: at.T, s: s0, v: 0, total, lift: RAIL_LIFT[net], target: 0, derailed: false, sim: null });
   if (kind === 'tram') {
     rail.sim = TRAMPHYS.createTramSim(at.T, R.v.def, s0);
     rail.sim.onStep = railForces;
     rail.bodyS = rail.sim.bodies.map(() => s0);
   }
   for (const tr of trains) if (tr.ch === at.ch) { tr.off = true; for (const m of tr.cars) m.visible = false; }
-  mode = 'rail'; ego = rail; if (PED) PED.g.visible = false;
   railPlace(0);
 }
 // położenie ciała na torze (rzut na oś), od poprzedniego oszacowania
@@ -2303,7 +2323,7 @@ function railPlace(dt) {
 }
 function railDoors() { if (Math.abs(rail.v) > 0.2) { flash('Zatrzymaj się, żeby otworzyć drzwi'); return; } rail.doors = rail.doors > 0.5 ? 0 : 1; }
 // E w składzie: na postoju otwiera drzwi, przy otwartych — wysiadasz (prawa strona czoła); E przy drzwiach — wsiadasz z powrotem
-const railDoorAt = () => toWorld({ x: rail.x, z: rail.z, th: rail.th }, -2.6, rail.kind === 'tram' ? 2.5 : -3);
+const railDoorAt = (R = rail) => toWorld({ x: R.x, z: R.z, th: R.th }, -2.6, R.kind === 'tram' ? 2.5 : -3);
 function railUse() {
   if (Math.abs(rail.v) > 0.2) { flash('Zatrzymaj się, żeby otworzyć drzwi'); return; }
   if (rail.doors < 0.5) { rail.doors = 1; flash('Drzwi otwarte — E: wysiądź'); return; }
@@ -2911,7 +2931,8 @@ async function switchArea(a) {
     if (boat.sim) { mv(boat.sim.state); mv(boat.spawn); boat.mask = null; boatSync(); boatMask(boat.sim.state.x, boat.sim.state.z); }
     if (mode !== 'air') { for (const V of FLEET) V.s.y = surfaceAt(V.s.x, V.s.z, V.s.y + 2); ped.y = surfaceAt(ped.x, ped.z, ped.y + 2); }
     camPos.x -= dx; camPos.z -= dz; if (air.off == null) {}
-    for (const o of railObjs) o.visible = rail.area === AREA;
+    for (const R of Object.values(RAILS)) for (const o of R.objs || []) o.visible = R.area === AREA;
+    await homeVehicles(t => status('Na swoje miejsce: ' + t, 0.95));
     if (sk) setSketch(true); if (xray) setXray(true); setNight(night);
     if (bigOpen) { bmPan = null; drawBigMap(); }
   } catch (e) { console.error('[W3D] zmiana obszaru', e); flash('Nie udało się wczytać: ' + a.name); }
@@ -2926,6 +2947,17 @@ function areaCheck(dt) {
     const [x, z] = toXZ(a.lat, a.lon), h = (a.r + 150) * 0.75;
     if (Math.abs(ego.x - x) < h && Math.abs(ego.z - z) < h) { switchArea(a); return; }
   }
+}
+// pojazdy na swoich miejscach niezależnie od tego, gdzie zaczynasz: auta, czołg, autobus, tramwaj i pociąg — w centrum,
+// samolot — na Okęciu, okręt — na Wiśle; każdy pojawia się, gdy pierwszy raz zbudujesz jego obszar, i potem już tam stoi
+async function homeVehicles(progress = () => {}) {
+  if (AREA === AREAS.centrum) {
+    if (!FLEET.homed && FLEET.length) { const sp = findSpawn(); SPAWN = sp; for (const V of FLEET) { park(V, sp, PARK[V.id] || 0); V.v.group.visible = true; } FLEET.homed = true; }
+    for (const k of ['tram', 'train']) if (!RAILS[k].V) { progress(k === 'tram' ? 'Tramwaj…' : 'Pociąg WKD…'); try { await parkRail(k); } catch (e) { console.warn('[W3D] skład', k, e); } }
+    for (const R of Object.values(RAILS)) if (R.V && R.area === AREA) for (const tr of trains) if (tr.ch && chKey(tr.ch) === R.chKey) { tr.off = true; for (const m of tr.cars) m.visible = false; }
+  }
+  if (AREA === AREAS.okecie && !air.V) { progress('Samolot…'); try { await parkAir(); } catch (e) { console.warn('[W3D] samolot', e); } }
+  if (AREA === AREAS.wisla && !boat.V) { progress('Okręt…'); try { await parkBoat(); } catch (e) { console.warn('[W3D] okręt', e); } }
 }
 /* ---------- dokładny obszar: dane, teren, budowa świata ---------- */
 async function loadArea() {
@@ -2973,20 +3005,23 @@ async function main() {
     requestAnimationFrame(loop);
     const ml = $('modes').querySelector('.mload u');
     await loadModels((f, t) => { ml.textContent = t + ' ' + Math.round(f * 100) + '%'; });
-    startAt(findSpawn());
+    if (AREA === AREAS.centrum) startAt(findSpawn());
+    else { for (const V of FLEET) V.v.group.visible = false; const sp = findSpawn(); SPAWN = sp; Object.assign(ped, { x: sp.x, z: sp.z, th: sp.th, vf: 0, vy: 0 }); ped.y = surfaceAt(sp.x, sp.z, H(sp.x, sp.z)); mode = 'foot'; ego = ped; camYaw = sp.th; }
+    FLEET.homed = AREA === AREAS.centrum;
+    await homeVehicles(t => { ml.textContent = 'Na swoje miejsce: ' + t; });
     if (GFX.sketch) setSketch(true);
     $('modes').querySelector('.mload').remove();
-    $('modes').querySelector('[data-mode=foot]').disabled = false; $('modes').querySelector('[data-mode=rail]').disabled = !!MAP; $('modes').querySelector('[data-mode=air]').disabled = false; $('modes').querySelector('[data-mode=boat]').disabled = false;
+    $('modes').querySelector('[data-mode=foot]').disabled = false; $('modes').querySelector('[data-mode=rail]').disabled = false; $('modes').querySelector('[data-mode=air]').disabled = false; $('modes').querySelector('[data-mode=boat]').disabled = false;
     const chosen = QS.get('mode') || await new Promise(res => { for (const b of $('modes').querySelectorAll('button:not(:disabled)')) b.onclick = (e) => res(b.dataset.mode === 'rail' ? 'rail:' + ((e.target.dataset && e.target.dataset.veh) || 'tram') : b.dataset.mode); });
     started = chosen;
     if (chosen === 'drive') { mode = 'car'; ego = car; if (PED) PED.g.visible = false; }   // od razu za kierownicą (doktor mapy)
     if (chosen === 'boat') { $('mload4').style.display = 'flex'; if (AREA !== AREAS.wisla) await switchArea(AREAS.wisla); await startBoat(); }
     if (chosen === 'air') { $('mload3').style.display = 'flex'; if (AREA !== AREAS.okecie) await switchArea(AREAS.okecie); await startAir(); }   // samolot startuje z Okęcia
-    if (chosen.startsWith('rail')) { $('mload2').style.display = 'flex'; await startRail(chosen.split(':')[1] || 'tram'); }
+    if (chosen.startsWith('rail')) { $('mload2').style.display = 'flex'; if (AREA !== AREAS.centrum) await switchArea(AREAS.centrum); await startRail(chosen.split(':')[1] || 'tram'); }
     $('start').classList.add('out'); setTimeout(() => { $('start').style.display = 'none'; }, 650);
     $('hud').style.display = ''; $('minimap').style.display = ''; $('help').style.display = '';
     updateCamera(0, true);
-    window.__W3D = { step, get car() { return car; }, FLEET, ped, rail, startRail, air, startAir, boat, startBoat, isWater, TS, streamTick, buildTile, tileData, disposeTile, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, get E() { return E; }, get R() { return R; }, get AREA() { return AREA; }, switchArea, AREAS, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, version: APP_VERSION };
+    window.__W3D = { step, get car() { return car; }, FLEET, ped, get rail() { return rail; }, RAILS, startRail, air, startAir, boat, startBoat, isWater, TS, streamTick, buildTile, tileData, disposeTile, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, get E() { return E; }, get R() { return R; }, get AREA() { return AREA; }, switchArea, AREAS, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, version: APP_VERSION };
     window.dispatchEvent(new Event('w3d-ready'));
   } catch (e) {
     console.error(e);

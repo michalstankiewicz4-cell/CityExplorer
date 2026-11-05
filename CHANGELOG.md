@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.0 — 2026-11-05
+- **Wszystkie pojazdy na swoich miejscach**, niezależnie od tego, gdzie zaczynasz: Polonez, Abrams, Solaris, tramwaj PESA Swing i pociąg WKD — w centrum; Spitfire — na progu drogi startowej Okęcia; ORP Błyskawica — na Wiśle przy Moście Świętokrzyskim. Każdy pojawia się przy pierwszym zbudowaniu swojego obszaru (przy starcie albo po wjeździe / wlocie) i potem tam stoi; podchodzisz i wsiadasz klawiszem E. Tramwaj i pociąg stoją jednocześnie, każdy na swoim torze.
+- Tryby na ekranie startowym przenoszą do miejsca pojazdu (Szynowy — do centrum, Samolot — na Okęcie, Okręt — na Wisłę); karta Szynowy czynna na każdej mapie.
+
 ## 0.12.0 — 2026-11-05
 - **Tryb Okręt**: ORP Błyskawica (1937, ShipKit z GameLaboratory) na Wiśle przy Moście Świętokrzyskim — nowy dokładny obszar wspólnego świata (`?map=wisla`, plik `wisla.json` z deployu). W/S — telegraf (naprzód / wstecz), A/D — ster, Spacja — stop maszyn, R — od nowa, E — na postoju przy brzegu zejście na ląd (i z powrotem przy burcie). Kamera C: za rufą, dalej, z mostka.
 - **Woda z laboratorium wody** (WaterKit): rzeka — zmarszczki, odbicia nieba, odblask słońca, fala dziobowa, fale Kelvina, kilwater i piana przy burtach; liczona w układzie okrętu (jak w laboratorium) i rysowana drugim przebiegiem z tą samą głębią; maska z OSM (obszary wody i linie rzek z kafli) wycina ją do koryta.
