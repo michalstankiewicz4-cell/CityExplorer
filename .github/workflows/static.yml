@@ -9,6 +9,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+  # co 2 godziny: dłuższe pobieranie kafli Warszawy (aż będą wszystkie); deploy po pushu pobiera tylko kilka minut
+  schedule:
+    - cron: '17 */2 * * *'
+
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
@@ -57,9 +61,9 @@ jobs:
           restore-keys: tiles-v1-
       - name: Pobierz brakujące kafle Warszawy (tiles/, najpierw trasa centrum — Okęcie)
         continue-on-error: true
-        timeout-minutes: 30
+        timeout-minutes: 50
         env:
-          TILE_MINUTES: 25
+          TILE_MINUTES: ${{ github.event_name == 'push' && '4' || '40' }}
         run: node tools/fetch-tiles.mjs
       - name: Zapisz kafle (cache)
         if: always()
