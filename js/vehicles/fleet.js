@@ -76,7 +76,7 @@ let seq = 0, SEQV = null;              // wsiadanie / wysiadanie: postęp (s) i 
 const keys = {};
 const doorOf = (V) => toWorld(V.s, V.def.doorAt.x, V.def.doorAt.z);
 function nearVehicle() {
-  let best = null, bd = 2.6;
+  let best = null, bd = 3.6;   // jak w GTA: wsiadasz z większej odległości
   if (FLEET.homed) for (const V of FLEET) { const [dx, dz] = doorOf(V), d = Math.hypot(ped.x - dx, ped.z - dz); if (d < bd && Math.abs(ped.y - V.s.y) < 1.5) { bd = d; best = V; } }
   return best;
 }

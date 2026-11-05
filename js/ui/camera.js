@@ -3,28 +3,57 @@
 'use strict';
 /* ---------- kamera ---------- */
 let started = null, camYaw = 0, camMode = 0, orbit = 0, tilt = 0, camDist = 1, dragging = false, lastX = 0, lastY = 0;
-// LPM: pełne rozglądanie — poziomo (orbit) i w pionie (tilt)
-let clickAt = null;   // krótkie kliknięcie LPM (bez przeciągania) — strzał
-canvas.addEventListener('pointerdown', e => { if (e.button !== 0) return; dragging = true; lastX = e.clientX; lastY = e.clientY; clickAt = { x: e.clientX, y: e.clientY, t: performance.now() }; canvas.setPointerCapture(e.pointerId); });
-canvas.addEventListener('pointerup', e => { dragging = false; if (clickAt && Math.hypot(e.clientX - clickAt.x, e.clientY - clickAt.y) < 5 && performance.now() - clickAt.t < 350) fire(); clickAt = null; });
-canvas.addEventListener('pointercancel', () => { dragging = false; });
-canvas.addEventListener('pointermove', e => {
-  if (!dragging) return;
-  orbit -= (e.clientX - lastX) * 0.006;
-  tilt = Math.max(-1.5, Math.min(1.5, tilt + (e.clientY - lastY) * 0.005));
-  lastX = e.clientX; lastY = e.clientY;
+// Mysz jak w GTA V: kliknięcie w grę łapie mysz (Pointer Lock) — ruch obraca kamerę bez trzymania przycisku,
+// LPM strzela, PPM celuje; Esc puszcza mysz i otwiera opcje. Bez złapania (np. odmowa przeglądarki): LPM + przeciągnij.
+const SENS = 0.0022;
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+canvas.addEventListener('pointerdown', e => {
+  if (mouse.locked) { if (e.button === 0) { mouse.fire = true; fire(); } if (e.button === 2) mouse.aim = true; return; }
+  if (e.button === 2) { mouse.aim = true; return; }
+  if (e.button !== 0) return;
+  if (started && !optOpen && !bigOpen && canvas.requestPointerLock) { try { const r = canvas.requestPointerLock(); if (r && r.catch) r.catch(() => {}); } catch { } }
+  dragging = true; lastX = e.clientX; lastY = e.clientY; canvas.setPointerCapture(e.pointerId);
 });
-canvas.addEventListener('wheel', e => { camDist = Math.min(4, Math.max(0.5, camDist * (e.deltaY > 0 ? 1.1 : 0.9))); e.preventDefault(); }, { passive: false });
-const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
+addEventListener('pointerup', e => { if (e.button === 0) { mouse.fire = false; dragging = false; } if (e.button === 2) mouse.aim = false; });
+canvas.addEventListener('pointercancel', () => { dragging = false; mouse.fire = mouse.aim = false; });
+const look = (dx, dy) => { orbit -= dx * SENS; tilt = Math.max(-1.5, Math.min(1.5, tilt + dy * SENS)); mouse.last = performance.now(); };
+addEventListener('mousemove', e => { if (mouse.locked) look(e.movementX, e.movementY); });
+canvas.addEventListener('pointermove', e => {
+  if (mouse.locked || !dragging) return;
+  look((e.clientX - lastX) * 2.7, (e.clientY - lastY) * 2.3); lastX = e.clientX; lastY = e.clientY;
+});
+document.addEventListener('pointerlockchange', () => {
+  mouse.locked = document.pointerLockElement === canvas; mouse.fire = mouse.aim = false; if (!mouse.locked) mouse.unlockAt = performance.now();
+  if (!mouse.locked && started && !optOpen && !bigOpen && !mouse.wantUnlock) toggleOptions(true);   // Esc w grze: pauza i opcje
+  mouse.wantUnlock = false;
+});
+// kółko: pieszo — broń (Beryl / bez broni), w czołgu — działo / karabin, w pozostałych pojazdach — odległość kamery
+canvas.addEventListener('wheel', e => {
+  e.preventDefault(); if (!started || optOpen) return;
+  const now = performance.now(); if (now - (mouse.wheelT || 0) < 180 && (mode === 'foot' || isTank())) return; mouse.wheelT = now;
+  if (mode === 'foot') { WPN.armed = !WPN.armed; flash(WPN.armed ? 'Beryl' : 'Bez broni'); }
+  else if (isTank()) { WPN.tankGun = WPN.tankGun === 'cannon' ? 'mg' : 'cannon'; flash(WPN.tankGun === 'cannon' ? 'Działo 120 mm' : 'Karabin maszynowy'); }
+  else camDist = Math.min(4, Math.max(0.5, camDist * (e.deltaY > 0 ? 1.1 : 0.9)));
+}, { passive: false });
+const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), CAM = { aim: 0, spd: 0 };
 function updateCamera(dt, snap) {
   if (mode === 'air') return airCamera(dt, snap);
   if (mode === 'boat') return boatCamera(dt, snap);
   const onFoot = ego === ped;
-  if (!dragging && !onFoot) { orbit *= Math.exp(-1.5 * dt); tilt *= Math.exp(-1.5 * dt); }   // pieszo kamera zostaje tam, gdzie ją ustawisz
-  const th = (onFoot ? camYaw : ego.th) + orbit, fx = Math.sin(th), fz = Math.cos(th);
+  // w pojeździe kamera sama wraca za pojazd 1,5 s po ruchu myszą, gdy jedzie (w czołgu nie: kamera celuje wieżą)
+  if (!onFoot && !dragging && !(mode === 'car' && ACT && ACT.id === 'abrams') && performance.now() - mouse.last > 1500 && Math.abs(ego.vf || 0) > 1) { orbit *= Math.exp(-2.2 * dt); tilt *= Math.exp(-2.2 * dt); }
+  const back = !onFoot && on('lookBack') ? Math.PI : 0;   // spójrz za siebie
+  const th = (onFoot ? camYaw : ego.th) + orbit + back, fx = Math.sin(th), fz = Math.cos(th);
+  // pieszo: kamera przez prawe ramię (jak w GTA V), przy celowaniu bliżej i węższy kąt widzenia
+  const aimK = on('aim') && ((onFoot && WPN.armed) || mode === 'car') ? 1 : 0; CAM.aim += (aimK - CAM.aim) * Math.min(1, 10 * dt);
+  const side = onFoot && camMode !== 2 ? 0.42 + 0.2 * CAM.aim : 0, rx = -fz * side, rz = fx * side;
+  // „feeling”: w pojeździe kąt widzenia rośnie z prędkością, kamera lekko odjeżdża i drży przy dużej prędkości
+  const spd = onFoot ? 0 : Math.abs(ego.vf || 0); CAM.spd += (spd - CAM.spd) * Math.min(1, 2 * dt);
+  { const f = GFX.fov * (1 - 0.3 * CAM.aim) + (camMode === 2 ? 4 : 10) * Math.min(1, CAM.spd / 45); if (Math.abs(camera.fov - f) > 0.05) { camera.fov = f; camera.updateProjectionMatrix(); } }
+  if (CAM.spd > 25 && camMode !== 2) bump = Math.max(bump, 0.025 * Math.min(1, (CAM.spd - 25) / 30));
   let dist, hgt, look;
-  const CT = onFoot ? [3.6, 1.9] : mode === 'rail' ? RT[rail.kind].cam : TUNE[ACT.id].cam, big = CT[0] / 8.5;
-  if (camMode === 0) { dist = CT[0] * camDist; hgt = CT[1] * camDist; look = onFoot ? 1.45 : 1.3 * Math.max(1, big); }
+  const CT = onFoot ? [3.2 - 1.6 * CAM.aim, 1.0 - 0.35 * CAM.aim] : mode === 'rail' ? RT[rail.kind].cam : TUNE[ACT.id].cam, big = CT[0] / 8.5;
+  if (camMode === 0) { const sk = 1 + 0.25 * Math.min(1, CAM.spd / 40); dist = CT[0] * camDist * sk; hgt = CT[1] * camDist; look = onFoot ? 1.55 : 1.3 * Math.max(1, big); }
   else if (camMode === 1) { dist = (onFoot ? 11 : 26 * big) * camDist; hgt = (onFoot ? 6 : 13 * big) * camDist; look = onFoot ? 1.2 : 2 * big; }
   else { dist = 0; hgt = onFoot ? 1.66 : 0; look = 1.1; }
   // kąt elewacji kamery wokół auta; poniżej poziomu kamera zostaje nad ziemią i patrzy w górę
@@ -33,7 +62,7 @@ function updateCamera(dt, snap) {
     const r = Math.hypot(dist, hgt), E0 = Math.atan2(hgt, dist), Ev = Math.max(-1.3, Math.min(1.45, E0 + tilt)), Ec = Math.max(0.06, Ev);
     lookUp = Ec - Ev; dist = r * Math.cos(Ec); hgt = r * Math.sin(Ec);
   }
-  const want = new THREE.Vector3(ego.x - fx * dist, ego.y + hgt, ego.z - fz * dist);
+  const want = new THREE.Vector3(ego.x - fx * dist + rx, ego.y + hgt + (onFoot ? 0.6 : 0), ego.z - fz * dist + rz);
   // kamera nie wchodzi w budynki: szukamy pierwszej ściany między autem a kamerą
   if (camMode !== 2) {
     const dx = want.x - ego.x, dz = want.z - ego.z, L = Math.hypot(dx, dz);
@@ -57,13 +86,13 @@ function updateCamera(dt, snap) {
     want.copy(holder.localToWorld(new THREE.Vector3(e[1], e[2], e[3])));
     }
   } else if (camMode === 2) { want.x = ped.x + Math.sin(ped.th) * 0.12; want.z = ped.z + Math.cos(ped.th) * 0.12; }
-  if (camMode === 2 || snap) camPos.copy(want); else camPos.lerp(want, 1 - Math.exp(-6 * dt));
+  if (camMode === 2 || snap) camPos.copy(want); else camPos.lerp(want, 1 - Math.exp(-(onFoot ? 18 : 6) * dt));
   const near = camMode === 2 ? 0.05 : 0.3; if (camera.near !== near) { camera.near = near; camera.updateProjectionMatrix(); }
   if (camMode === 2) {   // z maski: swobodne rozglądanie
     const p = Math.max(-1.35, Math.min(1.35, -tilt)), c = Math.cos(p) * 20;
     camLook.set(camPos.x + fx * c, camPos.y + Math.sin(p) * 20, camPos.z + fz * c);
   } else {
-    camLook.set(ego.x + fx * 5, ego.y + look, ego.z + fz * 5);
+    camLook.set(ego.x + fx * 5 + rx, ego.y + look, ego.z + fz * 5 + rz);
     if (lookUp > 0) camLook.y += (Math.hypot(camPos.x - camLook.x, camPos.z - camLook.z) + 0.1) * Math.tan(Math.min(1.35, lookUp));
   }
   camera.position.copy(camPos);

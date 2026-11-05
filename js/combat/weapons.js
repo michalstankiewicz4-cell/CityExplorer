@@ -19,7 +19,7 @@ function aimRay() { const d = new THREE.Vector3(); camera.getWorldDirection(d); 
 function fireRifle() {
   if (WPN.fireT > 0 || !WPN.rifle) return; WPN.fireT = 1 / WPN.rifle.info.rate;
   const { o, d } = aimRay(); d.x += (Math.random() - 0.5) * 0.006; d.y += (Math.random() - 0.5) * 0.006; d.normalize();
-  const h = rayHit(o, d, 400), m = WPN.rifle.parts.flash.getWorldPosition(new THREE.Vector3());
+  const h = rayHit(o, d, 400), m = mode === 'car' ? new THREE.Vector3(car.x + Math.sin(car.th) * 0.5, car.y + 1.3, car.z + Math.cos(car.th) * 0.5) : WPN.rifle.parts.flash.getWorldPosition(new THREE.Vector3());
   tracer(m, h.p); WPN.rifle.update(carT, 0, { fire: true }); bump = Math.max(bump, 0.08);
   if (h.z) zHit(h.z, h.p); else burst(h.p.x, h.p.y, h.p.z, 6, 0x8a8070, 2);
 }
@@ -46,8 +46,29 @@ function fireTank() {
     if (h.z) zHit(h.z, h.p); else burst(h.p.x, h.p.y, h.p.z, 4, 0x8a8070, 2);
   }
 }
-const armed = () => mode === 'foot' || (mode === 'car' && ACT && ACT.id === 'abrams');
-function fire() { if (!started || optOpen || bigOpen) return; if (mode === 'foot') fireRifle(); else if (mode === 'car' && ACT && ACT.id === 'abrams') fireTank(); }
+// mysz zależnie od tego, czym sterujesz (jak w GTA V): pieszo LPM strzał, PPM celowanie, kółko — broń (Beryl / bez broni);
+// samochód i autobus: PPM celowanie przez okno, LPM strzał; czołg: LPM strzał, PPM przybliżenie, kółko — działo / karabin;
+// samolot: LPM — 8 karabinów Browning w skrzydłach; tramwaj, pociąg, okręt: tylko kamera
+const isTank = () => mode === 'car' && ACT && ACT.id === 'abrams';
+const armed = () => (mode === 'foot' && WPN.armed) || isTank() || (mode === 'car' && on('aim')) || mode === 'air';
+function fire() {
+  if (!started || optOpen || bigOpen) return;
+  if (mode === 'foot') { if (WPN.armed) fireRifle(); }
+  else if (isTank()) fireTank();
+  else if (mode === 'car' && on('aim')) fireRifle();   // strzał z okna
+  else if (mode === 'air') firePlane();
+}
+// Spitfire Mk I: 8 × Browning .303 w skrzydłach (po 4 na skrzydło), zbieżność ok. 230 m
+function firePlane() {
+  if (WPN.fireT > 0 || !air.V || air.sim.state.crashed) return; WPN.fireT = 1 / 18;
+  const g = air.V.group; g.updateMatrixWorld(true);
+  const conv = g.localToWorld(new THREE.Vector3(0, 0.2, 230));
+  for (const x of [2.3, -2.3, 3.4, -3.4]) {
+    const p = g.localToWorld(new THREE.Vector3(x, -0.1, 0.7)), d = conv.clone().sub(p).normalize(); d.x += (Math.random() - 0.5) * 0.008; d.y += (Math.random() - 0.5) * 0.008; d.normalize();
+    const h = rayHit(p, d, 600); if (Math.random() < 0.5) tracer(p, h.p, 0xffc070);
+    if (h.z) zHit(h.z, h.p); else if (h.t < 599) burst(h.p.x, h.p.y, h.p.z, 3, 0x8a8070, 2);
+  }
+}
 // broń i latarka pieszego (z GameLaboratory), raz
 async function weaponsInit() {
   try {
@@ -61,15 +82,15 @@ async function weaponsInit() {
 }
 function weaponsStep(dt) {
   WPN.fireT -= dt; WPN.reload = Math.max(0, WPN.reload - dt); WPN.mgT -= dt;
-  if (WPN.rifle) { WPN.rifle.group.visible = mode === 'foot'; WPN.rifle.update(carT, dt, {}); }
-  if (started && !optOpen && on('fire') && (mode === 'foot' || (mode === 'car' && ACT && ACT.id === 'abrams' && WPN.tankGun === 'mg'))) fire();
+  if (WPN.rifle) { WPN.rifle.group.visible = mode === 'foot' && WPN.armed; WPN.rifle.update(carT, dt, {}); }
+  if (started && !optOpen && on('fire') && ((mode === 'foot' && WPN.armed) || (isTank() && WPN.tankGun === 'mg') || (mode === 'car' && !isTank() && on('aim')) || mode === 'air')) fire();
   // latarka: w dłoni przy piersi, świeci tam, gdzie patrzy kamera
   if (WPN.holder) {
     const onF = WPN.lightOn && mode === 'foot'; WPN.holder.visible = onF;
     if (onF) { const fx = Math.sin(ped.th), fz = Math.cos(ped.th); WPN.holder.position.set(ped.x + fx * 0.3 + fz * 0.2, ped.y + 1.25, ped.z + fz * 0.3 - fx * 0.2);
       const d = new THREE.Vector3(); camera.getWorldDirection(d); WPN.holder.lookAt(WPN.holder.position.clone().add(d)); WPN.light.update(dt); }
   }
-  const cr = $('cross'); if (cr) cr.style.display = started && armed() && camMode !== 1 ? 'block' : 'none';
-  const wp = $('weap'); if (wp) { const t = mode === 'foot' ? 'Beryl · LPM / V — strzał · L — latarka ' + (WPN.lightOn ? 'wł.' : 'wył.') : mode === 'car' && ACT && ACT.id === 'abrams' ? (WPN.tankGun === 'cannon' ? 'Działo 120 mm' + (WPN.reload > 0 ? ' · ładowanie ' + WPN.reload.toFixed(1) + ' s' : ' · gotowe') : 'Karabin maszynowy') + ' · Tab — zmiana · L — reflektor ' + (WPN.search ? 'wł.' : 'wył.') : ''; wp.textContent = t ? t + ' · zombie: ' + ZB.kills : ''; wp.style.display = t ? 'block' : 'none'; }
+  const cr = $('cross'); if (cr) cr.style.display = started && (mode === 'foot' ? CAM.aim > 0.5 || camMode === 2 : armed()) ? 'block' : 'none';
+  const wp = $('weap'); if (wp) { const t = mode === 'foot' ? (WPN.armed ? 'Beryl · PPM — celuj · LPM — strzał' : 'Bez broni') + ' · kółko — broń · latarka ' + (WPN.lightOn ? 'wł.' : 'wył.') : mode === 'car' && ACT && ACT.id === 'abrams' ? (WPN.tankGun === 'cannon' ? 'Działo 120 mm' + (WPN.reload > 0 ? ' · ładowanie ' + WPN.reload.toFixed(1) + ' s' : ' · gotowe') : 'Karabin maszynowy') + ' · LPM — strzał · PPM — przybliżenie · kółko — broń · reflektor ' + (WPN.search ? 'wł.' : 'wył.') : ''; wp.textContent = t ? t + ' · zombie: ' + ZB.kills : ''; wp.style.display = t ? 'block' : 'none'; }
 }
 let bump = 0;

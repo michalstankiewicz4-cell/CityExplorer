@@ -4,14 +4,20 @@
 /* ---------- pieszy: chód, bieg, zderzenia ze ścianami i z pojazdami ---------- */
 function walk(dt) {
   // jak w grach z kamerą za plecami: W/S naprzód i w tył, A/D w bok — względem kamery; postać obraca się w stronę ruchu
-  const f = (on('fwd') ? 1 : 0) - (on('back') ? 1 : 0), sd = (on('left') ? 1 : 0) - (on('right') ? 1 : 0), run = on('fast');
-  let want = 0;
-  if (f || sd) {
-    const dir = camYaw + orbit + Math.atan2(sd, f), d = Math.atan2(Math.sin(dir - ped.th), Math.cos(dir - ped.th));
-    ped.th += d * Math.min(1, 9 * dt); want = (run ? 4.2 : 1.45) * Math.max(0.2, Math.cos(Math.min(Math.abs(d), 1.5)));
+  const f = (on('fwd') ? 1 : 0) - (on('back') ? 1 : 0), sd = (on('left') ? 1 : 0) - (on('right') ? 1 : 0), aim = on('aim') && WPN.armed, crouch = on('slow');
+  const run = on('fast') && !aim && !crouch, camDir = camYaw + orbit;
+  let want = 0; ped.side = 0;
+  if (aim) {   // celowanie: postać patrzy tam, gdzie kamera, a chodzi bokiem i tyłem (jak w GTA V)
+    const d = Math.atan2(Math.sin(camDir - ped.th), Math.cos(camDir - ped.th)); ped.th += d * Math.min(1, 14 * dt);
+    if (f || sd) { const dir = camDir + Math.atan2(sd, f); want = crouch ? 0.8 : 1.3; ped.mx = Math.sin(dir); ped.mz = Math.cos(dir); }
+  } else if (f || sd) {
+    const dir = camDir + Math.atan2(sd, f), d = Math.atan2(Math.sin(dir - ped.th), Math.cos(dir - ped.th));
+    ped.th += d * Math.min(1, 9 * dt); want = (run ? 6.4 : crouch ? 1.0 : 3.1) * Math.max(0.2, Math.cos(Math.min(Math.abs(d), 1.5)));
+    ped.mx = Math.sin(ped.th); ped.mz = Math.cos(ped.th);
   }
-  ped.vf += (want - ped.vf) * Math.min(1, (want > ped.vf ? 4 : 7) * dt);
-  ped.x += Math.sin(ped.th) * ped.vf * dt; ped.z += Math.cos(ped.th) * ped.vf * dt;
+  ped.crouch = crouch;
+  ped.vf += (want - ped.vf) * Math.min(1, (want > ped.vf ? 6 : 9) * dt);
+  ped.x += (ped.mx ?? Math.sin(ped.th)) * ped.vf * dt; ped.z += (ped.mz ?? Math.cos(ped.th)) * ped.vf * dt;
   for (let it = 0; it < 2; it++) {
     const k0x = Math.floor(ped.x / COLL_CELL), k0z = Math.floor(ped.z / COLL_CELL);
     for (let i = k0x - 1; i <= k0x + 1; i++) for (let j = k0z - 1; j <= k0z + 1; j++) {

@@ -5,13 +5,35 @@
 let optOpen = false;
 const keyName = (c) => !c ? '—' : c.replace(/^Key/, '').replace(/^Digit/, '').replace('ArrowUp', '↑').replace('ArrowDown', '↓').replace('ArrowLeft', '←').replace('ArrowRight', '→').replace('ShiftLeft', 'Shift L').replace('ShiftRight', 'Shift P').replace('ControlLeft', 'Ctrl L').replace('ControlRight', 'Ctrl P').replace('Space', 'Spacja');
 function drawKeys() {
-  const L = $('kList'); L.textContent = '';
-  for (const [a, label] of ACTIONS) {
+  const L = $('kList'); L.textContent = ''; let grp = '';
+  for (const [a, label, , g] of ACTIONS) {
+    if (g !== grp) { grp = g; const h = document.createElement('div'); h.className = 'kg'; h.textContent = g; L.appendChild(h); }
     const row = document.createElement('div'); row.className = 'k';
     const t = document.createElement('span'); t.textContent = label; row.appendChild(t);
     for (const i of [0, 1]) { const b = document.createElement('button'); const w = rebinding && rebinding[0] === a && rebinding[1] === i; b.textContent = w ? 'naciśnij…' : keyName(BIND[a][i]); b.className = w ? 'wait' : ''; b.onclick = () => { rebinding = [a, i]; drawKeys(); }; row.appendChild(b); }
     L.appendChild(row);
   }
+  const h = document.createElement('div'); h.className = 'kg'; h.textContent = 'Mysz (zależnie od tego, czym sterujesz)'; L.appendChild(h);
+  const M = [['Pieszo', 'ruch — kamera · LPM — strzał · PPM — celowanie · kółko — broń (Beryl / bez broni)'], ['Samochód, autobus', 'ruch — rozglądanie (kamera wraca za pojazd) · PPM — celowanie przez okno · LPM — strzał · kółko — odległość kamery'],
+    ['Czołg', 'ruch — wieża i armata · LPM — strzał · PPM — przybliżenie · kółko — działo / karabin'], ['Samolot', 'ruch — rozglądanie · LPM — karabiny w skrzydłach · kółko — odległość kamery'],
+    ['Tramwaj, pociąg, okręt', 'ruch — rozglądanie · kółko — odległość kamery'], ['Zawsze', 'kliknięcie w grę — złapanie myszy · Esc — puszcza mysz i otwiera opcje']];
+  for (const [k, t] of M) { const row = document.createElement('div'); row.className = 'k km'; const a2 = document.createElement('span'); a2.textContent = k; const b2 = document.createElement('span'); b2.textContent = t; row.append(a2, b2); L.appendChild(row); }
+}
+// pomoc w lewym dolnym rogu: klawisze dla tego, czym teraz sterujesz (z ustawień klawiszy)
+let helpFor = '';
+function drawHelp(force) {
+  const k = (a) => { const v = [...new Set(BIND[a].filter(Boolean).map(c => keyName(c).replace(/ [LP]$/, '')))]; return v.length ? v.join(' / ') : '—'; };
+  const ctx = mode === 'car' && ACT ? (ACT.id === 'abrams' ? 'tank' : 'car') : mode === 'enter' || mode === 'exit' ? 'foot' : mode;
+  if (!force && ctx === helpFor) return; helpFor = ctx;
+  const R = (a, b) => `<div><b>${a}</b>${b}</div>`, mv = `${k('fwd')} ${k('left')} ${k('back')} ${k('right')}`.replace(/ \/ [↑↓←→]/g, '');
+  let h = '';
+  if (ctx === 'foot') h = R(mv, 'chodzenie (względem kamery)') + R(k('fast'), 'sprint') + R(k('slow'), 'kucanie') + R(k('brake'), 'skok') + R('Mysz', 'kamera — kliknij w grę, by złapać mysz') + R('PPM', 'celowanie') + R('LPM', 'strzał (Beryl)') + R('Kółko', 'broń: Beryl / bez broni') + R(k('light'), 'latarka') + R(k('use'), 'wsiądź (przy pojeździe)');
+  else if (ctx === 'car' || ctx === 'tank') h = R(k('fwd'), 'gaz') + R(k('back'), 'hamulec / wstecz') + R(`${k('left')} ${k('right')}`.replace(/ \/ [←→]/g, ''), 'skręt') + R(k('brake'), 'hamulec ręczny') + R(k('fast'), 'turbo') + R(k('lookBack'), 'spójrz za siebie') + R(k('use'), 'wysiądź (po zatrzymaniu)') + (ctx === 'tank' ? R('Mysz', 'wieża i armata') + R('LPM', 'strzał') + R('PPM', 'przybliżenie') + R('Kółko / ' + k('weapon'), 'działo / karabin') + R(k('light'), 'reflektor') : R('Mysz', 'rozglądanie') + R('PPM + LPM', 'strzał przez okno') + R('Kółko', 'odległość kamery'));
+  else if (ctx === 'rail') h = R(k('fwd'), 'napęd / nastawa w górę') + R(k('back'), 'hamowanie / nastawa w dół') + R(k('brake'), 'hamulec nagły') + R(k('use'), 'drzwi, drugi raz — wysiądź');
+  else if (ctx === 'air') h = R(`${k('fwd')} ${k('back')}`.replace(/ \/ [↑↓]/g, ''), 'drążek: nos w dół / w górę') + R(`${k('left')} ${k('right')}`.replace(/ \/ [←→]/g, ''), 'lotki (na ziemi: kółko ogonowe)') + R(`${k('rudL')} ${k('rudR')}`, 'ster kierunku') + R(`${k('fast')} ${k('slow')}`.replace(/ \/ [^ ]+ P/g, ''), 'gaz więcej / mniej') + R(k('brake'), 'hamulce kół') + R(`${k('gear')} ${k('flaps')}`, 'podwozie, klapy') + R(k('use'), 'wysiądź (na ziemi)') + R('LPM', 'karabiny w skrzydłach');
+  else if (ctx === 'boat') h = R(`${k('fwd')} ${k('back')}`.replace(/ \/ [↑↓]/g, ''), 'telegraf: naprzód / wstecz') + R(`${k('left')} ${k('right')}`.replace(/ \/ [←→]/g, ''), 'ster') + R(k('brake'), 'stop maszyn') + R(k('use'), 'zejście na ląd (przy brzegu)');
+  h += R(k('cam'), 'widok kamery') + R(`${k('map')} ${k('mini')}`, 'mapa, minimapa') + R(`${k('night')} ${k('xray')} ${k('pix')}`, 'noc, rentgen, pixel-art') + R('Esc', 'opcje i klawisze · ' + k('help') + ' ukryj');
+  $('helpKeys').innerHTML = h;
 }
 function applyGfx() {
   try { localStorage.setItem('w3d.gfx', JSON.stringify(GFX)); } catch {}
@@ -44,5 +66,5 @@ for (const [id, k] of [['gRes', 'res'], ['gView', 'view'], ['gFov', 'fov'], ['gE
 $('gSh').onchange = e => { GFX.shadows = +e.target.value; applyGfx(); };
 $('gSketch').onchange = e => { GFX.sketch = +e.target.value; applyGfx(); };
 $('gDef').onclick = () => { Object.assign(GFX, { res: 1, shadows: 2, view: 1700, fov: 62, exposure: 1.05, sketch: 0 }); applyGfx(); };
-$('kDef').onclick = () => { BIND = Object.fromEntries(ACTIONS.map(([a, , k]) => [a, k.slice()])); store.set('keys', BIND); drawKeys(); };
+$('kDef').onclick = () => { BIND = Object.fromEntries(ACTIONS.map(([a, , k]) => [a, k.slice()])); store.set('keys2', BIND); drawKeys(); drawHelp(true); };
 $('opts').addEventListener('click', e => { if (e.target === $('opts')) toggleOptions(false); });

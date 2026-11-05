@@ -9,6 +9,7 @@ function hud(dt, fps) {
   const nv = mode === 'foot' && FLEET.length ? (nearVehicle() || (nearOther() && { def: { name: nearOther().name } })) : null;
   if (flashT > 0) flashT -= dt;
   else { const pr = $('prompt'), txt = nv ? '<b>E</b> — wsiądź: ' + nv.def.name : ''; if (pr.innerHTML !== txt) pr.innerHTML = txt; pr.style.display = txt ? 'block' : 'none'; }
+  drawHelp();
   streetT -= dt;
   if (streetT <= 0) {
     streetT = 0.25; let best = null, bd = 1e9; const k0x = Math.floor(ego.x / ROAD_CELL), k0z = Math.floor(ego.z / ROAD_CELL);

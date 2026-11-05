@@ -8,7 +8,7 @@
    (Tab), reflektor szperacz (L). Rozjechane i zastrzelone zombie zostają na ziemi z krwią.
    ========================================================================= */
 const ZB = { list: [], corpses: [], decals: [], t: 0, def: null, LK: null, spawnT: 0, kills: 0 };
-const WPN = { rifle: null, fireT: 0, light: null, lightOn: false, holder: null, tankGun: 'cannon', reload: 0, mgT: 0, search: false, WK: null, GK: null };
+const WPN = { armed: true, rifle: null, fireT: 0, light: null, lightOn: false, holder: null, tankGun: 'cannon', reload: 0, mgT: 0, search: false, WK: null, GK: null };
 const FX = { tracers: [], booms: [], parts: null, pv: [], pi: 0 };
 const zMax = () => night ? 22 : 7;
 const zSpeedOf = () => night ? 2.4 + Math.random() * 1.0 : 0.4 + Math.random() * 0.3;

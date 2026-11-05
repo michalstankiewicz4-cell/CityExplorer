@@ -7,36 +7,31 @@ Spacer i jazda (FSO Polonez, czołg M1A2 Abrams, przegubowy Solaris Urbino 18) p
 ## Tryby
 Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy zaparkowanych pojazdach: Polonezie, czołgu i autobusie; **szynowy** (czynny) — tramwaj PESA Swing 120Na albo pociąg (TrainKit) na torach z OSM: W napęd, S hamowanie / wstecz, Spacja hamowanie nagłe, E drzwi; **samolot** (czynny) — Supermarine Spitfire Mk I (1940) na progu drogi startowej Okęcia (osobna mapa `?map=okecie`), fizyka lotu z GameLaboratory (zachowanie „lot w atmosferze”: nośna, przeciągnięcie, ciąg śmigła, momenty sterów, podwozie na sprężynach); **okręt** (czynny) — ORP Błyskawica na Wiśle przy Moście Świętokrzyskim (`?map=wisla`), woda z laboratorium wody GameLaboratory, ruch okrętu z zachowania „okręt na wodzie”: W/S telegraf, A/D ster, Spacja stop maszyn, E przy brzegu — zejście na ląd.
 
-## Sterowanie
-| Klawisz | Akcja |
+## Sterowanie (jak w GTA V)
+Klawisze można zmienić w opcjach (Esc → Klawisze); lista w lewym dolnym rogu (H) pokazuje klawisze dla tego, czym teraz sterujesz.
+
+| Pieszo | |
 |---|---|
-| E | wsiądź / wysiądź (przy drzwiach lub włazie najbliższego pojazdu; wysiąść można po zatrzymaniu) |
-| Esc | opcje: gra, grafika (m.in. styl „rysunek”), zmiana klawiszy |
-| W / ↑ | gaz / naprzód |
-| S / ↓ | hamulec, wsteczny / wstecz |
-| A D / ← → | skręt; pieszo: krok w bok (W A S D względem kamery, kamerę obraca LPM) |
-| Spacja | ręczny (drift) |
-| Shift | turbo / bieg |
-| R | autem: powrót na start; pieszo: do drzwi auta |
-| C | kamera (za plecami / wysoko / oczami — zza kierownicy) |
-| M | duża mapa (klik = teleport, przeciągnij = przesuwanie, kółko = zoom i oddalanie) |
-| K | minimapa wł./wył. |
-| X | rentgen: przezroczysty grunt i budynki (tunele, metro, pociągi) |
-| N | noc / dzień |
-| P | filtr pixel-art |
-| H | ukryj pomoc |
-| LPM (krótko) / V | strzał: pieszo karabinek Beryl, w czołgu armata albo karabin maszynowy |
-| Tab | broń czołgu: działo / karabin maszynowy |
-| L | latarka (pieszo) / reflektor szperacz (czołg) |
-| **Samolot:** W / S | drążek: pchnij (nos w dół) / ciągnij (nos w górę) |
-| A / D | lotki (na ziemi także kółko ogonowe) |
-| Q / F | ster kierunku |
-| Shift / Ctrl | gaz więcej / mniej |
-| Spacja | hamulce kół |
-| G / B | podwozie / klapy |
-| E | wysiądź (na ziemi po zatrzymaniu; owiewka się otwiera) |
-| R | od nowa na progu drogi startowej |
-| Mysz | LPM + przeciągnij = rozglądanie dookoła i w górę/dół, kółko = zoom |
+| Mysz | kamera (kliknij w grę, by złapać mysz; Esc — puszcza mysz i otwiera opcje) |
+| W A S D | ruch względem kamery (trucht), Shift — sprint, Ctrl — kucanie, Spacja — skok |
+| PPM / LPM | celowanie przez prawe ramię / strzał (Beryl) |
+| Kółko | broń: Beryl / bez broni |
+| F | wsiądź (przy pojeździe) · L — latarka |
+
+| Samochód, autobus, czołg | |
+|---|---|
+| W / S | gaz / hamulec, wstecz · A D — skręt · Spacja — ręczny · Shift — turbo |
+| Mysz | rozglądanie (kamera wraca za pojazd); czołg: wieża i armata |
+| PPM + LPM | strzał przez okno; czołg: LPM — strzał, PPM — przybliżenie, kółko / Tab — działo / karabin, L — reflektor |
+| C | spójrz za siebie · F — wysiądź |
+
+| Wszędzie | |
+|---|---|
+| V | kamera: TPP (za plecami) / FPP (oczami, z kabiny) |
+| M / K | mapa (przeciągnij, kółko, klik = przeniesienie) / minimapa |
+| N · X · P · R · H | noc · rentgen · pixel-art · powrót na start · pomoc |
+
+Samolot: W/S drążek, A/D lotki, Q/E ster kierunku, Shift/Ctrl gaz, Spacja hamulce kół, G podwozie, B klapy, LPM karabiny w skrzydłach, F wysiądź. Okręt: W/S telegraf, A/D ster, Spacja stop maszyn, F zejście na ląd. Tramwaj i pociąg: W/S napęd i hamowanie, Spacja hamulec nagły, F drzwi / wysiądź.
 
 ## Parametry URL
 `?mode=foot` – bez ekranu wyboru trybu

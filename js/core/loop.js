@@ -46,7 +46,7 @@ function step(dt, draw) {
   if (PED) {
     PED.g.position.set(ped.x, ped.y, ped.z); PED.g.rotation.set(0, ped.th, 0);
     const sp = Math.abs(ped.vf);
-    PED.c.animate(carT, dt, { gait: sp < 0.15 ? 'idle' : sp > 2.6 ? 'run' : 'walk', speed: Math.max(0.6, sp), layers: { aim: WPN.rifle ? 1 : 0 } });
+    PED.c.animate(carT, dt, { gait: sp < 0.15 ? 'idle' : sp > 2.6 ? 'run' : 'walk', speed: Math.max(0.6, sp), layers: { aim: WPN.rifle && WPN.armed ? 1 : 0, sneak: ped.crouch ? 1 : 0 } });
   }
   zombiesStep(dt); weaponsStep(dt); fxStep(dt);
   updateCamera(dt); sketchFrame();

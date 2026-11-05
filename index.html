@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.15.0</title>
+<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.16.0</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Warszawa 3D, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.15.0"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.16.0"}
 </script>
 <link rel="stylesheet" href="css/game.css">
 <script type="importmap">{"imports":{"three":"./lab/vendor/three/three.module.js"}}</script>
@@ -38,7 +38,7 @@
   <h1>Warszawa 3D — jazda autem po centrum Warszawy</h1>
   <p>Darmowa gra w przeglądarce. Jedziesz samochodem po trójwymiarowym Śródmieściu zbudowanym z prawdziwej mapy: Pałac Kultury i Nauki, Złote Tarasy, Marszałkowska, Aleje Jerozolimskie, Plac Defilad, Ogród Saski.</p>
   <p>W grze są wiadukty (Chałubińskiego, Jana Pawła II, Wiadukt Markiewicza), tunele, przejazdy bramne pod kamienicami, Tunel Średnicowy, metro i jeżdżące tramwaje. Teren pochodzi z modelu NMT GUGiK, budynki i ulice z OpenStreetMap.</p>
-  <p>Na starcie wybierasz tryb gry. Pieszo chodzisz po mieście, a przy starcie czeka FSO Polonez 1500 — wsiadasz i wysiadasz klawiszem E.</p>
+  <p>Na starcie wybierasz tryb gry. Pieszo chodzisz po mieście, a przy starcie czeka FSO Polonez 1500 — wsiadasz i wysiadasz klawiszem F.</p>
   <p>Sterowanie: W, A, S, D lub strzałki, Shift — bieg lub turbo, Spacja — hamulec ręczny, E — wsiądź / wysiądź, M — mapa, X — widok podziemi (rentgen), N — noc.</p>
 </main>
 <noscript><p style="padding:20px;color:#fff">Warszawa 3D wymaga włączonego JavaScriptu i przeglądarki z obsługą WebGL.</p></noscript>
@@ -56,12 +56,12 @@
     <div class="ttl">Warszawa 3D <small id="ver2"></small></div>
     <div class="sub">Prawdziwe Śródmieście z mapy · wybierz, czym ruszasz</div>
     <div id="modes">
-      <button data-mode="foot" disabled><i>Tryb 1</i><b>Pieszo i pojazdem</b><span>Spacer po mieście; przy starcie czekają FSO Polonez, M1A2 Abrams i przegubowy Solaris — wsiadasz i wysiadasz klawiszem E.</span><div class="thumbs" data-for="foot"><img src="img/pieszy.jpg" alt="Pieszy" title="Pieszy"><img src="img/polonez.jpg" alt="FSO Polonez" title="FSO Polonez 1500"><img src="img/abrams.jpg" alt="M1A2 Abrams" title="M1A2 Abrams"><img src="img/urbino18.jpg" alt="Solaris Urbino 18" title="Solaris Urbino 18 electric"><span class="soonT">trolejbus 51<br>wkrótce</span></div><div class="mload"><em></em><u>Wczytuję modele…</u></div></button>
+      <button data-mode="foot" disabled><i>Tryb 1</i><b>Pieszo i pojazdem</b><span>Spacer po mieście; przy starcie czekają FSO Polonez, M1A2 Abrams i przegubowy Solaris — wsiadasz i wysiadasz klawiszem F.</span><div class="thumbs" data-for="foot"><img src="img/pieszy.jpg" alt="Pieszy" title="Pieszy"><img src="img/polonez.jpg" alt="FSO Polonez" title="FSO Polonez 1500"><img src="img/abrams.jpg" alt="M1A2 Abrams" title="M1A2 Abrams"><img src="img/urbino18.jpg" alt="Solaris Urbino 18" title="Solaris Urbino 18 electric"><span class="soonT">trolejbus 51<br>wkrótce</span></div><div class="mload"><em></em><u>Wczytuję modele…</u></div></button>
       <button data-mode="rail" disabled><i>Tryb 2</i><b>Szynowy</b><span>Tramwaj PESA Swing na fizyce koło–szyna z aTrain albo nasz pociąg na linii WKD w stronę Pruszkowa (na razie do końca mapy) — kliknij, którym.</span><div class="thumbs" data-for="rail"><img src="img/swing.jpg" alt="Tramwaj PESA Swing" title="Tramwaj PESA Swing 120Na" data-veh="tram"><img src="img/pociag.jpg" alt="Pociąg WKD" title="WKD w stronę Pruszkowa: nasz pociąg (lokomotywa i dwa wagony)" data-veh="train"><span class="soonT">metro<br>wkrótce</span></div><div class="mload" id="mload2" style="display:none"><em></em><u>Wczytuję skład…</u></div></button>
       <button data-mode="boat" disabled><i>Tryb 4</i><b>Okręt</b><span>ORP Błyskawica (1937) na Wiśle przy Moście Świętokrzyskim — woda z laboratorium wody: fala dziobowa, kilwater, piana; telegraf i ster.</span><div class="thumbs" data-for="boat"><img src="img/blyskawica.jpg" alt="ORP Błyskawica" title="ORP Błyskawica"></div><div class="mload" id="mload4" style="display:none"><em></em><u>Wczytuję okręt…</u></div></button>
       <button data-mode="air" disabled><i>Tryb 3</i><b>Samolot</b><span>Supermarine Spitfire Mk I (1940) na progu drogi startowej Okęcia — prawdziwa fizyka lotu: nośna, przeciągnięcie, ciąg śmigła, podwozie na sprężynach.</span><div class="thumbs" data-for="air"><img src="img/spitfire.jpg" alt="Supermarine Spitfire Mk I" title="Supermarine Spitfire Mk I"><span class="soonT">W-3 Sokół, Boeing, F-15<br>wkrótce</span></div><div class="mload" id="mload3" style="display:none"><em></em><u>Wczytuję samolot…</u></div></button>
     </div>
-    <div class="foot">Wkrótce: trolejbus linii 51 (1983–1995, Dworzec Południowy — Puławska — Piaseczno), metro M1, śmigłowiec W-3 Sokół, Boeing, odrzutowy F-15.<br>Sterowanie (pieszo i pojazdem): W A S D · Shift — bieg / turbo · E — wsiądź / wysiądź · C — kamera · M — mapa · Esc — opcje</div>
+    <div class="foot">Wkrótce: trolejbus linii 51 (1983–1995, Dworzec Południowy — Puławska — Piaseczno), metro M1, śmigłowiec W-3 Sokół, Boeing, odrzutowy F-15.<br>Sterowanie jak w GTA V: mysz — kamera (kliknij w grę), W A S D, Shift — sprint, Spacja — skok / ręczny, F — wsiądź / wysiądź, V — kamera TPP / FPP, PPM — celuj, LPM — strzał, M — mapa, Esc — opcje i klawisze</div>
   </div>
 </div>
 <div id="prompt"></div>
@@ -92,7 +92,7 @@
     </div>
     <div class="tab" data-tab="keys" hidden>
       <div id="kList"></div>
-      <div class="note">Kliknij klawisz i naciśnij nowy (Esc — anuluj). Ten sam klawisz nie może mieć dwóch czynności.</div>
+      <div class="note">Kliknij klawisz i naciśnij nowy (Esc — anuluj). Ten sam klawisz nie może mieć dwóch czynności. Mysz: ruch — kamera (kliknij w grę, by ją złapać; Esc — puszcza i otwiera opcje), LPM — strzał, PPM — celowanie, kółko — przybliżenie.</div>
       <button id="kDef" class="wide">Domyślne</button>
     </div>
   </div>
@@ -108,16 +108,7 @@
 <button id="bmQual" title="Pokaż, które obszary są dopracowane, a które wygenerowane automatycznie">Dopracowanie obszarów</button>
 <div id="bigmapHint">Mapa — kliknij, aby się tam przenieść · przeciągnij = przesuwanie · kółko = zoom · M zamyka</div>
 <div id="help" style="display:none">
-  <div><b>E</b> wsiądź / wysiądź; tramwaj, pociąg: drzwi</div>
-  <div><b>W / ↑</b> gaz, naprzód &nbsp; <b style="min-width:0">S / ↓</b> hamulec, wstecz</div>
-  <div><b>A D / ← →</b> skręt (pieszo: w bok)</div>
-  <div><b>Mysz</b> pieszo: LPM obraca kamerę, idziesz tam, gdzie patrzy</div>
-  <div><b>Spacja</b> ręczny (drift) &nbsp; <b style="min-width:0">Shift</b> turbo, bieg</div>
-  <div><b>R</b> powrót na start &nbsp; <b style="min-width:0">C</b> kamera</div>
-  <div><b>Esc</b> opcje: grafika, klawisze</div>
-  <div><b>N</b> noc / dzień &nbsp; <b style="min-width:0">P</b> pixel-art &nbsp; <b style="min-width:0">M</b> mapa</div>
-  <div><b>K</b> minimapa wł./wył. &nbsp; <b style="min-width:0">X</b> rentgen (tunele, metro)</div>
-  <div><b>Mysz</b> LPM = rozglądanie (też góra/dół), kółko = zoom</div>
+  <div id="helpKeys"></div>
   <div class="btns">
     <button id="bExport">Zapisz dane (JSON)</button>
     <button id="bRefresh">Pobierz dane od nowa</button>
