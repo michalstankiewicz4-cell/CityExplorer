@@ -10,7 +10,6 @@
 - F-15 (odrzutowy).
 - Kafle mapy: tunele, wiadukty, przejścia i tory na kaflach; teren z wysokościami.
 - Dokładna mapa ładowana w locie, po kawałku (kwadraty budowane w tle wokół gracza, zwalniane za nim) zamiast trzech obszarów z ekranem ładowania — **po dokończeniu mapy** (tory, przejścia, trasy), żeby podział nie przesunął obiektów.
-- Publikacja po pushu bez pobierania danych (tylko z cache, ok. 1 min); pobieranie OSM i kafli tylko w przebiegu planowym — **po grze z innymi** (0.19.0).
 
 ## Propozycje (czekają na decyzję)
 - Schody / rampy przy wejściach do podziemi, które doktor mapy zgłasza jako niepodłączone.

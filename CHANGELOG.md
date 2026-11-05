@@ -2,6 +2,9 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.19.1 — 2026-11-05
+- **Szybka publikacja**: po pushu strona publikuje się w ok. minutę z danymi z cache (wcześniej: kolejka za przebiegiem kafli i 12 minut pobierania OSM przy każdym pushu, razem nawet godzina). Dane OSM i kafle pobiera osobne zadanie co 2 godziny, które nie blokuje publikacji ([docs/deploy.md](docs/deploy.md)).
+
 ## 0.19.0 — 2026-11-05
 - **Gra z innymi (2–4 osoby)** — połączenie bezpośrednie między przeglądarkami (WebRTC, PeerJS 1.5.5 w `js/vendor/`; serwer PeerJS tylko zestawia połączenie). Na ekranie startowym: imię, „Utwórz pokój” (kod do podania znajomym) albo kod i „Dołącz”, potem wybór trybu. W prawym górnym rogu lista graczy w pokoju (kto prowadzi, kto jest pasażerem).
 - **Gospodarz** (ten, kto utworzył pokój) prowadzi zombie dla wszystkich (pojawiają się, gonią i atakują najbliższego gracza) i rozsyła ich stan 10 razy na sekundę; trafienia, przejechania i wybuchy innych graczy idą do niego, a śmierć zombie widzą wszyscy. Gospodarz ustala też porę dnia.

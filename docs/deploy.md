@@ -1,13 +1,17 @@
 # Publikacja (GitHub Actions, `.github/workflows/static.yml`)
 
-Uruchamia się po pushu na `main`, ręcznie i co 2 godziny. Kroki:
-1. `tools/check-version.mjs` — numer wersji ten sam w `APP_VERSION` (`js/core/config.js`), `<title>`, JSON-LD
-   (`softwareVersion`) i adres miniatury (`og-image.jpg?v=…`) w `index.html` oraz na górze `CHANGELOG.md`; inaczej publikacja się zatrzymuje.
-2. Dane OSM (`tools/fetch-osm.mjs lat lon r [plik]`): `warszawa-centrum.json`, `warszawa-r2000.json`, `okecie.json`,
-   `wisla.json` (błąd pobierania nie zatrzymuje publikacji — gra pobierze dane w przeglądarce).
-3. Kafle Warszawy (`tools/fetch-tiles.mjs`): odtworzenie z cache poprzednich przebiegów, pobranie brakujących (blokami
-   2 × 2 km, dwa zapytania Overpass naraz, najpierw trasa centrum — Okęcie; po pushu 4 minuty, w przebiegu co 2 godziny
-   40 minut), zapis cache, `tiles/index.json`.
-4. Publikacja całego katalogu na GitHub Pages.
+Dwa zadania:
+- **dane** — tylko co 2 godziny i ręcznie (nie po pushu): dane OSM obszarów (`tools/fetch-osm.mjs lat lon r [plik]`:
+  `warszawa-centrum.json`, `warszawa-r2000.json`, `okecie.json`, `wisla.json`) i brakujące kafle Warszawy
+  (`tools/fetch-tiles.mjs`, blokami 2 × 2 km, dwa zapytania Overpass naraz, najpierw trasa centrum — Okęcie, do 40 minut);
+  wszystko zapisywane w cache (`osm-v1-…`, `tiles-v1-…`).
+- **publikacja** — po każdym pushu, po zadaniu „dane” i ręcznie, ok. minuty:
+  1. `tools/check-version.mjs` — numer wersji ten sam w `APP_VERSION` (`js/core/config.js`), `<title>`, JSON-LD
+     (`softwareVersion`) i adres miniatury (`og-image.jpg?v=…`) w `index.html` oraz na górze `CHANGELOG.md`; inaczej publikacja się zatrzymuje.
+  2. Dane OSM i kafle z cache (bez pobierania; dane OSM pobiera tylko wtedy, gdy w cache ich jeszcze nie ma), spis `tiles/index.json`.
+  3. Publikacja całego katalogu na GitHub Pages.
+
+Pobieranie nie blokuje publikacji po pushu: kolejka Pages (`concurrency: pages`) obejmuje tylko krótkie zadanie „publikacja”.
+Błąd pobierania danych nie zatrzymuje publikacji — gra pobierze brakujące dane w przeglądarce.
 
 Wersje: SemVer — MINOR: nowa funkcja widoczna dla gracza, PATCH: poprawki; każda wersja ma wpis w `CHANGELOG.md`.

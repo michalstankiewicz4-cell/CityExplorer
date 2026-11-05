@@ -1,37 +1,31 @@
-# Simple workflow for deploying static content to GitHub Pages
+# Publikacja na GitHub Pages. Dwa zadania:
+# - „dane” (tylko co 2 godziny i ręcznie): pobiera dane OSM obszarów i brakujące kafle Warszawy, zapisuje je w cache;
+# - „publikacja” (po każdym pushu, po „danych” i ręcznie): bierze dane z cache i publikuje — po pushu ok. minuty,
+#   bez pobierania (dane OSM pobiera tylko wtedy, gdy w cache ich jeszcze nie ma).
+# Długie pobieranie nie blokuje publikacji po pushu: w kolejce Pages czeka tylko krótkie zadanie „publikacja”.
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
-  # co 2 godziny: dłuższe pobieranie kafli Warszawy (aż będą wszystkie); deploy po pushu pobiera tylko kilka minut
+  # co 2 godziny: odświeżenie danych OSM i dopełnianie kafli Warszawy
   schedule:
     - cron: '17 */2 * * *'
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  data:
+    name: Dane OSM i kafle (cache)
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
+    concurrency:
+      group: "data"
+      cancel-in-progress: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,25 +33,35 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Sprawdź numer wersji
-        run: node tools/check-version.mjs
-      - name: Pobierz dane OSM (warszawa-centrum.json)
+      - name: Dane OSM z poprzednich przebiegów (cache)
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            warszawa-centrum.json
+            warszawa-r2000.json
+            okecie.json
+            wisla.json
+          key: osm-v1-${{ github.run_id }}
+          restore-keys: osm-v1-
+      - name: Pobierz dane OSM (centrum, r2000, Okęcie, Wisła)
         continue-on-error: true
-        timeout-minutes: 15
-        run: node tools/fetch-osm.mjs
-      - name: Pobierz dane OSM dla ?r=2000 (warszawa-r2000.json)
+        timeout-minutes: 40
+        run: |
+          node tools/fetch-osm.mjs || true
+          node tools/fetch-osm.mjs 52.23175 21.00586 2000 || true
+          node tools/fetch-osm.mjs 52.1657 20.9671 2000 okecie.json || true
+          node tools/fetch-osm.mjs 52.2400 21.0370 1500 wisla.json || true
+      - name: Zapisz dane OSM (cache)
         continue-on-error: true
-        timeout-minutes: 15
-        run: node tools/fetch-osm.mjs 52.23175 21.00586 2000
-      - name: Pobierz dane OSM lotniska Okęcie (okecie.json, ?map=okecie)
-        continue-on-error: true
-        timeout-minutes: 15
-        run: node tools/fetch-osm.mjs 52.1657 20.9671 2000 okecie.json
-      - name: Pobierz dane OSM Wisły (wisla.json, ?map=wisla)
-        continue-on-error: true
-        timeout-minutes: 15
-        run: node tools/fetch-osm.mjs 52.2400 21.0370 1500 wisla.json
-      - name: Kafle Warszawy z poprzednich deployów (cache)
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            warszawa-centrum.json
+            warszawa-r2000.json
+            okecie.json
+            wisla.json
+          key: osm-v1-${{ github.run_id }}
+      - name: Kafle Warszawy z poprzednich przebiegów (cache)
         uses: actions/cache/restore@v4
         with:
           path: tiles
@@ -67,7 +71,7 @@ jobs:
         continue-on-error: true
         timeout-minutes: 50
         env:
-          TILE_MINUTES: ${{ github.event_name == 'push' && '4' || '40' }}
+          TILE_MINUTES: '40'
         run: node tools/fetch-tiles.mjs
       - name: Zapisz kafle (cache)
         if: always()
@@ -76,12 +80,74 @@ jobs:
         with:
           path: tiles
           key: tiles-v1-${{ github.run_id }}
+
+  deploy:
+    name: Publikacja
+    needs: data
+    if: ${{ !cancelled() && (needs.data.result == 'success' || needs.data.result == 'skipped') }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    # jedna publikacja naraz; przebiegi czekające w kolejce między bieżącym a najnowszym są pomijane
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Sprawdź numer wersji
+        run: node tools/check-version.mjs
+      - name: Dane OSM (cache)
+        id: osm
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            warszawa-centrum.json
+            warszawa-r2000.json
+            okecie.json
+            wisla.json
+          key: osm-v1-${{ github.run_id }}
+          restore-keys: osm-v1-
+      - name: Brakujące dane OSM (tylko gdy cache ich nie ma)
+        continue-on-error: true
+        timeout-minutes: 40
+        run: |
+          [ -f warszawa-centrum.json ] || node tools/fetch-osm.mjs || true
+          [ -f warszawa-r2000.json ] || node tools/fetch-osm.mjs 52.23175 21.00586 2000 || true
+          [ -f okecie.json ] || node tools/fetch-osm.mjs 52.1657 20.9671 2000 okecie.json || true
+          [ -f wisla.json ] || node tools/fetch-osm.mjs 52.2400 21.0370 1500 wisla.json || true
+      - name: Zapisz dane OSM (cache, gdy były pobierane)
+        if: steps.osm.outputs.cache-matched-key == ''
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            warszawa-centrum.json
+            warszawa-r2000.json
+            okecie.json
+            wisla.json
+          key: osm-v1-${{ github.run_id }}
+      - name: Kafle Warszawy (cache)
+        uses: actions/cache/restore@v4
+        with:
+          path: tiles
+          key: tiles-v1-${{ github.run_id }}
+          restore-keys: tiles-v1-
+      - name: Spis kafli (tiles/index.json)
+        continue-on-error: true
+        env:
+          TILE_MINUTES: '0'
+        run: node tools/fetch-tiles.mjs
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
           path: '.'
       - name: Deploy to GitHub Pages
         id: deployment
