@@ -1,6 +1,6 @@
 // Pilnuje spójności numeru wersji (uruchamiane w GitHub Actions przed publikacją).
 import { readFileSync } from 'node:fs';
-const html = readFileSync('index.html', 'utf8'), log = readFileSync('CHANGELOG.md', 'utf8');
+const html = readFileSync('index.html', 'utf8') + readFileSync('js/core/config.js', 'utf8'), log = readFileSync('CHANGELOG.md', 'utf8');
 const v = (html.match(/const APP_VERSION = '([\d.]+)'/) || [])[1];
 const t = (html.match(/<title>[^<]*· v([\d.]+)<\/title>/) || [])[1];
 const ld = (html.match(/"softwareVersion":"([\d.]+)"/) || [])[1];

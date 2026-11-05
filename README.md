@@ -66,7 +66,30 @@ OSM podaje tylko poziom (`layer`), więc wysokości są liczone:
 Przycisk „Zapisz dane (JSON)” zapisuje komplet (OSM + teren) – taki plik wrzucony do repo jako `warszawa-centrum.json` też zadziała.
 
 ## Technika
-Jeden plik `index.html`. Three.js r186, pojazdy (RoadKit, TramKit, TrainKit, AirKit: Spitfire Mk I) i fizyka (koło na szynie, lot w atmosferze) i człowiek (LifeKit z laboratorium ludzi) ładują się z [GameLaboratory](https://michalstankiewicz4-cell.github.io/GameLaboratory/) — jedna kopia Three.js dla gry i modeli. Budynki są łączone w siatki po kwadratach 220 m. Ulice, place i trawniki są malowane na teksturze gruntu nałożonej na teren. Drzewa to instancje. Kolizje liczone są z obrysami budynków i pniami drzew. Wysokości: `height` / `building:levels` / `min_height` / `roof:shape` (pyramidal, dome, hipped). Gdy budynek ma części (`building:part`), rysowane są tylko części.
+Three.js r186. Modele i zachowania (RoadKit, LifeKit, TramKit, TrainKit, AirKit, ShipKit, WeaponKit, GearKit; koło na szynie, lot w atmosferze, okręt na wodzie, woda z laboratorium wody, doktor modeli) powstają w [GameLaboratory](https://github.com/michalstankiewicz4-cell/GameLaboratory) i są kopiowane do gry (`lab/`) — gra nie pobiera niczego z laboratorium w trakcie działania. Budynki są łączone w siatki po kwadratach 220 m. Ulice, place i trawniki są malowane na teksturze gruntu nałożonej na teren. Drzewa to instancje. Kolizje liczone są z obrysami budynków i pniami drzew. Wysokości: `height` / `building:levels` / `min_height` / `roof:shape` (pyramidal, dome, hipped). Gdy budynek ma części (`building:part`), rysowane są tylko części.
+
+## Struktura plików
+```
+index.html            strona: znaczniki (ekran startowy, HUD, opcje), importmap Three.js, js/boot.mjs
+css/game.css          wygląd strony
+js/boot.mjs           start: Three.js jako window.THREE, potem skrypty gry po kolei (wspólny zakres globalny)
+js/core/              config.js (obszar mapy, ładowanie, IndexedDB) · scene.js (renderer, kamera, światła, H()) ·
+                      input.js (klawisze) · loop.js (pętla gry) · main.js (start)
+js/world/             osm.js · terrain.js · grids.js (zderzenia, nawierzchnie) · structures.js (wiadukty, tunele) ·
+                      trains.js (składy AI) · build.js (budowa mapy) · tiles.js (kafle w locie) · areas.js (wspólny świat)
+js/vehicles/          fleet.js (auta, czołg, autobus, pieszy) · drive.js (jazda) · rail.js (tramwaj, pociąg) ·
+                      air.js (samolot) · boat.js (okręt i woda)
+js/player/walk.js     pieszy
+js/combat/            zombies.js (zombie, ciała, efekty) · weapons.js (karabinek, armata, karabin maszynowy, latarka)
+js/ui/                camera.js · hud.js · bigmap.js · options.js · view.js (rentgen, noc) · export.js
+js/render/sketch.js   styl „rysunek”
+js/shared/tiles.mjs   kafle mapy: format i siatka (gra i tools/fetch-tiles.mjs)
+lab/                  pliki z GameLaboratory (te same ścieżki co tam): lab/entries.json, lab/SOURCE.json
+tools/                fetch-osm.mjs, fetch-tiles.mjs, sync-lab.mjs, check-version.mjs
+doktor.html           doktor mapy
+img/                  miniatury pojazdów
+```
+Praca z modelami: zmiany robimy w GameLaboratory, potem `node tools/sync-lab.mjs ../GameLaboratory` kopiuje do `lab/` potrzebne pliki (punkty wejścia w `lab/entries.json`, zależności zbierane same; nadmiarowe usuwane, `lab/SOURCE.json` — commit laboratorium) i commit w grze.
 
 Dane © OpenStreetMap contributors (ODbL).
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.15.0 — 2026-11-05
+- **Podział na pliki i foldery**: `index.html` to już tylko strona; wygląd w `css/game.css`, kod gry w `js/` (core, world, vehicles, player, combat, ui, render, shared) — opis w README, „Struktura plików”.
+- **Pliki z GameLaboratory w grze** (`lab/`): modele, zachowania, woda, Three.js i doktor modeli są kopiowane do repozytorium gry narzędziem `tools/sync-lab.mjs` (punkty wejścia w `lab/entries.json`, zależności zbierane same) — gra nie pobiera niczego z laboratorium w trakcie działania. Pracujemy dalej w GameLaboratory, po zmianie — synchronizacja i commit w grze.
+
 ## 0.14.0 — 2026-11-05
 - **Zombie**: w dzień kilku powolnych, w nocy więcej (do 22) i szybkich — biegną. Człowiek z laboratorium ludzi GameLaboratory w skórze i ubraniu zombie, z warstwami ruchu „zombie” (pochylony, ręce przed sobą, powłóczy nogą) i „atak”. Pojawiają się wokół gracza, idą do niego; przy nim — także przy pojeździe — atakują, ale nie robią szkód. Daleko za plecami znikają.
 - **Pieszo: karabinek Beryl** (WeaponKit z GameLaboratory) trzymany przed sobą i **latarka** (GearKit): strzał krótkim kliknięciem LPM albo V (przytrzymanie — seria), celownik na środku ekranu; w głowę — od razu, w ciało — dwa trafienia. L — latarka.

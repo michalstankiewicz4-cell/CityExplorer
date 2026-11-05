@@ -9,7 +9,6 @@
 - Boeing (samolot pasażerski).
 - F-15 (odrzutowy).
 - Kafle mapy: tunele, wiadukty, przejścia i tory na kaflach; teren z wysokościami.
-- **Podział projektu na pliki i foldery** (profesjonalny układ: moduły zamiast jednego `index.html`, style i skrypty osobno).
 
 ## Propozycje (czekają na decyzję)
 - Schody / rampy przy wejściach do podziemi, które doktor mapy zgłasza jako niepodłączone.

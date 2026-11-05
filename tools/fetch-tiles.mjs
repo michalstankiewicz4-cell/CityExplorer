@@ -4,7 +4,7 @@
 // TILE_MINUTES (domyślnie 25). Na końcu zapisuje tiles/index.json (lista gotowych kafli).
 // Test bez sieci: node tools/fetch-tiles.mjs --from plik-osm.json [dx dz]  (dane w formacie gry v2, przesunięte o dx, dz metrów)
 import { writeFileSync, existsSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
-import { WARSAW, T, key, tileBBox, overpassQuery, tilesFromElements, toG, KX, KY, G0 } from '../js/tiles.mjs';
+import { WARSAW, T, key, tileBBox, overpassQuery, tilesFromElements, toG, KX, KY, G0 } from '../js/shared/tiles.mjs';
 
 const DIR = 'tiles'; mkdirSync(DIR, { recursive: true });
 const UA = 'CityExplorer-build/1.0 (+https://github.com/michalstankiewicz4-cell/CityExplorer)';

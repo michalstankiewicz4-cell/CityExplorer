@@ -1,0 +1,27 @@
+{
+  "note": "Punkty wejścia: pliki GameLaboratory, które gra wczytuje (reszta zależności zbierana sama przez tools/sync-lab.mjs).",
+  "entries": [
+    "vendor/three/three.module.js",
+    "js/core/three-global.js",
+    "js/models/road/roadkit.js",
+    "js/models/life/lifekit.js",
+    "js/models/human/walk.js",
+    "js/models/human/face.js",
+    "js/models/human/data/bust-head.js",
+    "js/models/human/data/human-head.js",
+    "js/models/human/human.js",
+    "js/models/train/trams/tramkit.js",
+    "js/models/train/trainkit.js",
+    "js/behaviors/rail/path.js",
+    "js/behaviors/rail/tram.js",
+    "js/models/structures/railway/path-track.js",
+    "js/models/air/airkit.js",
+    "js/behaviors/air/flight.js",
+    "js/envs/water/waterkit.js",
+    "js/models/ships-sea/index.js",
+    "js/behaviors/water/ship.js",
+    "js/models/weapons/weaponkit.js",
+    "js/models/gear/gearkit.js",
+    "tools/doctor/modeldoctor.js"
+  ]
+}
