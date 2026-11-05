@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.12.0 — 2026-11-05
+- **Tryb Okręt**: ORP Błyskawica (1937, ShipKit z GameLaboratory) na Wiśle przy Moście Świętokrzyskim — nowy dokładny obszar wspólnego świata (`?map=wisla`, plik `wisla.json` z deployu). W/S — telegraf (naprzód / wstecz), A/D — ster, Spacja — stop maszyn, R — od nowa, E — na postoju przy brzegu zejście na ląd (i z powrotem przy burcie). Kamera C: za rufą, dalej, z mostka.
+- **Woda z laboratorium wody** (WaterKit): rzeka — zmarszczki, odbicia nieba, odblask słońca, fala dziobowa, fale Kelvina, kilwater i piana przy burtach; liczona w układzie okrętu (jak w laboratorium) i rysowana drugim przebiegiem z tą samą głębią; maska z OSM (obszary wody i linie rzek z kafli) wycina ją do koryta.
+- Ruch okrętu z GameLaboratory (zachowanie „okręt na wodzie”): ciąg, opór, ster i cyrkulacja, kołysanie na falach, mielizna przy brzegu.
+- Mosty nad rzekami i kanałami mają prześwit nad wodą (rzeka 10 m, kanał 5 m).
+
 ## 0.11.1 — 2026-11-05
 - Zaparkowany tramwaj lub pociąg (po wysiadce) i jego tor zostają w swoim obszarze: po przejściu do innego obszaru są ukryte (wcześniej zostawały w złym miejscu), po powrocie do centrum stoją tam, gdzie je zostawiłeś.
 

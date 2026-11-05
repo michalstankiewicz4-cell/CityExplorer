@@ -53,6 +53,10 @@ jobs:
         continue-on-error: true
         timeout-minutes: 15
         run: node tools/fetch-osm.mjs 52.1657 20.9671 2000 okecie.json
+      - name: Pobierz dane OSM Wisły (wisla.json, ?map=wisla)
+        continue-on-error: true
+        timeout-minutes: 15
+        run: node tools/fetch-osm.mjs 52.2400 21.0370 1500 wisla.json
       - name: Kafle Warszawy z poprzednich deployów (cache)
         uses: actions/cache/restore@v4
         with:

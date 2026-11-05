@@ -5,7 +5,7 @@ Spacer i jazda (FSO Polonez, czołg M1A2 Abrams, przegubowy Solaris Urbino 18) p
 **Graj:** https://michalstankiewicz4-cell.github.io/CityExplorer/
 
 ## Tryby
-Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy zaparkowanych pojazdach: Polonezie, czołgu i autobusie; **szynowy** (czynny) — tramwaj PESA Swing 120Na albo pociąg (TrainKit) na torach z OSM: W napęd, S hamowanie / wstecz, Spacja hamowanie nagłe, E drzwi; **samolot** (czynny) — Supermarine Spitfire Mk I (1940) na progu drogi startowej Okęcia (osobna mapa `?map=okecie`), fizyka lotu z GameLaboratory (zachowanie „lot w atmosferze”: nośna, przeciągnięcie, ciąg śmigła, momenty sterów, podwozie na sprężynach); **łódź** — wkrótce.
+Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy zaparkowanych pojazdach: Polonezie, czołgu i autobusie; **szynowy** (czynny) — tramwaj PESA Swing 120Na albo pociąg (TrainKit) na torach z OSM: W napęd, S hamowanie / wstecz, Spacja hamowanie nagłe, E drzwi; **samolot** (czynny) — Supermarine Spitfire Mk I (1940) na progu drogi startowej Okęcia (osobna mapa `?map=okecie`), fizyka lotu z GameLaboratory (zachowanie „lot w atmosferze”: nośna, przeciągnięcie, ciąg śmigła, momenty sterów, podwozie na sprężynach); **okręt** (czynny) — ORP Błyskawica na Wiśle przy Moście Świętokrzyskim (`?map=wisla`), woda z laboratorium wody GameLaboratory, ruch okrętu z zachowania „okręt na wodzie”: W/S telegraf, A/D ster, Spacja stop maszyn, E przy brzegu — zejście na ląd.
 
 ## Sterowanie
 | Klawisz | Akcja |
@@ -50,7 +50,7 @@ Kolejność ładowania:
 Wysokości terenu: **NMT GUGiK** (`teren-nmt.bin`, model gruntu bez budynków, oczko 5 m, pokrywa ok. 2 km od PKiN; źródło: Główny Urząd Geodezji i Kartografii). Poza nim kafle Terrarium (AWS Terrain Tiles) z wycinaniem „garbów” po budynkach.
 
 ## Wspólna mapa
-Dokładne obszary (Śródmieście przy PKiN, lotnisko Chopina) i kafle tworzą jeden świat dla wszystkich pojazdów. Gra buduje dokładnie obszar, w którym jesteś; po wejściu w inny przebudowuje go w locie. Ze wszystkich pojazdów da się wysiąść (E; w tramwaju i pociągu pierwsze E otwiera drzwi).
+Dokładne obszary (Śródmieście przy PKiN, lotnisko Chopina, Wisła przy Moście Świętokrzyskim) i kafle tworzą jeden świat dla wszystkich pojazdów. Gra buduje dokładnie obszar, w którym jesteś; po wejściu w inny przebudowuje go w locie. Ze wszystkich pojazdów da się wysiąść (E; w tramwaju i pociągu pierwsze E otwiera drzwi).
 
 ## Mapa wczytywana w locie (kafle)
 Poza dokładną mapą świat dobudowuje się kaflami 1 × 1 km w zasięgu widoku, w stronę ruchu; dalekie kafle są zwalniane z pamięci. Kafle są uproszczone (płaski grunt z ulicami i obszarami, budynki z płaskimi dachami). Źródła: `tiles/<i>_<j>.json` dla całej Warszawy (generuje deploy: `tools/fetch-tiles.mjs`, w kilku przebiegach — najpierw trasa centrum — Okęcie; deploy po pushu dopisuje kafle przez 4 minuty, uruchomienie co 2 godziny — przez 40 minut; postęp trzyma cache GitHub Actions), pamięć przeglądarki, a poza Warszawą Overpass na żywo. Format i siatka: `js/tiles.mjs`. Duża mapa (M) przesuwa się przeciąganiem i oddala kółkiem; przycisk „Dopracowanie obszarów” pokazuje, które obszary są dopracowane (centrum, Okęcie), a które to automatyczne kafle.
@@ -68,7 +68,6 @@ Jeden plik `index.html`. Three.js r186, pojazdy (RoadKit, TramKit, TrainKit, Air
 Dane © OpenStreetMap contributors (ODbL).
 
 ## Plan
-- Łódź: Wisła i ORP Błyskawica z wodą z laboratorium wody.
 - Lotnictwo: śmigłowiec W-3 Sokół; Boeing (samolot pasażerski); F-15 (odrzutowy).
 - Kafle mapy: tunele, wiadukty, przejścia i tory (jazda) na kaflach; teren z wysokościami.
 - Szynowe: metro — na początek linia M1; trolejbus linii 51 (1983–1995, Dworzec Południowy — Puławska — Piaseczno); pozostałe linie tramwajowe i kolejowe; WKD do Pruszkowa (cała trasa).
