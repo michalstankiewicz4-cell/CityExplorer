@@ -31,7 +31,7 @@ Klawisze można zmienić w opcjach (Esc → Klawisze); lista w lewym dolnym rogu
 | M / K | mapa (przeciągnij, kółko, klik = przeniesienie) / minimapa |
 | N · X · P · R · H | noc · rentgen · pixel-art · powrót na start · pomoc |
 
-Samolot: W/S drążek, A/D lotki, Q/E ster kierunku, Shift/Ctrl gaz, Spacja hamulce kół, G podwozie, B klapy, LPM karabiny w skrzydłach, F wysiądź. Okręt: W/S telegraf, A/D ster, Spacja stop maszyn, F zejście na ląd. Tramwaj i pociąg: W/S napęd i hamowanie, Spacja hamulec nagły, F drzwi / wysiądź.
+Samolot: W/S drążek, A/D lotki, Q/E ster kierunku, Shift/Ctrl gaz, Spacja hamulce kół, G podwozie, B klapy, LPM karabiny w skrzydłach, PPM / Z zrzut bomby (2 × 250 lb, uzbrajane po wylądowaniu), F wysiądź. Okręt: W/S telegraf, A/D ster, Spacja stop maszyn, F zejście na ląd. Tramwaj i pociąg: W/S napęd i hamowanie, Spacja hamulec nagły, F drzwi / wysiądź.
 
 ## Parametry URL
 `?mode=foot` – bez ekranu wyboru trybu

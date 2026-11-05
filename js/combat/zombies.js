@@ -87,7 +87,7 @@ function zClearAll() { for (const z of ZB.list) zFree(z); ZB.list.length = 0; ZB
 function zFree(z) { scene.remove(z.c.group); z.c.group.traverse(o => { if (o.isMesh) o.geometry.dispose(); }); }
 function zSpawn() {
   for (let k = 0; k < 12; k++) {
-    const a = Math.random() * 6.28, d = 45 + Math.random() * 70, x = ego.x + Math.sin(a) * d, z = ego.z + Math.cos(a) * d;
+    const a = Math.random() * 6.28, d = mode === 'air' ? 80 + Math.random() * 300 : 45 + Math.random() * 70, x = ego.x + Math.sin(a) * d, z = ego.z + Math.cos(a) * d;
     if (W.inBuilding && W.inBuilding(x, z)) continue; if (boat.mask && isWater(x, z)) continue;
     if (zWall(x, z, H(x, z) + 1)) continue;
     const c = zBuild(); if (!c) return;
@@ -134,7 +134,7 @@ function zombiesStep(dt) {
       continue;
     }
     const d0 = Math.hypot(z.x - ego.x, z.z - ego.z);
-    if (d0 > 190) { zFree(z); ZB.list.splice(i, 1); continue; }   // za daleko — zniknął
+    if (d0 > (mode === 'air' ? 480 : 190)) { zFree(z); ZB.list.splice(i, 1); continue; }   // z samolotu widać dalej   // za daleko — zniknął
     // przejechany: pojazd w ruchu przez zombie
     const dc = capDist(S, z.x, z.z);
     if (S.v > 2.5 && dc < 0.35 && !S.air) { zKill(z, S.th, true); if (mode === 'car' && ACT && ACT.id !== 'abrams') bump = Math.max(bump, 0.25); continue; }

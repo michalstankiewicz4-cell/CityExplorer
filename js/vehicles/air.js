@@ -20,6 +20,7 @@ function airReset() {
   const sp = air.spawn, def = air.V.def, h = H(sp.x, sp.z);
   air.sim = FLY.createFlight(def.flight, def.mass, { p: [sp.x, h + def.rest.y, sp.z], yaw: sp.th, pitch: -def.rest.pitch });
   Object.assign(air.c, { throttle: 0, elevator: 0, aileron: 0, rudder: 0, flaps: 0, gear: 1, brake: 1 }); air.work = 0; air.off = null;
+  if (typeof bombsArm === 'function' && BOMBS.armedOnce) bombsArm();
   airSync();
 }
 // samolot stoi na swoim miejscu (próg drogi startowej Okęcia) od chwili zbudowania Okęcia — wsiadasz E albo trybem Samolot
@@ -67,7 +68,7 @@ function airDoorAt() { const d = air.V.def.doorAt, g = air.V.group; g.updateMatr
 function airHud() {
   const s = air.sim.state, c = air.c;
   return `Wys. ${Math.round(s.p[1] - H(s.p[0], s.p[2]))} m · gaz ${Math.round(c.throttle * 100)}% · klapy ${c.flaps ? 'wypuszczone' : 'schowane'} · podwozie ${c.gear ? 'wypuszczone' : 'schowane'}` +
-    (s.stall && !s.onGround ? ' · PRZECIĄGNIĘCIE' : '') + (s.crashed ? ' · ROZBITY (R — od nowa)' : '');
+    ` · bomby ${BOMBS.hung.filter(Boolean).length}` + (s.stall && !s.onGround ? ' · PRZECIĄGNIĘCIE' : '') + (s.crashed ? ' · ROZBITY (R — od nowa)' : '');
 }
 // kamera: za samolotem (C: bliżej / dalej) albo z kabiny — horyzont przechyla się z samolotem
 function airCamera(dt, snap) {

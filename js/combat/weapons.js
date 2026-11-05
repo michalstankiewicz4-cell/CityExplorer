@@ -58,6 +58,36 @@ function fire() {
   else if (mode === 'car' && on('aim')) fireRifle();   // strzał z okna
   else if (mode === 'air') firePlane();
 }
+// bomby pod skrzydłami samolotu (2 × 250 lb z WeaponKit): PPM / Z — zrzut; spadają z prędkością samolotu (grawitacja,
+// opór), obracają się wzdłuż lotu, wybuchają na ziemi, budynku albo ścianie; uzbrajane ponownie na postoju na ziemi
+const BOMBS = { racks: [[1.55, -0.62, 0.35], [-1.55, -0.62, 0.35]], hung: [], falling: [] };
+function bombsArm() {
+  if (!WPN.WK || !air.V) return;
+  for (const b of BOMBS.hung) if (b) air.V.group.remove(b.group);
+  BOMBS.hung = BOMBS.racks.map(([x, y, z]) => { const b = WPN.WK.buildWeapon('bomb250'); b.group.position.set(x, y, z); air.V.group.add(b.group); return b; });
+}
+function dropBomb() {
+  const i = BOMBS.hung.findIndex(Boolean); if (i < 0 || !air.sim || air.sim.state.crashed) { if (i < 0) flash('Brak bomb — wyląduj i zatrzymaj się, żeby uzbroić'); return; }
+  const b = BOMBS.hung[i]; BOMBS.hung[i] = null;
+  const g = air.V.group; g.updateMatrixWorld(true); const p = b.group.getWorldPosition(new THREE.Vector3()), q = b.group.getWorldQuaternion(new THREE.Quaternion());
+  g.remove(b.group); scene.add(b.group); b.group.position.copy(p); b.group.quaternion.copy(q);
+  const v = air.sim.state.v; BOMBS.falling.push({ b, v: new THREE.Vector3(v[0], v[1] - 0.5, v[2]), t: 0 });
+}
+function bombsStep(dt) {
+  if (mode === 'air' && air.sim && air.sim.state.onGround && Math.hypot(air.sim.state.v[0], air.sim.state.v[2]) < 1 && !BOMBS.hung.some(Boolean)) bombsArm();
+  for (let i = BOMBS.falling.length - 1; i >= 0; i--) {
+    const f = BOMBS.falling[i], g = f.b.group; f.t += dt;
+    f.v.y -= 9.81 * dt; f.v.multiplyScalar(1 - 0.012 * dt);
+    g.position.addScaledVector(f.v, dt);
+    if (f.v.lengthSq() > 1) g.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), f.v.clone().normalize());
+    const x = g.position.x, y = g.position.y, z = g.position.z, gy = H(x, z);
+    if (y <= gy + 0.2 || (W.inBuilding && W.inBuilding(x, z) && y < gy + 25) || zWall(x, z, y) || f.t > 60) {
+      scene.remove(g); f.b.dispose(); BOMBS.falling.splice(i, 1);
+      const r = f.b.info.blast; boom(x, Math.max(y, gy), z, r);
+      for (const zb of ZB.list) if (!zb.dead && Math.hypot(zb.x - x, zb.z - z) < r) zKill(zb, Math.atan2(zb.x - x, zb.z - z), false);
+    }
+  }
+}
 // Spitfire Mk I: 8 × Browning .303 w skrzydłach (po 4 na skrzydło), zbieżność ok. 230 m
 function firePlane() {
   if (WPN.fireT > 0 || !air.V || air.sim.state.crashed) return; WPN.fireT = 1 / 18;
@@ -83,6 +113,9 @@ async function weaponsInit() {
 function weaponsStep(dt) {
   WPN.fireT -= dt; WPN.reload = Math.max(0, WPN.reload - dt); WPN.mgT -= dt;
   if (WPN.rifle) { WPN.rifle.group.visible = mode === 'foot' && WPN.armed; WPN.rifle.update(carT, dt, {}); }
+  if (air.V && WPN.WK && !BOMBS.armedOnce) { BOMBS.armedOnce = true; bombsArm(); }
+  const bombKey = mode === 'air' && started && !optOpen && (on('aim') || on('bomb')); if (bombKey && !WPN.bombPrev) dropBomb(); WPN.bombPrev = bombKey;
+  bombsStep(dt);
   if (started && !optOpen && on('fire') && ((mode === 'foot' && WPN.armed) || (isTank() && WPN.tankGun === 'mg') || (mode === 'car' && !isTank() && on('aim')) || mode === 'air')) fire();
   // latarka: w dłoni przy piersi, świeci tam, gdzie patrzy kamera
   if (WPN.holder) {

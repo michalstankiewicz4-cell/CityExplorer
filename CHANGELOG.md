@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.17.0 — 2026-11-05
+- **Samolot: bomby** — dwie bomby 250 lb GP Mk IV (WeaponKit z GameLaboratory) pod skrzydłami Spitfire’a; zrzut PPM albo Z. Bomba spada z prędkością samolotu (grawitacja, opór), obraca się wzdłuż lotu i wybucha na ziemi, budynku albo ścianie: wybuch z dymem i osmaleniem, zabija zombie w promieniu 14 m. Po wylądowaniu i zatrzymaniu bomby są podwieszane od nowa; HUD pokazuje, ile zostało.
+- Karabiny w skrzydłach (LPM, 8 × Browning .303, zbieżność ok. 230 m) — jak dotąd.
+- Z samolotu zombie widać i pojawiają się dalej (do ok. 480 m), żeby było w co celować.
+
 ## 0.16.0 — 2026-11-05
 - **Sterowanie i kamera jak w GTA V**: mysz łapana kliknięciem w grę (ruch obraca kamerę bez trzymania przycisku), Esc puszcza mysz i otwiera opcje. Pieszo: kamera przez prawe ramię, W A S D — trucht, Shift — sprint, Ctrl — kucanie, Spacja — skok; PPM — celowanie (kamera bliżej, węższy kąt, postać patrzy tam, gdzie kamera, i chodzi bokiem), LPM — strzał, kółko — broń (Beryl / bez broni). F — wsiądź / wysiądź z większej odległości.
 - **Kamera: dwa widoki** — V przełącza TPP (za plecami / za pojazdem) i FPP (oczami, z kabiny, z mostka). W pojeździe kamera sama wraca za pojazd 1,5 s po ruchu myszą; C — spójrz za siebie; kąt widzenia rośnie z prędkością, kamera lekko odjeżdża i drży przy dużej prędkości.

@@ -13,7 +13,7 @@ const ACTIONS = [
   ['fire', 'Strzał (też LPM)', ['', ''], 'Broń'], ['aim', 'Celowanie (też PPM)', ['', ''], 'Broń'],
   ['weapon', 'Broń czołgu: działo / karabin', ['Tab', ''], 'Broń'], ['light', 'Latarka / reflektor czołgu', ['KeyL', ''], 'Broń'],
   ['rudL', 'Ster kierunku w lewo', ['KeyQ', ''], 'Samolot'], ['rudR', 'Ster kierunku w prawo', ['KeyE', ''], 'Samolot'],
-  ['gear', 'Podwozie', ['KeyG', ''], 'Samolot'], ['flaps', 'Klapy', ['KeyB', ''], 'Samolot'],
+  ['gear', 'Podwozie', ['KeyG', ''], 'Samolot'], ['flaps', 'Klapy', ['KeyB', ''], 'Samolot'], ['bomb', 'Zrzut bomby (też PPM)', ['KeyZ', ''], 'Samolot'],
   ['reset', 'Powrót na start', ['KeyR', ''], 'Inne'], ['night', 'Noc / dzień', ['KeyN', ''], 'Inne'], ['xray', 'Rentgen', ['KeyX', ''], 'Inne'],
   ['pix', 'Pixel-art', ['KeyP', ''], 'Inne'], ['help', 'Pomoc (lewy dolny róg)', ['KeyH', ''], 'Inne'],
 ];

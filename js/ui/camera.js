@@ -45,7 +45,7 @@ function updateCamera(dt, snap) {
   const back = !onFoot && on('lookBack') ? Math.PI : 0;   // spójrz za siebie
   const th = (onFoot ? camYaw : ego.th) + orbit + back, fx = Math.sin(th), fz = Math.cos(th);
   // pieszo: kamera przez prawe ramię (jak w GTA V), przy celowaniu bliżej i węższy kąt widzenia
-  const aimK = on('aim') && ((onFoot && WPN.armed) || mode === 'car') ? 1 : 0; CAM.aim += (aimK - CAM.aim) * Math.min(1, 10 * dt);
+  const aimK = on('aim') && ((onFoot && WPN.armed) || mode === 'car') ? 1 : 0;   // w samolocie PPM to zrzut bomby CAM.aim += (aimK - CAM.aim) * Math.min(1, 10 * dt);
   const side = onFoot && camMode !== 2 ? 0.42 + 0.2 * CAM.aim : 0, rx = -fz * side, rz = fx * side;
   // „feeling”: w pojeździe kąt widzenia rośnie z prędkością, kamera lekko odjeżdża i drży przy dużej prędkości
   const spd = onFoot ? 0 : Math.abs(ego.vf || 0); CAM.spd += (spd - CAM.spd) * Math.min(1, 2 * dt);
