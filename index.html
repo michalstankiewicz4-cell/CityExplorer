@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.13.0</title>
+<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.14.0</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Warszawa 3D, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.13.0"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.14.0"}
 </script>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#0d1014;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#e8e6e1}
@@ -133,6 +133,8 @@
   </div>
 </div>
 <div id="prompt"></div>
+<div id="cross" style="display:none;position:fixed;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;pointer-events:none;z-index:5;background:linear-gradient(#fff,#fff) center/2px 8px no-repeat,linear-gradient(#fff,#fff) center/8px 2px no-repeat;border:1.5px solid #ffffffaa;border-radius:50%;box-shadow:0 0 3px #000"></div>
+<div id="weap" style="display:none;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:5;font:600 13px system-ui;color:#fff;background:#0d1014aa;padding:5px 12px;border-radius:8px;pointer-events:none"></div>
 <div id="opts">
   <div class="box">
     <div class="hd"><b>Opcje</b><span>Esc — wróć do gry</span></div>
@@ -198,7 +200,7 @@ import * as THREE from 'three';
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
-const APP_VERSION = '0.13.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+const APP_VERSION = '0.14.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
 document.getElementById('ver').textContent = 'v' + APP_VERSION; document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
 // dokładne obszary wspólnego świata: gra buduje dokładnie ten, w którym jesteś (przy wejściu w inny — przebudowa w locie);
@@ -1573,7 +1575,7 @@ async function loadModels(progress = () => {}) {
   for (let i = 0; i < VEH_IDS.length; i++) {
     const id = VEH_IDS[i], def = RK.vehicleInfo(id);
     progress(0.1 + i * 0.22, def.name + '…'); await frame();
-    const v = RK.buildVehicle(id, {}); prepModel(v.group); scene.add(v.group);
+    const v = RK.buildVehicle(id, id === 'abrams' ? { searchlight: true } : {}); prepModel(v.group); scene.add(v.group);
     FLEET.push({ id, def, v, s: { x: 0, z: 0, y: 0, vy: 0, air: false, th: 0, vx: 0, vz: 0, steer: 0, w: 0, vf: 0, brake: false, work: 0, rest: false, spawn: null } });
   }
   ACT = FLEET.find(V => V.id === 'polonez'); car = ACT.s; VDEF = ACT.def;
@@ -1653,6 +1655,7 @@ const ACTIONS = [
   ['fast', 'Bieg / turbo / gaz więcej', ['ShiftLeft', 'ShiftRight']], ['slow', 'Gaz mniej (samolot)', ['ControlLeft', 'ControlRight']], ['brake', 'Hamulec ręczny', ['Space', '']], ['use', 'Wsiądź / wysiądź', ['KeyE', '']],
   ['cam', 'Kamera', ['KeyC', '']], ['map', 'Mapa', ['KeyM', '']], ['mini', 'Minimapa', ['KeyK', '']], ['night', 'Noc / dzień', ['KeyN', '']],
   ['xray', 'Rentgen', ['KeyX', '']], ['pix', 'Pixel-art', ['KeyP', '']], ['reset', 'Powrót na start', ['KeyR', '']], ['help', 'Pomoc', ['KeyH', '']],
+  ['fire', 'Strzał (też krótkie kliknięcie LPM)', ['KeyV', '']], ['weapon', 'Broń czołgu: działo / karabin', ['Tab', '']], ['light', 'Latarka / reflektor czołgu', ['KeyL', '']],
   ['rudL', 'Ster kierunku w lewo (samolot)', ['KeyQ', '']], ['rudR', 'Ster kierunku w prawo (samolot)', ['KeyF', '']], ['gear', 'Podwozie (samolot)', ['KeyG', '']], ['flaps', 'Klapy (samolot)', ['KeyB', '']],
 ];
 const store = { get(k, d) { try { const v = localStorage.getItem('w3d.' + k); return v ? JSON.parse(v) : d; } catch { return d; } }, set(k, v) { try { localStorage.setItem('w3d.' + k, JSON.stringify(v)); } catch {} } };
@@ -1663,7 +1666,7 @@ let rebinding = null;
 addEventListener('keydown', e => {
   if (rebinding) { e.preventDefault(); if (e.code !== 'Escape') { const [a, i] = rebinding; for (const k in BIND) BIND[k] = BIND[k].map(c => c === e.code ? '' : c); BIND[a][i] = e.code; store.set('keys', BIND); } rebinding = null; drawKeys(); return; }
   keys[e.code] = true;
-  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'Tab'].includes(e.code)) e.preventDefault();
   if (!started) return;
   if (e.code === 'Escape') { if (bigOpen) toggleBigMap(); else toggleOptions(); return; }
   if (optOpen) return;
@@ -1673,6 +1676,9 @@ addEventListener('keydown', e => {
   if (mode === 'air' && !e.repeat && a === 'gear') { air.c.gear = 1 - air.c.gear; flash('Podwozie: ' + (air.c.gear ? 'wypuszczanie' : 'chowanie')); }
   if (mode === 'air' && !e.repeat && a === 'flaps') { air.c.flaps = 1 - air.c.flaps; flash('Klapy: ' + (air.c.flaps ? 'wypuszczone' : 'schowane')); }
   if (a === 'cam') camMode = (camMode + 1) % 3;
+  if (a === 'weapon' && !e.repeat && mode === 'car' && ACT && ACT.id === 'abrams') { WPN.tankGun = WPN.tankGun === 'cannon' ? 'mg' : 'cannon'; flash(WPN.tankGun === 'cannon' ? 'Działo 120 mm' : 'Karabin maszynowy'); }
+  if (a === 'light' && !e.repeat) { if (mode === 'car' && ACT && ACT.id === 'abrams') WPN.search = !WPN.search; else WPN.lightOn = !WPN.lightOn; }
+  if (a === 'fire' && !e.repeat) fire();
   if (a === 'night') setNight(!night);
   if (a === 'xray') setXray(!xray);
   if (a === 'pix') { pixelMode = !pixelMode; canvas.classList.toggle('pix', pixelMode); onResize(); }
@@ -2035,6 +2041,233 @@ function boatCamera(dt, snap) {
   }
   camera.up.set(0, 1, 0); camera.position.copy(camPos); camera.lookAt(camLook);
 }
+/* =========================================================================
+   ZOMBIE, BROŃ, ŚWIATŁA: zombie (człowiek z LifeKit: skóra i ubranie zombie, warstwy ruchu „zombie” i „atak”) —
+   w dzień kilku powolnych, w nocy więcej i szybszych; idą do gracza, przy nim (także przy pojeździe) atakują, ale nie
+   robią szkód. Pieszo: karabinek Beryl (WeaponKit) i latarka (GearKit); czołg: armata albo karabin maszynowy
+   (Tab), reflektor szperacz (L). Rozjechane i zastrzelone zombie zostają na ziemi z krwią.
+   ========================================================================= */
+const ZB = { list: [], corpses: [], decals: [], t: 0, def: null, LK: null, spawnT: 0, kills: 0 };
+const WPN = { rifle: null, fireT: 0, light: null, lightOn: false, holder: null, tankGun: 'cannon', reload: 0, mgT: 0, search: false, WK: null, GK: null };
+const FX = { tracers: [], booms: [], parts: null, pv: [], pi: 0 };
+const zMax = () => night ? 22 : 7;
+const zSpeedOf = () => night ? 2.4 + Math.random() * 1.0 : 0.4 + Math.random() * 0.3;
+// krew: nieregularna plama (raz, płótno 128 px)
+const BLOOD_TEX = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
+  for (let i = 0; i < 26; i++) { const a = Math.random() * 6.28, r = Math.random() * 40, x = 64 + Math.cos(a) * r, y = 64 + Math.sin(a) * r, s = 8 + Math.random() * (28 - r * 0.45);
+    const gr = g.createRadialGradient(x, y, 0, x, y, s); gr.addColorStop(0, 'rgba(90,6,6,0.95)'); gr.addColorStop(0.7, 'rgba(70,4,4,0.85)'); gr.addColorStop(1, 'rgba(60,0,0,0)'); g.fillStyle = gr; g.beginPath(); g.arc(x, y, s, 0, 7); g.fill(); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+})();
+const SCORCH_TEX = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(64, 64, 4, 64, 64, 62); gr.addColorStop(0, 'rgba(10,9,8,0.95)'); gr.addColorStop(0.6, 'rgba(25,22,20,0.7)'); gr.addColorStop(1, 'rgba(30,28,25,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+})();
+const decalGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+function decal(tex, x, z, sx, sz, rot, y) {
+  const m = new THREE.Mesh(decalGeo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }));
+  m.position.set(x, (y ?? surfaceAt(x, z, H(x, z) + 1)) + 0.03, z); m.rotation.y = rot; m.scale.set(sx, 1, sz); m.renderOrder = 2; scene.add(m);
+  ZB.decals.push(m); if (ZB.decals.length > 120) { const o = ZB.decals.shift(); scene.remove(o); o.material.dispose(); }
+}
+// cząstki: krew i pył (jeden bufor, kolejne sloty)
+function fxInit() {
+  const N = 600, g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(N * 3).fill(-1e5), 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(N * 3), 3));
+  FX.parts = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.09, vertexColors: true, transparent: true, depthWrite: false })); FX.parts.frustumCulled = false; scene.add(FX.parts);
+  FX.pv = Array.from({ length: N }, () => ({ v: [0, 0, 0], life: 0 }));
+}
+function burst(x, y, z, n, col, spd = 3) {
+  if (!FX.parts) fxInit(); const P = FX.parts.geometry.attributes.position, C = FX.parts.geometry.attributes.color, c = new THREE.Color(col);
+  for (let k = 0; k < n; k++) { const i = FX.pi = (FX.pi + 1) % FX.pv.length, p = FX.pv[i]; P.setXYZ(i, x, y, z); C.setXYZ(i, c.r, c.g, c.b); p.v = [(Math.random() - 0.5) * spd, Math.random() * spd * 0.8, (Math.random() - 0.5) * spd]; p.life = 0.6 + Math.random() * 0.5; }
+}
+function tracer(a, b, col = 0xffd27a) {
+  const g = new THREE.BufferGeometry().setFromPoints([a, b]), m = new THREE.Line(g, new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: 0.9 }));
+  scene.add(m); FX.tracers.push({ m, life: 0.07 });
+}
+function boom(x, y, z, r) {
+  const fl = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), new THREE.MeshBasicMaterial({ color: 0xffb050, transparent: true, opacity: 1, depthWrite: false, blending: THREE.AdditiveBlending }));
+  fl.position.set(x, y + 0.5, z); scene.add(fl);
+  const L = new THREE.PointLight(0xffa040, 40000, r * 12, 2); L.position.set(x, y + 2, z); scene.add(L);
+  const smoke = []; for (let k = 0; k < 9; k++) { const s = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), new THREE.MeshStandardMaterial({ color: 0x3b3835, transparent: true, opacity: 0.75, depthWrite: false, roughness: 1 })); s.position.set(x + (Math.random() - 0.5) * r * 0.6, y + 0.5 + Math.random() * r * 0.4, z + (Math.random() - 0.5) * r * 0.6); s.userData.v = [(Math.random() - 0.5) * 2, 1.5 + Math.random() * 2, (Math.random() - 0.5) * 2]; scene.add(s); smoke.push(s); }
+  FX.booms.push({ fl, L, smoke, t: 0, r });
+  decal(SCORCH_TEX, x, z, r * 0.9, r * 0.9, Math.random() * 6.28);
+  burst(x, y + 0.3, z, 60, 0x5a4a38, 12);
+  const d = Math.hypot(camPos.x - x, camPos.z - z); bump = Math.max(bump, Math.min(1, 25 / Math.max(10, d)));
+}
+function fxStep(dt) {
+  if (FX.parts) {
+    const P = FX.parts.geometry.attributes.position;
+    for (let i = 0; i < FX.pv.length; i++) { const p = FX.pv[i]; if (p.life <= 0) continue; p.life -= dt; p.v[1] -= 9.81 * dt;
+      let y = P.getY(i) + p.v[1] * dt; const x = P.getX(i) + p.v[0] * dt, z = P.getZ(i) + p.v[2] * dt; if (p.life <= 0) y = -1e5; P.setXYZ(i, x, y, z); }
+    P.needsUpdate = true;
+  }
+  for (let i = FX.tracers.length - 1; i >= 0; i--) { const t = FX.tracers[i]; t.life -= dt; t.m.material.opacity = Math.max(0, t.life / 0.07); if (t.life <= 0) { scene.remove(t.m); t.m.geometry.dispose(); t.m.material.dispose(); FX.tracers.splice(i, 1); } }
+  for (let i = FX.booms.length - 1; i >= 0; i--) {
+    const b = FX.booms[i]; b.t += dt; const k = b.t / 0.35;
+    b.fl.scale.setScalar(b.r * (0.3 + 0.9 * Math.min(1, k))); b.fl.material.opacity = Math.max(0, 1 - k); b.L.intensity = Math.max(0, 40000 * (1 - b.t / 0.3));
+    for (const s of b.smoke) { s.position.x += s.userData.v[0] * dt; s.position.y += s.userData.v[1] * dt; s.position.z += s.userData.v[2] * dt; s.scale.setScalar(b.r * 0.25 * (1 + b.t)); s.material.opacity = Math.max(0, 0.75 * (1 - b.t / 3)); }
+    if (b.t > 3) { scene.remove(b.fl, b.L); b.fl.geometry.dispose(); b.fl.material.dispose(); for (const s of b.smoke) { scene.remove(s); s.geometry.dispose(); s.material.dispose(); } FX.booms.splice(i, 1); }
+  }
+}
+/* ---------- zombie ---------- */
+function zBuild() {
+  const LK = window.LifeKit; if (!LK) return null;
+  const def = LK.CREATURES.find(c => c.id === 'humanHead') || LK.CREATURES[0], P = {};
+  for (const q of def.params) P[q.key] = q.value;
+  const pick = (k, label) => { const q = def.params.find(x => x.key === k); const i = q && q.choices ? q.choices.findIndex(c => c.startsWith(label)) : -1; return i >= 0 ? i : P[k]; };
+  P.height = 1.6 + Math.random() * 0.3; P.build = Math.random(); P.frame = Math.random();
+  P.tone = pick('tone', Math.random() < 0.7 ? 'Zombie' : 'Corpse'); P.suit = pick('suit', Math.random() < 0.6 ? 'Torn' : 'Graphite');
+  P.hair = Math.floor(Math.random() * 4); P.hairColor = Math.floor(Math.random() * 6); P.seed = Math.floor(Math.random() * 1000);
+  const c = LK.build(def.id, P, { detail: 0.6 });
+  c.group.traverse(o => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
+  scene.add(c.group); return c;
+}
+// zmiana obszaru: zombie, ciała i plamy znikają (nowy obszar zaludni się sam)
+function zClearAll() { for (const z of ZB.list) zFree(z); ZB.list.length = 0; ZB.corpses.length = 0; for (const m of ZB.decals) { scene.remove(m); m.material.dispose(); } ZB.decals.length = 0; }
+function zFree(z) { scene.remove(z.c.group); z.c.group.traverse(o => { if (o.isMesh) o.geometry.dispose(); }); }
+function zSpawn() {
+  for (let k = 0; k < 12; k++) {
+    const a = Math.random() * 6.28, d = 45 + Math.random() * 70, x = ego.x + Math.sin(a) * d, z = ego.z + Math.cos(a) * d;
+    if (W.inBuilding && W.inBuilding(x, z)) continue; if (boat.mask && isWater(x, z)) continue;
+    if (zWall(x, z, H(x, z) + 1)) continue;
+    const c = zBuild(); if (!c) return;
+    const y = surfaceAt(x, z, H(x, z) + 1);
+    ZB.list.push({ c, x, z, y, th: Math.random() * 6.28, sp: zSpeedOf(), hp: 2, wander: Math.random() * 6.28, atk: 0, t0: Math.random() * 10 });
+    return;
+  }
+}
+function zWall(x, z, y) { const a = collGrid.get(Math.floor(x / COLL_CELL) * 100003 + Math.floor(z / COLL_CELL)); return !!a && a.some(sg => sg[4] === 0 && sg[7] !== 't' && y >= sg[5] && y <= sg[6] + 1 && segDist(x, z, sg)[0] < 0.45); }
+// gracz jako cel: środek, kierunek, połowa długości i promień (pieszy, pojazd, skład, samolot, okręt)
+function egoShape() {
+  if (mode === 'car' && ACT) return { x: car.x, z: car.z, th: car.th, hl: ACT.id === 'urbino18' ? 7.5 : ACT.id === 'abrams' ? 3.2 : 1.4, r: ACT.id === 'abrams' ? 1.9 : ACT.id === 'urbino18' ? 1.3 : 0.9, v: Math.abs(car.vf) };
+  if (mode === 'rail') return { x: rail.x, z: rail.z, th: rail.th, hl: 7, r: 1.4, v: Math.abs(rail.v) };
+  if (mode === 'air') return { x: air.ego.x, z: air.ego.z, th: air.ego.th, hl: 4, r: 3, v: air.sim.state.onGround ? Math.hypot(air.sim.state.v[0], air.sim.state.v[2]) : 0, air: !air.sim.state.onGround };
+  if (mode === 'boat') return { x: boat.ego.x, z: boat.ego.z, th: boat.ego.th, hl: 55, r: 6, v: 0, water: true };
+  return { x: ped.x, z: ped.z, th: ped.th, hl: 0, r: 0.4, v: 0 };
+}
+function capDist(S, x, z) { const fx = Math.sin(S.th), fz = Math.cos(S.th), dx = x - S.x, dz = z - S.z, al = Math.max(-S.hl, Math.min(S.hl, dx * fx + dz * fz)); return Math.hypot(dx - fx * al, dz - fz * al) - S.r; }
+function zKill(z, dir, crushed) {
+  z.dead = true; z.fall = 0; z.dir = dir; z.crushed = crushed;
+  z.c.animate(carT, 1, { gait: 'idle' });   // rozluźniony, potem upada na wznak
+  const y = surfaceAt(z.x, z.z, z.y + 1);
+  decal(BLOOD_TEX, z.x - Math.sin(z.th) * 0.9, z.z - Math.cos(z.th) * 0.9, 1.6 + Math.random(), 1.6 + Math.random(), Math.random() * 6.28, y);
+  if (crushed) { const fx = Math.sin(dir), fz = Math.cos(dir); decal(BLOOD_TEX, z.x + fx * 2.5, z.z + fz * 2.5, 1.1, 4.5, dir, y); }
+  burst(z.x, y + 1.1, z.z, crushed ? 50 : 25, 0x7a0a0a, crushed ? 6 : 3);
+  ZB.corpses.push(z); ZB.kills++;
+  if (ZB.corpses.length > 50) { const old = ZB.corpses.shift(); zFree(old); ZB.list.splice(ZB.list.indexOf(old), 1); }
+}
+function zHit(z, p) {
+  burst(p.x, p.y, p.z, 14, 0x8a0b0b, 2.5);
+  z.hp -= p.y > z.y + 1.5 ? 3 : 1;   // w głowę — od razu
+  if (z.hp <= 0) zKill(z, Math.atan2(z.x - ego.x, z.z - ego.z), false);
+}
+function zombiesStep(dt) {
+  if (!started || switching || !window.LifeKit) return;
+  ZB.spawnT -= dt;
+  const alive = ZB.list.filter(z => !z.dead);
+  if (ZB.spawnT <= 0 && alive.length < zMax() && mode !== 'boat') { ZB.spawnT = night ? 0.6 : 2.5; zSpawn(); }
+  const S = egoShape();
+  for (let i = ZB.list.length - 1; i >= 0; i--) {
+    const z = ZB.list[i];
+    if (z.dead) {   // upadek na wznak (0,6 s), potem leży
+      if (z.fall < 1) { z.fall = Math.min(1, z.fall + dt / 0.6); const k = z.fall * z.fall; z.c.group.rotation.set(-Math.PI / 2 * k, z.th, 0, 'YXZ'); z.c.group.position.y = z.y + 0.12 * k; }
+      continue;
+    }
+    const d0 = Math.hypot(z.x - ego.x, z.z - ego.z);
+    if (d0 > 190) { zFree(z); ZB.list.splice(i, 1); continue; }   // za daleko — zniknął
+    // przejechany: pojazd w ruchu przez zombie
+    const dc = capDist(S, z.x, z.z);
+    if (S.v > 2.5 && dc < 0.35 && !S.air) { zKill(z, S.th, true); if (mode === 'car' && ACT && ACT.id !== 'abrams') bump = Math.max(bump, 0.25); continue; }
+    z.sp = night ? Math.max(z.sp, 2.4) : Math.min(z.sp, 0.7);
+    let want = z.th, go = 0, atk = 0;
+    if (d0 < 75 && !S.air) {   // goni gracza; przy nim (i przy pojeździe) atakuje — bez szkód
+      want = Math.atan2(ego.x - z.x, ego.z - z.z);
+      if (dc < 0.9) atk = 1; else go = z.sp;
+      if (S.water && boat.mask && isWater(z.x + Math.sin(want) * 1.5, z.z + Math.cos(want) * 1.5)) { go = 0; atk = 1; }
+    } else { z.wander += (Math.random() - 0.5) * dt; want = z.wander; go = 0.35; }
+    let dth = ((want - z.th + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+    z.th += Math.max(-2.5 * dt, Math.min(2.5 * dt, dth));
+    if (go) {
+      const nx = z.x + Math.sin(z.th) * go * dt, nz = z.z + Math.cos(z.th) * go * dt;
+      if (!zWall(nx, nz, z.y + 1) && !(W.inBuilding && W.inBuilding(nx, nz))) { z.x = nx; z.z = nz; } else { z.wander = z.th + (Math.random() < 0.5 ? 1.4 : -1.4); z.th = z.wander; }
+    }
+    z.y = surfaceAt(z.x, z.z, z.y + 0.8);
+    z.atk += (atk - z.atk) * Math.min(1, 6 * dt);
+    z.c.group.position.set(z.x, z.y, z.z); z.c.group.rotation.set(0, z.th, 0);
+    z.c.animate(carT + z.t0, dt, { gait: go > 0.05 ? (go > 1.9 ? 'run' : 'walk') : 'idle', speed: Math.max(0.4, go), layers: { zombie: 1, attack: z.atk } });
+  }
+}
+/* ---------- strzał: promień z kamery przez środek ekranu (celownik) ---------- */
+function rayHit(o, d, maxD) {
+  let best = maxD, hz = null;
+  for (const z of ZB.list) {
+    if (z.dead) continue;
+    const ox = z.x - o.x, oz = z.z - o.z, hd = d.x * d.x + d.z * d.z; if (hd < 1e-6) continue;
+    const t = (ox * d.x + oz * d.z) / hd; if (t < 0.5 || t > best) continue;
+    const px = o.x + d.x * t - z.x, pz = o.z + d.z * t - z.z, y = o.y + d.y * t;
+    if (Math.hypot(px, pz) < 0.42 && y > z.y && y < z.y + 1.85) { best = t; hz = z; }
+  }
+  // grunt i budynki dokładnej mapy na drodze pocisku
+  for (let t = 1; t < best; t += 1.5) { const x = o.x + d.x * t, y = o.y + d.y * t, z = o.z + d.z * t; if (y < H(x, z) || (W.inBuilding && W.inBuilding(x, z) && y < H(x, z) + 40) || zWall(x, z, y)) { return { t, z: null, p: new THREE.Vector3(x, y, z) }; } }
+  return { t: best, z: hz, p: new THREE.Vector3(o.x + d.x * best, o.y + d.y * best, o.z + d.z * best) };
+}
+function aimRay() { const d = new THREE.Vector3(); camera.getWorldDirection(d); return { o: camera.position.clone(), d }; }
+function fireRifle() {
+  if (WPN.fireT > 0 || !WPN.rifle) return; WPN.fireT = 1 / WPN.rifle.info.rate;
+  const { o, d } = aimRay(); d.x += (Math.random() - 0.5) * 0.006; d.y += (Math.random() - 0.5) * 0.006; d.normalize();
+  const h = rayHit(o, d, 400), m = WPN.rifle.parts.flash.getWorldPosition(new THREE.Vector3());
+  tracer(m, h.p); WPN.rifle.update(carT, 0, { fire: true }); bump = Math.max(bump, 0.08);
+  if (h.z) zHit(h.z, h.p); else burst(h.p.x, h.p.y, h.p.z, 6, 0x8a8070, 2);
+}
+// wylot lufy czołgu; pocisk leci z wylotu w punkt pod celownikiem (gdy jest przed lufą), inaczej wzdłuż lufy
+function tankMuzzle(len) {
+  const V = ACT.v; V.gun.updateMatrixWorld(true); const p = V.gun.localToWorld(new THREE.Vector3(0, 0, len)), d = new THREE.Vector3(0, 0, 1).transformDirection(V.gun.matrixWorld);
+  const a = aimRay(), h = rayHit(a.o, a.d, 900), to = h.p.clone().sub(p); if (to.length() > 3 && to.clone().normalize().dot(d) > 0.8) d.copy(to.normalize());
+  return { p, d };
+}
+function fireTank() {
+  if (WPN.tankGun === 'cannon') {
+    if (WPN.reload > 0) { flash('Działo: ładowanie…'); return; }
+    WPN.reload = 4;
+    const { p, d } = tankMuzzle(5.6);
+    const h = rayHit(p, d, 900);
+    tracer(p, h.p, 0xffe0a0); if (h.t < 899) boom(h.p.x, Math.max(h.p.y, H(h.p.x, h.p.z)), h.p.z, 6);
+    burst(p.x, p.y, p.z, 30, 0xc8c0b0, 5); bump = Math.max(bump, 0.6);
+    for (const z of ZB.list) if (!z.dead && Math.hypot(z.x - h.p.x, z.z - h.p.z) < 7) zKill(z, Math.atan2(z.x - h.p.x, z.z - h.p.z), false);
+  } else {
+    if (WPN.mgT > 0) return; WPN.mgT = 0.09;
+    const { p, d } = tankMuzzle(2.0); d.x += (Math.random() - 0.5) * 0.01; d.y += (Math.random() - 0.5) * 0.01; d.normalize(); p.x += 0.4;
+    const h = rayHit(p, d, 600);
+    if (Math.random() < 0.4) tracer(p, h.p, 0xff9a50);
+    if (h.z) zHit(h.z, h.p); else burst(h.p.x, h.p.y, h.p.z, 4, 0x8a8070, 2);
+  }
+}
+const armed = () => mode === 'foot' || (mode === 'car' && ACT && ACT.id === 'abrams');
+function fire() { if (!started || optOpen || bigOpen) return; if (mode === 'foot') fireRifle(); else if (mode === 'car' && ACT && ACT.id === 'abrams') fireTank(); }
+// broń i latarka pieszego (z GameLaboratory), raz
+async function weaponsInit() {
+  try {
+    [WPN.WK, WPN.GK] = await Promise.all([import(GL + 'js/models/weapons/weaponkit.js'), import(GL + 'js/models/gear/gearkit.js')]);
+    WPN.rifle = WPN.WK.buildWeapon('beryl'); WPN.rifle.group.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    if (PED) { PED.c.rig.chest.add(WPN.rifle.group); WPN.rifle.group.position.set(-0.08, 0.02, 0.28); WPN.rifle.group.rotation.set(0.05, 0.08, 0); }
+    WPN.light = WPN.GK.makeItem('flashlight', {}); WPN.light.lights.forEach(l => { l.castShadow = false; });
+    WPN.holder = new THREE.Object3D(); scene.add(WPN.holder); WPN.holder.add(WPN.light.group); WPN.light.group.position.set(0, 0, 0); WPN.light.group.rotation.set(0, Math.PI, 0);
+    WPN.holder.visible = false;
+  } catch (e) { console.warn('[W3D] broń', e); }
+}
+function weaponsStep(dt) {
+  WPN.fireT -= dt; WPN.reload = Math.max(0, WPN.reload - dt); WPN.mgT -= dt;
+  if (WPN.rifle) { WPN.rifle.group.visible = mode === 'foot'; WPN.rifle.update(carT, dt, {}); }
+  if (started && !optOpen && on('fire') && (mode === 'foot' || (mode === 'car' && ACT && ACT.id === 'abrams' && WPN.tankGun === 'mg'))) fire();
+  // latarka: w dłoni przy piersi, świeci tam, gdzie patrzy kamera
+  if (WPN.holder) {
+    const onF = WPN.lightOn && mode === 'foot'; WPN.holder.visible = onF;
+    if (onF) { const fx = Math.sin(ped.th), fz = Math.cos(ped.th); WPN.holder.position.set(ped.x + fx * 0.3 + fz * 0.2, ped.y + 1.25, ped.z + fz * 0.3 - fx * 0.2);
+      const d = new THREE.Vector3(); camera.getWorldDirection(d); WPN.holder.lookAt(WPN.holder.position.clone().add(d)); WPN.light.update(dt); }
+  }
+  const cr = $('cross'); if (cr) cr.style.display = started && armed() && camMode !== 1 ? 'block' : 'none';
+  const wp = $('weap'); if (wp) { const t = mode === 'foot' ? 'Beryl · LPM / V — strzał · L — latarka ' + (WPN.lightOn ? 'wł.' : 'wył.') : mode === 'car' && ACT && ACT.id === 'abrams' ? (WPN.tankGun === 'cannon' ? 'Działo 120 mm' + (WPN.reload > 0 ? ' · ładowanie ' + WPN.reload.toFixed(1) + ' s' : ' · gotowe') : 'Karabin maszynowy') + ' · Tab — zmiana · L — reflektor ' + (WPN.search ? 'wł.' : 'wył.') : ''; wp.textContent = t ? t + ' · zombie: ' + ZB.kills : ''; wp.style.display = t ? 'block' : 'none'; }
+}
 let bump = 0;
 /* ---------- pieszy: chód, bieg, zderzenia ze ścianami i z pojazdami ---------- */
 function walk(dt) {
@@ -2335,8 +2568,9 @@ function railUse() {
 /* ---------- kamera ---------- */
 let started = null, camYaw = 0, camMode = 0, orbit = 0, tilt = 0, camDist = 1, dragging = false, lastX = 0, lastY = 0;
 // LPM: pełne rozglądanie — poziomo (orbit) i w pionie (tilt)
-canvas.addEventListener('pointerdown', e => { if (e.button !== 0) return; dragging = true; lastX = e.clientX; lastY = e.clientY; canvas.setPointerCapture(e.pointerId); });
-canvas.addEventListener('pointerup', () => { dragging = false; });
+let clickAt = null;   // krótkie kliknięcie LPM (bez przeciągania) — strzał
+canvas.addEventListener('pointerdown', e => { if (e.button !== 0) return; dragging = true; lastX = e.clientX; lastY = e.clientY; clickAt = { x: e.clientX, y: e.clientY, t: performance.now() }; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointerup', e => { dragging = false; if (clickAt && Math.hypot(e.clientX - clickAt.x, e.clientY - clickAt.y) < 5 && performance.now() - clickAt.t < 350) fire(); clickAt = null; });
 canvas.addEventListener('pointercancel', () => { dragging = false; });
 canvas.addEventListener('pointermove', e => {
   if (!dragging) return;
@@ -2717,6 +2951,7 @@ function step(dt, draw) {
       lights: night && (mine || V.id === 'urbino18'), brake: S.brake, work: S.work,
     };
     if (V.id === 'abrams' && mine) { o.turret = orbit; o.gun = Math.max(-0.15, Math.min(0.35, 0.05 - tilt * 0.5)); }
+    if (V.id === 'abrams') o.searchlight = WPN.search;
     V.v.update(carT, dt, o);
   }
   if (mode === 'rail') railPlace(dt);
@@ -2726,8 +2961,9 @@ function step(dt, draw) {
   if (PED) {
     PED.g.position.set(ped.x, ped.y, ped.z); PED.g.rotation.set(0, ped.th, 0);
     const sp = Math.abs(ped.vf);
-    PED.c.animate(carT, dt, { gait: sp < 0.15 ? 'idle' : sp > 2.6 ? 'run' : 'walk', speed: Math.max(0.6, sp) });
+    PED.c.animate(carT, dt, { gait: sp < 0.15 ? 'idle' : sp > 2.6 ? 'run' : 'walk', speed: Math.max(0.6, sp), layers: { aim: WPN.rifle ? 1 : 0 } });
   }
+  zombiesStep(dt); weaponsStep(dt); fxStep(dt);
   updateCamera(dt); sketchFrame();
   if ((TS.t += dt) > 0.4) { TS.t = 0; streamTick(); ovTick(); }
   areaCheck(dt);
@@ -2922,7 +3158,7 @@ async function switchArea(a) {
   try {
     $('loader').style.display = 'flex'; status('Wczytuję dokładną mapę: ' + a.name + '…', 0.02);
     if (sk) setSketch(false);
-    unloadWorld(); setArea(a);
+    zClearAll(); unloadWorld(); setArea(a);
     await loadArea();
     const g = toXZ(TS.TL ? TS.TL.G0.lat : 52.23175, TS.TL ? TS.TL.G0.lon : 21.00586); TS.OFF = [g[0], g[1]]; TS.fail.clear();
     const mv = (o) => { if (o) { o.x -= dx; o.z -= dz; } };
@@ -3009,6 +3245,7 @@ async function main() {
     else { for (const V of FLEET) V.v.group.visible = false; const sp = findSpawn(); SPAWN = sp; Object.assign(ped, { x: sp.x, z: sp.z, th: sp.th, vf: 0, vy: 0 }); ped.y = surfaceAt(sp.x, sp.z, H(sp.x, sp.z)); mode = 'foot'; ego = ped; camYaw = sp.th; }
     FLEET.homed = AREA === AREAS.centrum;
     await homeVehicles(t => { ml.textContent = 'Na swoje miejsce: ' + t; });
+    ml.textContent = 'Broń i latarka…'; await weaponsInit();
     if (GFX.sketch) setSketch(true);
     $('modes').querySelector('.mload').remove();
     $('modes').querySelector('[data-mode=foot]').disabled = false; $('modes').querySelector('[data-mode=rail]').disabled = false; $('modes').querySelector('[data-mode=air]').disabled = false; $('modes').querySelector('[data-mode=boat]').disabled = false;
@@ -3021,7 +3258,7 @@ async function main() {
     $('start').classList.add('out'); setTimeout(() => { $('start').style.display = 'none'; }, 650);
     $('hud').style.display = ''; $('minimap').style.display = ''; $('help').style.display = '';
     updateCamera(0, true);
-    window.__W3D = { step, get car() { return car; }, FLEET, ped, get rail() { return rail; }, RAILS, startRail, air, startAir, boat, startBoat, isWater, TS, streamTick, buildTile, tileData, disposeTile, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, get E() { return E; }, get R() { return R; }, get AREA() { return AREA; }, switchArea, AREAS, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, version: APP_VERSION };
+    window.__W3D = { step, get car() { return car; }, FLEET, ped, ZB, WPN, fire, zSpawn, get rail() { return rail; }, RAILS, startRail, air, startAir, boat, startBoat, isWater, TS, streamTick, buildTile, tileData, disposeTile, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, get E() { return E; }, get R() { return R; }, get AREA() { return AREA; }, switchArea, AREAS, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, version: APP_VERSION };
     window.dispatchEvent(new Event('w3d-ready'));
   } catch (e) {
     console.error(e);

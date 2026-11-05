@@ -25,6 +25,9 @@ Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy 
 | N | noc / dzień |
 | P | filtr pixel-art |
 | H | ukryj pomoc |
+| LPM (krótko) / V | strzał: pieszo karabinek Beryl, w czołgu armata albo karabin maszynowy |
+| Tab | broń czołgu: działo / karabin maszynowy |
+| L | latarka (pieszo) / reflektor szperacz (czołg) |
 | **Samolot:** W / S | drążek: pchnij (nos w dół) / ciągnij (nos w górę) |
 | A / D | lotki (na ziemi także kółko ogonowe) |
 | Q / F | ster kierunku |
@@ -67,7 +70,11 @@ Jeden plik `index.html`. Three.js r186, pojazdy (RoadKit, TramKit, TrainKit, Air
 
 Dane © OpenStreetMap contributors (ODbL).
 
+## Zombie
+W dzień kilku powolnych, w nocy więcej i szybszych. Idą do gracza i atakują (także pojazd), ale nie robią szkód. Można je zastrzelić albo przejechać; ciała zostają na ziemi z krwią.
+
 ## Plan
+Pełna lista: [TODO.md](TODO.md).
 - Lotnictwo: śmigłowiec W-3 Sokół; Boeing (samolot pasażerski); F-15 (odrzutowy).
 - Kafle mapy: tunele, wiadukty, przejścia i tory (jazda) na kaflach; teren z wysokościami.
 - Szynowe: metro — na początek linia M1; trolejbus linii 51 (1983–1995, Dworzec Południowy — Puławska — Piaseczno); pozostałe linie tramwajowe i kolejowe; WKD do Pruszkowa (cała trasa).

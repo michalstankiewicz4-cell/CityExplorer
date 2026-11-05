@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.14.0 — 2026-11-05
+- **Zombie**: w dzień kilku powolnych, w nocy więcej (do 22) i szybkich — biegną. Człowiek z laboratorium ludzi GameLaboratory w skórze i ubraniu zombie, z warstwami ruchu „zombie” (pochylony, ręce przed sobą, powłóczy nogą) i „atak”. Pojawiają się wokół gracza, idą do niego; przy nim — także przy pojeździe — atakują, ale nie robią szkód. Daleko za plecami znikają.
+- **Pieszo: karabinek Beryl** (WeaponKit z GameLaboratory) trzymany przed sobą i **latarka** (GearKit): strzał krótkim kliknięciem LPM albo V (przytrzymanie — seria), celownik na środku ekranu; w głowę — od razu, w ciało — dwa trafienia. L — latarka.
+- **Czołg: armata 120 mm albo karabin maszynowy** (Tab): armata — wybuch z dymem, błyskiem i osmaleniem, zabija zombie w promieniu 7 m, ładowanie 4 s; karabin — seria ze smugaczami. Pocisk leci w punkt pod celownikiem. **Reflektor szperacz** przy armacie (L), celuje razem z nią.
+- **Rozjeżdżanie**: pojazd w ruchu przejeżdża zombie; **ciała zostają na ziemi z krwią** (upadek na wznak, kałuża krwi, przy przejechaniu smuga), do 50 ciał.
+- Nowe klawisze (do zmiany w opcjach): V — strzał, Tab — broń czołgu, L — latarka / reflektor.
+
 ## 0.13.0 — 2026-11-05
 - **Wszystkie pojazdy na swoich miejscach**, niezależnie od tego, gdzie zaczynasz: Polonez, Abrams, Solaris, tramwaj PESA Swing i pociąg WKD — w centrum; Spitfire — na progu drogi startowej Okęcia; ORP Błyskawica — na Wiśle przy Moście Świętokrzyskim. Każdy pojawia się przy pierwszym zbudowaniu swojego obszaru (przy starcie albo po wjeździe / wlocie) i potem tam stoi; podchodzisz i wsiadasz klawiszem E. Tramwaj i pociąg stoją jednocześnie, każdy na swoim torze.
 - Tryby na ekranie startowym przenoszą do miejsca pojazdu (Szynowy — do centrum, Samolot — na Okęcie, Okręt — na Wisłę); karta Szynowy czynna na każdej mapie.
