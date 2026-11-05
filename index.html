@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.9.1</title>
+<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.10.0</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Warszawa 3D, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.9.1"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.10.0"}
 </script>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#0d1014;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#e8e6e1}
@@ -198,7 +198,7 @@ import * as THREE from 'three';
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
-const APP_VERSION = '0.9.1';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+const APP_VERSION = '0.10.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
 document.getElementById('ver').textContent = 'v' + APP_VERSION; document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
 // gotowe mapy (?map=…): okecie — lotnisko Chopina (tryb Samolot); bez parametru — Śródmieście
@@ -485,7 +485,16 @@ function onResize() { renderer.setPixelRatio(pixelMode ? 0.3 : basePR()); render
 
 /* ---------- teren: funkcja wysokości ---------- */
 let HF = null;  // Float32Array (SEG+1)^2
+// wysokość terenu; poza dokładną mapą (kafle) teren od krawędzi łagodnie schodzi przez 300 m do płaskiego gruntu kafli
 function H(x, z) {
+  const ax = Math.abs(x), az = Math.abs(z);
+  if (ax > E || az > E) {
+    const he = Hin(Math.max(-E, Math.min(E, x)), Math.max(-E, Math.min(E, z))), d = Math.max(ax, az) - E, t = Math.min(1, d / 300), k = t * t * (3 - 2 * t);
+    return he + ((W.terrBase || 0) - 0.3 - he) * k;
+  }
+  return Hin(x, z);
+}
+function Hin(x, z) {
   if (!HF) return 0;
   let fx = (x + E) / (2 * E) * SEG, fz = (z + E) / (2 * E) * SEG;
   fx = Math.max(0, Math.min(SEG - 1e-4, fx)); fz = Math.max(0, Math.min(SEG - 1e-4, fz));
@@ -1702,9 +1711,6 @@ function physics(dt) {
     const sy = surfaceAt(car.x, car.z, car.y);
     if (car.y - sy > 0.25 || car.vy > 0.5) { car.vy -= 9.81 * dt; car.y += car.vy * dt; if (car.y <= sy) { if (car.vy < -6 && drive) bump = Math.max(bump, Math.min(1, -car.vy / 15)); car.y = sy; car.vy = 0; } car.air = car.y > sy + 0.05; }
     else { car.y = sy; car.vy = 0; car.air = false; }
-    const lim = R + 80;
-    if (Math.abs(car.x) > lim) { car.x = Math.sign(car.x) * lim; car.vx *= -0.3; }
-    if (Math.abs(car.z) > lim) { car.z = Math.sign(car.z) * lim; car.vz *= -0.3; }
     car.rest = !drive && !car.air && Math.abs(car.vf) < 0.02 && Math.hypot(car.vx, car.vz) < 0.03;
   }
   if (ACT) { car = ACT.s; VDEF = ACT.def; }
@@ -1789,8 +1795,7 @@ function airStep(dt) {
   if (on('fast')) c.throttle = Math.min(1, c.throttle + 0.5 * dt);
   if (on('slow')) c.throttle = Math.max(0, c.throttle - 0.5 * dt);
   c.brake = on('brake') ? 1 : 0;
-  const gy = tileGY(), gh = (x, z) => Math.abs(x) < E && Math.abs(z) < E ? H(x, z) : gy;   // poza dokładną mapą: płaski grunt kafli
-  for (let i = 0; i < 2; i++) air.sim.step(dt / 2, c, gh);
+  for (let i = 0; i < 2; i++) air.sim.step(dt / 2, c, H);   // H: także poza dokładną mapą (grunt kafli)
   if (!s.crashed) {   // ściana budynku (siatka kolizji) — rozbity
     const a = collGrid.get(Math.floor(s.p[0] / COLL_CELL) * 100003 + Math.floor(s.p[2] / COLL_CELL));
     if (a && a.some(sg => sg[4] === 0 && s.p[1] >= sg[5] && s.p[1] <= sg[6] && segDist(s.p[0], s.p[2], sg)[0] < 3)) s.crashed = true;
@@ -1822,7 +1827,7 @@ function airCamera(dt, snap) {
     const want = new THREE.Vector3(-Math.sin(h) * Math.cos(el) * r, Math.sin(el) * r, -Math.cos(h) * Math.cos(el) * r);
     if (!air.off || snap) air.off = want.clone(); else air.off.lerp(want, 1 - Math.exp(-4 * dt));   // przesunięcie względem samolotu: kamera nie zostaje w tyle przy prędkości
     camPos.set(s.p[0] + air.off.x, s.p[1] + air.off.y, s.p[2] + air.off.z);
-    const gy = (Math.abs(camPos.x) < E && Math.abs(camPos.z) < E ? H(camPos.x, camPos.z) : tileGY()) + 1.2; if (camPos.y < gy) camPos.y = gy;
+    const gy = H(camPos.x, camPos.z) + 1.2; if (camPos.y < gy) camPos.y = gy;
     camLook.set(s.p[0] + f[0] * 8, s.p[1] + 1 + f[1] * 8, s.p[2] + f[2] * 8); camera.up.set(0, 1, 0);
     if (camera.near !== 0.3) { camera.near = 0.3; camera.updateProjectionMatrix(); }
   }
@@ -1861,7 +1866,7 @@ function walk(dt) {
   const sy = surfaceAt(ped.x, ped.z, ped.y + 0.4);
   if (ped.y - sy > 0.35 || ped.vy > 0.5) { ped.vy -= 9.81 * dt; ped.y += ped.vy * dt; if (ped.y <= sy) { ped.y = sy; ped.vy = 0; } ped.air = ped.y > sy + 0.05; }
   else { ped.y += (sy - ped.y) * Math.min(1, 14 * dt); ped.vy = 0; ped.air = false; }
-  const lim = R + 80; ped.x = Math.max(-lim, Math.min(lim, ped.x)); ped.z = Math.max(-lim, Math.min(lim, ped.z));
+
 }
 // zderzenia pojazdu ze ścianami, drzewami, filarami i z innymi pojazdami (okręgi wzdłuż nadwozia)
 function collideV(V, drive) {
@@ -2215,6 +2220,7 @@ function hud(dt, fps) {
   const fx = Math.sin(ego.th), fz = Math.cos(ego.th);
   mmg.rotate(-Math.PI / 2 - Math.atan2(fz, fx));
   mmg.scale(zoom / W.os, zoom / W.os);
+  if (TS.TL) for (const k of TS.loaded.keys()) { const c = TS.ov.get(k); if (!c) continue; const [i, j] = k.split('_').map(Number), T = TS.TL.T; mmg.drawImage(c, (i * T + TS.OFF[0] - ego.x) * W.os, (j * T + TS.OFF[1] - ego.z) * W.os, T * W.os, T * W.os); }   // kafle wokół
   mmg.drawImage(W.ov, -(ego.x + E) * W.os, -(ego.z + E) * W.os);
   mmg.restore();
   mmg.fillStyle = '#ff3b30'; mmg.strokeStyle = '#fff'; mmg.lineWidth = 2;
@@ -2267,7 +2273,6 @@ addEventListener('pointerup', () => { bmDrag = null; });
 bm.addEventListener('click', e => {
   if (!bmView || bmMoved) { bmMoved = false; return; }
   const x = (e.clientX - bmView.ox) / bmView.s - E, z = (e.clientY - bmView.oy) / bmView.s - E;
-  if (Math.abs(x) > R + 60 || Math.abs(z) > R + 60) return;
   if (W.inBuilding && W.inBuilding(x, z)) { $('bigmapHint').textContent = 'Tam stoi budynek — wybierz ulicę lub plac'; return; }
   if (mode === 'car') { Object.assign(car, { x, z, vx: 0, vz: 0, vy: 0 }); car.y = surfaceAt(x, z, H(x, z)); } else if (mode === 'foot') { Object.assign(ped, { x, z, vy: 0, vf: 0 }); ped.y = surfaceAt(x, z, H(x, z)); } updateCamera(0, true); toggleBigMap();
   $('bigmapHint').textContent = 'Mapa — kliknij, aby się tam przenieść · przeciągnij = przesuwanie · kółko = zoom · M zamyka';
@@ -2554,22 +2559,29 @@ function buildTile(tile) {
   }
   if (rects.length) {
     const pos = [], uv = [], nor = [];
-    for (const [a, b, c, d] of rects) for (const [px, pz] of [[a, b], [a, d], [c, b], [c, b], [a, d], [c, d]]) { pos.push(px, GY, pz); nor.push(0, 1, 0); uv.push((px - x0) / T, 1 - (pz - z0) / T); }
+    for (const [a, b, c, d] of rects) {   // siatka co ≤ 50 m: grunt idzie za terenem (zejście od krawędzi dokładnej mapy)
+      const nx = Math.max(1, Math.ceil((c - a) / 50)), nz = Math.max(1, Math.ceil((d - b) / 50));
+      for (let u = 0; u < nx; u++) for (let v = 0; v < nz; v++) {
+        const xa = a + (c - a) * u / nx, xb = a + (c - a) * (u + 1) / nx, za = b + (d - b) * v / nz, zb = b + (d - b) * (v + 1) / nz;
+        for (const [px, pz] of [[xa, za], [xa, zb], [xb, za], [xb, za], [xa, zb], [xb, zb]]) { pos.push(px, H(px, pz) - 0.02, pz); nor.push(0, 1, 0); uv.push((px - x0) / T, 1 - (pz - z0) / T); }
+      }
+    }
     const gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); gg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); gg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
     const gm = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.97 }); const m = new THREE.Mesh(gg, gm); m.receiveShadow = true; grp.add(m); res.push(gg, gm);
   }
   // budynki: ściany i płaskie dachy, kolor z lekką zmiennością
-  const P = [], C = [], col = new THREE.Color();
+  const P = [], C = [], col = new THREE.Color(), coll = [];
   for (const b of tile.b) {
     const n = (b.length - 2) / 2; if (n < 3) continue;
     const xs = [], zs = []; let cx = 0, cz = 0;
     for (let q = 0; q < n; q++) { const x = x0 + b[2 + q * 2] / 10, z = z0 + b[3 + q * 2] / 10; xs.push(x); zs.push(z); cx += x; cz += z; }
     cx /= n; cz /= n; if (Math.abs(cx) < E && Math.abs(cz) < E) continue;   // tę część pokazuje dokładna mapa
-    const yb = GY + b[1], yt = GY + b[0], hsh = Math.sin(cx * 12.9898 + cz * 78.233) * 43758.5453, rr = hsh - Math.floor(hsh);
+    const g0 = H(cx, cz), yb = g0 - 0.5 + b[1], yt = g0 + b[0], hsh = Math.sin(cx * 12.9898 + cz * 78.233) * 43758.5453, rr = hsh - Math.floor(hsh);
     col.setHSL(0.08 + rr * 0.05, 0.12 + rr * 0.1, 0.62 + rr * 0.12);
     for (let q = 0; q < n; q++) {
       const a = q, c = (q + 1) % n;
       P.push(xs[a], yb, zs[a], xs[c], yb, zs[c], xs[a], yt, zs[a], xs[a], yt, zs[a], xs[c], yb, zs[c], xs[c], yt, zs[c]);
+      coll.push(collTile(xs[a], zs[a], xs[c], zs[c], yb, yt));   // ściana do zderzeń (zwalniana z kaflem)
       for (let v = 0; v < 6; v++) C.push(col.r, col.g, col.b);
     }
     const tri = THREE.ShapeUtils.triangulateShape(xs.map((x, q) => new THREE.Vector2(x, zs[q])), []);
@@ -2583,10 +2595,19 @@ function buildTile(tile) {
   // podgląd na dużą mapę (128 px)
   const o = document.createElement('canvas'); o.width = o.height = 128; o.getContext('2d').drawImage(cv, 0, 0, 128, 128); ovPut(tile.i + '_' + tile.j, o);
   scene.add(grp); TS.stats.built++;
-  return { grp, res, cx: x0 + T / 2, cz: z0 + T / 2 };
+  return { grp, res, coll, cx: x0 + T / 2, cz: z0 + T / 2 };
+}
+// ściana budynku kafla w siatce zderzeń (ten sam format co collAdd); zwraca [ściana, klucze komórek] do zwolnienia
+function collTile(ax, az, bx, bz, y0, y1) {
+  const sg = [ax, az, bx, bz, 0, y0, y1, 'b'], ks = [];
+  for (let i = Math.floor(Math.min(ax, bx) / COLL_CELL); i <= Math.floor(Math.max(ax, bx) / COLL_CELL); i++) for (let j = Math.floor(Math.min(az, bz) / COLL_CELL); j <= Math.floor(Math.max(az, bz) / COLL_CELL); j++) {
+    const k = i * 100003 + j; let a = collGrid.get(k); if (!a) collGrid.set(k, a = []); a.push(sg); ks.push(k);
+  }
+  return [sg, ks];
 }
 function ovPut(k, c) { TS.ov.delete(k); TS.ov.set(k, c); if (TS.ov.size > 500) TS.ov.delete(TS.ov.keys().next().value); }
-function freeTile(k) { const t = TS.loaded.get(k); if (!t) return; scene.remove(t.grp); for (const r of t.res) r.dispose(); TS.loaded.delete(k); TS.stats.freed++; }
+function disposeTile(t) { scene.remove(t.grp); for (const r of t.res) r.dispose(); for (const [sg, ks] of t.coll || []) for (const c of ks) { const a = collGrid.get(c); if (a) { const q = a.indexOf(sg); if (q >= 0) a.splice(q, 1); } } }
+function freeTile(k) { const t = TS.loaded.get(k); if (!t) return; disposeTile(t); TS.loaded.delete(k); TS.stats.freed++; }
 let liveBusy = false;
 async function tileData(k, allowLive = true) {
   if (TS.data.has(k)) return TS.data.get(k);
@@ -2703,7 +2724,7 @@ async function main() {
     $('start').classList.add('out'); setTimeout(() => { $('start').style.display = 'none'; }, 650);
     $('hud').style.display = ''; $('minimap').style.display = ''; $('help').style.display = '';
     updateCamera(0, true);
-    window.__W3D = { step, get car() { return car; }, FLEET, ped, rail, startRail, air, startAir, TS, streamTick, buildTile, tileData, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, E, R, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, version: APP_VERSION };
+    window.__W3D = { step, get car() { return car; }, FLEET, ped, rail, startRail, air, startAir, TS, streamTick, buildTile, tileData, disposeTile, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, E, R, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, version: APP_VERSION };
     window.dispatchEvent(new Event('w3d-ready'));
   } catch (e) {
     console.error(e);

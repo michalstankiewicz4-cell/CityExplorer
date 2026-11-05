@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.0 — 2026-11-05
+- **Jazda poza dokładną mapą** (krok 1 wspólnej mapy): samochody, czołg, autobus i pieszy nie zatrzymują się już na krawędzi — wjeżdżają na kafle wczytywane w locie. Teren od krawędzi dokładnej mapy schodzi łagodnie (300 m) do gruntu kafli, grunt kafli idzie za terenem; ściany budynków kafli są w siatce zderzeń (zwalniane razem z kaflem). Z centrum można dojechać do Okęcia (lotnisko w wersji uproszczonej — dokładne obszary we wspólnym świecie to krok 2).
+- Samolot nad kaflami używa tej samej wysokości terenu.
+- Minimapa pokazuje kafle wokół; duża mapa: przeniesienie kliknięciem także poza dokładną mapę.
+
 ## 0.9.1 — 2026-11-05
 - Duża mapa (M): przycisk **„Dopracowanie obszarów”** — zaznacza obszary dopracowane (centrum przy PKiN — najbardziej, lotnisko Chopina, centrum `?r=2000` — dokładna mapa, mniej sprawdzana) i przyciemnia kafle wygenerowane automatycznie; legenda z opisem, co jest w każdym.
 

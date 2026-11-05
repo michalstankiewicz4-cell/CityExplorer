@@ -322,7 +322,7 @@ async function checkTiles() {
     if (!Array.isArray(d.b) || !Array.isArray(d.l) || !Array.isArray(d.a)) { add('kafle', 'e', `Kafel ${k}: zły format`, '', null); continue; }
     if (!d.b.length && !d.l.length && !d.a.length) empty++;
     if (G.TS.loaded.has(k)) { ok++; bld += d.b.length; continue; }
-    try { const t = G.buildTile(d); G.scene.remove(t.grp); for (const r of t.res) r.dispose(); ok++; bld += d.b.length; }
+    try { const t = G.buildTile(d); G.disposeTile(t); ok++; bld += d.b.length; }
     catch (e) { add('kafle', 'e', `Kafel ${k}: błąd budowy`, e.message, null); }
   }
   add('kafle', 'i', `Sprawdzone kafle w promieniu 4 km: ${ok}/${near.length}`, `budynków: ${bld}, pustych kafli: ${empty} · w tej chwili wczytane: ${TS.loaded.size}, zbudowane: ${TS.stats.built}, zwolnione: ${TS.stats.freed}, z Overpass na żywo: ${TS.stats.live}`, null);
