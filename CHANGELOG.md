@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.0 — 2026-11-05
+- **Wspólna mapa dla wszystkich pojazdów** (krok 2): dokładne obszary (Śródmieście przy PKiN, lotnisko Chopina) leżą w jednym świecie z kaflami. Gra buduje dokładnie ten obszar, w który wjeżdżasz, wchodzisz lub wlatujesz (przy wejściu w inny — przebudowa w locie z kartą ładowania; poprzedni zostaje kaflami). Z Okęcia dolatujesz nad nasze centrum, z centrum dojeżdżasz samochodem na nasze lotnisko. Tryb Samolot z centrum przenosi na Okęcie bez przeładowania strony.
+- **Wysiadanie ze wszystkich pojazdów**: samolot — E po zatrzymaniu na ziemi (owiewka się otwiera, pieszy staje za skrzydłem); tramwaj i pociąg — E na postoju otwiera drzwi, drugie E — wysiadasz przy czole. E przy kabinie samolotu lub przy drzwiach składu — wsiadasz z powrotem (podpowiedź na ekranie).
+
 ## 0.10.0 — 2026-11-05
 - **Jazda poza dokładną mapą** (krok 1 wspólnej mapy): samochody, czołg, autobus i pieszy nie zatrzymują się już na krawędzi — wjeżdżają na kafle wczytywane w locie. Teren od krawędzi dokładnej mapy schodzi łagodnie (300 m) do gruntu kafli, grunt kafli idzie za terenem; ściany budynków kafli są w siatce zderzeń (zwalniane razem z kaflem). Z centrum można dojechać do Okęcia (lotnisko w wersji uproszczonej — dokładne obszary we wspólnym świecie to krok 2).
 - Samolot nad kaflami używa tej samej wysokości terenu.

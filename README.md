@@ -31,7 +31,7 @@ Na starcie wybiera się tryb: **pieszo i pojazdem** (czynny) — człowiek przy 
 | Shift / Ctrl | gaz więcej / mniej |
 | Spacja | hamulce kół |
 | G / B | podwozie / klapy |
-| E | owiewka kabiny |
+| E | wysiądź (na ziemi po zatrzymaniu; owiewka się otwiera) |
 | R | od nowa na progu drogi startowej |
 | Mysz | LPM + przeciągnij = rozglądanie dookoła i w górę/dół, kółko = zoom |
 
@@ -48,6 +48,9 @@ Kolejność ładowania:
 3. Overpass API, a gdy nie odpowiada – API OpenStreetMap (kafle).
 
 Wysokości terenu: **NMT GUGiK** (`teren-nmt.bin`, model gruntu bez budynków, oczko 5 m, pokrywa ok. 2 km od PKiN; źródło: Główny Urząd Geodezji i Kartografii). Poza nim kafle Terrarium (AWS Terrain Tiles) z wycinaniem „garbów” po budynkach.
+
+## Wspólna mapa
+Dokładne obszary (Śródmieście przy PKiN, lotnisko Chopina) i kafle tworzą jeden świat dla wszystkich pojazdów. Gra buduje dokładnie obszar, w którym jesteś; po wejściu w inny przebudowuje go w locie. Ze wszystkich pojazdów da się wysiąść (E; w tramwaju i pociągu pierwsze E otwiera drzwi).
 
 ## Mapa wczytywana w locie (kafle)
 Poza dokładną mapą świat dobudowuje się kaflami 1 × 1 km w zasięgu widoku, w stronę ruchu; dalekie kafle są zwalniane z pamięci. Kafle są uproszczone (płaski grunt z ulicami i obszarami, budynki z płaskimi dachami). Źródła: `tiles/<i>_<j>.json` dla całej Warszawy (generuje deploy: `tools/fetch-tiles.mjs`, w kilku przebiegach — najpierw trasa centrum — Okęcie; deploy po pushu dopisuje kafle przez 4 minuty, uruchomienie co 2 godziny — przez 40 minut; postęp trzyma cache GitHub Actions), pamięć przeglądarki, a poza Warszawą Overpass na żywo. Format i siatka: `js/tiles.mjs`. Duża mapa (M) przesuwa się przeciąganiem i oddala kółkiem; przycisk „Dopracowanie obszarów” pokazuje, które obszary są dopracowane (centrum, Okęcie), a które to automatyczne kafle.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.10.0</title>
+<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.11.0</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Warszawa 3D, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.10.0"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.11.0"}
 </script>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#0d1014;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#e8e6e1}
@@ -198,22 +198,32 @@ import * as THREE from 'three';
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
-const APP_VERSION = '0.10.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+const APP_VERSION = '0.11.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
 document.getElementById('ver').textContent = 'v' + APP_VERSION; document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
-// gotowe mapy (?map=…): okecie — lotnisko Chopina (tryb Samolot); bez parametru — Śródmieście
-const MAPS = { okecie: { lat: 52.1657, lon: 20.9671, r: 2000, file: 'okecie.json', name: 'Lotnisko Chopina (Okęcie)' } };
-const MAP = MAPS[QS.get('map')] || null;
-const CENTER = { lat: +(QS.get('lat') || (MAP && MAP.lat) || 52.23175), lon: +(QS.get('lon') || (MAP && MAP.lon) || 21.00586) };
-const R = Math.min(2500, Math.max(300, +(QS.get('r') || (MAP && MAP.r) || 1000)));
-const E = R + 150;                       // połowa boku świata (m)
-let SEG = Math.min(400, Math.round(2 * E / 8));   // siatka terenu ~8 m (z NMT: ~4 m)
-const KX = 111320 * Math.cos(CENTER.lat * Math.PI / 180), KY = 110574;
+// dokładne obszary wspólnego świata: gra buduje dokładnie ten, w którym jesteś (przy wejściu w inny — przebudowa w locie);
+// poza nimi kafle. ?map=okecie — start na Okęciu; ?lat&lon&r — własny obszar startowy
+const AREAS = {
+  centrum: { id: 'centrum', lat: 52.23175, lon: 21.00586, r: 1000, file: 'warszawa-centrum.json', name: 'Śródmieście (PKiN)' },
+  okecie: { id: 'okecie', lat: 52.1657, lon: 20.9671, r: 2000, file: 'okecie.json', name: 'Lotnisko Chopina (Okęcie)' },
+};
+let AREA = AREAS[QS.get('map')] || (QS.get('lat') || QS.get('lon') || QS.get('r') ? { id: 'custom', lat: +(QS.get('lat') || 52.23175), lon: +(QS.get('lon') || 21.00586), r: Math.min(2500, Math.max(300, +(QS.get('r') || 1000))), name: 'Własny obszar' } : AREAS.centrum);
+if (AREA.id === 'custom' && AREA.r === 1000 && AREA.lat === 52.23175 && AREA.lon === 21.00586) AREA = AREAS.centrum;
+if (AREA.id === 'custom') AREA.file = AREA.lat === 52.23175 && AREA.lon === 21.00586 ? `warszawa-r${AREA.r}.json` : null;
+let MAP = AREA.id === 'centrum' ? null : AREA;   // inna mapa niż centrum (napisy na ekranie startowym)
+let CENTER, R, E, SEG, KX, BBOX, CACHE_KEY, TERR_KEY; const KY = 110574;
+function setArea(a) {
+  AREA = a; MAP = a.id === 'centrum' ? null : a;
+  CENTER = { lat: a.lat, lon: a.lon }; R = a.r; E = R + 150;   // E — połowa boku dokładnej mapy (m)
+  SEG = Math.min(400, Math.round(2 * E / 8));                    // siatka terenu ~8 m (z NMT: ~4 m)
+  KX = 111320 * Math.cos(CENTER.lat * Math.PI / 180);
+  BBOX = (() => { const [s, w] = toLL(-E, E), [n, e] = toLL(E, -E); return { s, w, n, e }; })();
+  CACHE_KEY = `osm-v2-${CENTER.lat.toFixed(5)}-${CENTER.lon.toFixed(5)}-${R}`;
+  TERR_KEY = `terr-v2-${CENTER.lat.toFixed(5)}-${CENTER.lon.toFixed(5)}-${R}-${Math.min(400, Math.round(2 * E / 8))}`;
+}
 const toXZ = (lat, lon) => [(lon - CENTER.lon) * KX, -(lat - CENTER.lat) * KY];
 const toLL = (x, z) => [CENTER.lat - z / KY, CENTER.lon + x / KX];
-const BBOX = (() => { const [s, w] = toLL(-E, E), [n, e] = toLL(E, -E); return { s, w, n, e }; })();
-const CACHE_KEY = `osm-v2-${CENTER.lat.toFixed(5)}-${CENTER.lon.toFixed(5)}-${R}`;
-const TERR_KEY = `terr-v2-${CENTER.lat.toFixed(5)}-${CENTER.lon.toFixed(5)}-${R}-${Math.min(400, Math.round(2 * E / 8))}`;
+setArea(AREA);
 const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
 
 /* ---------- UI ładowania ---------- */
@@ -328,7 +338,7 @@ async function fetchOsmApi() {
 async function loadLocalFile() {
   if (location.protocol === 'file:') return null;
   try {
-    const r = await fetchT(MAP ? MAP.file : R === 1000 ? 'warszawa-centrum.json' : `warszawa-r${R}.json`, {}, 40000); if (!r.ok) return null;
+    if (!AREA.file) return null; const r = await fetchT(AREA.file, {}, 40000); if (!r.ok) return null;
     const j = await r.json();
     if (!j.meta || Math.abs(j.meta.lat - CENTER.lat) > 1e-4 || Math.abs(j.meta.lon - CENTER.lon) > 1e-4 || j.meta.R !== R) return null;
     return j;
@@ -1584,8 +1594,19 @@ function nearVehicle() {
   return best;
 }
 const outward = (V) => Math.sign(V.def.doorAt.x) * Math.PI / 2;   // kierunek od pojazdu przy drzwiach (lewa: +, prawa: −)
+// inne pojazdy przy pieszym: zaparkowany samolot, skład (drzwi przy czole)
+function nearOther() {
+  if (air.V && mode === 'foot') { const [x, z] = airDoorAt(); if (Math.hypot(ped.x - x, ped.z - z) < 3) return { kind: 'air', name: air.V.def.name }; }
+  if (rail.V && mode === 'foot') { const [x, z] = railDoorAt(); if (Math.hypot(ped.x - x, ped.z - z) < 3.5) return { kind: 'rail', name: rail.kind === 'tram' ? 'tramwaj' : 'pociąg' }; }
+  return null;
+}
 function useCar() {
-  if (mode === 'foot') { const V = nearVehicle(); if (V) { SEQV = V; mode = 'enter'; seq = 0; } }
+  if (mode === 'foot') {
+    const o = nearOther();
+    if (o && o.kind === 'air') { mode = 'air'; ego = air.ego; air.work = 0; if (PED) PED.g.visible = false; air.off = null; return; }
+    if (o && o.kind === 'rail') { mode = 'rail'; ego = rail; if (PED) PED.g.visible = false; return; }
+    const V = nearVehicle(); if (V) { SEQV = V; mode = 'enter'; seq = 0; }
+  }
   else if (mode === 'car') {
     if (Math.abs(car.vf) > 1.5) { flash('Zatrzymaj pojazd, żeby wysiąść'); return; }
     const [dx, dz] = doorOf(ACT);
@@ -1635,7 +1656,7 @@ addEventListener('keydown', e => {
   if (e.code === 'Escape') { if (bigOpen) toggleBigMap(); else toggleOptions(); return; }
   if (optOpen) return;
   const a = actionOf(e.code);
-  if (a === 'use' && !e.repeat) { if (mode === 'rail') railDoors(); else if (mode === 'air') air.work = 1 - air.work; else useCar(); }
+  if (a === 'use' && !e.repeat) { if (mode === 'rail') railUse(); else if (mode === 'air') airExit(); else useCar(); }
   if (a === 'reset') { if (mode === 'rail') railReset(); else if (mode === 'air') airReset(); else resetCar(); }
   if (mode === 'air' && !e.repeat && a === 'gear') { air.c.gear = 1 - air.c.gear; flash('Podwozie: ' + (air.c.gear ? 'wypuszczanie' : 'chowanie')); }
   if (mode === 'air' && !e.repeat && a === 'flaps') { air.c.flaps = 1 - air.c.flaps; flash('Klapy: ' + (air.c.flaps ? 'wypuszczone' : 'schowane')); }
@@ -1805,8 +1826,18 @@ function airStep(dt) {
 function airPlace(dt) {
   const s = air.sim.state, g = air.V.group, c = air.c;
   g.position.set(s.p[0], s.p[1], s.p[2]); g.quaternion.set(s.q[1], s.q[2], s.q[3], s.q[0]);
-  air.V.update(carT, dt, { throttle: s.crashed ? 0 : c.throttle, engine: !s.crashed, aileron: c.aileron, elevator: c.elevator, rudder: c.rudder, flaps: c.flaps, gear: c.gear > 0.5, work: air.work, lights: night, speed: s.onGround ? Math.hypot(s.v[0], s.v[2]) : 0 });
+  const on_ = mode === 'air';
+  air.V.update(carT, dt, { throttle: s.crashed || !on_ ? 0 : c.throttle, engine: !s.crashed && on_, aileron: c.aileron, elevator: c.elevator, rudder: c.rudder, flaps: c.flaps, gear: c.gear > 0.5, work: on_ ? 0 : air.work, lights: night, speed: s.onGround && on_ ? Math.hypot(s.v[0], s.v[2]) : 0 });
 }
+// E w samolocie: na ziemi po zatrzymaniu wysiadasz (owiewka się otwiera); E przy kabinie — wsiadasz
+function airExit() {
+  const s = air.sim.state;
+  if (!s.onGround || Math.hypot(s.v[0], s.v[2]) > 1) { flash(s.onGround ? 'Zatrzymaj samolot, żeby wysiąść' : 'Najpierw wyląduj'); return; }
+  const [x, z] = airDoorAt();
+  Object.assign(ped, { x, z, th: air.ego.th + Math.PI, vf: 0, vy: 0 }); ped.y = surfaceAt(x, z, H(x, z) + 0.5);
+  air.c.throttle = 0; air.work = 1; mode = 'foot'; ego = ped; camYaw = air.ego.th + Math.PI; orbit = 0; camera.up.set(0, 1, 0); if (PED) PED.g.visible = true;
+}
+function airDoorAt() { const d = air.V.def.doorAt, g = air.V.group; g.updateMatrixWorld(true); const p = g.localToWorld(new THREE.Vector3(d.x, 0, d.z - 1.6)); return [p.x, p.z]; }   // za krawędzią spływu skrzydła
 function airHud() {
   const s = air.sim.state, c = air.c;
   return `Wys. ${Math.round(s.p[1] - H(s.p[0], s.p[2]))} m · gaz ${Math.round(c.throttle * 100)}% · klapy ${c.flaps ? 'wypuszczone' : 'schowane'} · podwozie ${c.gear ? 'wypuszczone' : 'schowane'}` +
@@ -2108,6 +2139,15 @@ function railPlace(dt) {
   });
 }
 function railDoors() { if (Math.abs(rail.v) > 0.2) { flash('Zatrzymaj się, żeby otworzyć drzwi'); return; } rail.doors = rail.doors > 0.5 ? 0 : 1; }
+// E w składzie: na postoju otwiera drzwi, przy otwartych — wysiadasz (prawa strona czoła); E przy drzwiach — wsiadasz z powrotem
+const railDoorAt = () => toWorld({ x: rail.x, z: rail.z, th: rail.th }, -2.6, rail.kind === 'tram' ? 2.5 : -3);
+function railUse() {
+  if (Math.abs(rail.v) > 0.2) { flash('Zatrzymaj się, żeby otworzyć drzwi'); return; }
+  if (rail.doors < 0.5) { rail.doors = 1; flash('Drzwi otwarte — E: wysiądź'); return; }
+  const [x, z] = railDoorAt();
+  Object.assign(ped, { x, z, th: rail.th, vf: 0, vy: 0 }); ped.y = surfaceAt(x, z, rail.y + 1);
+  mode = 'foot'; ego = ped; camYaw = rail.th; orbit = 0; if (PED) PED.g.visible = true;
+}
 
 /* ---------- kamera ---------- */
 let started = null, camYaw = 0, camMode = 0, orbit = 0, tilt = 0, camDist = 1, dragging = false, lastX = 0, lastY = 0;
@@ -2203,7 +2243,7 @@ const mm = $('minimap'), mmg = mm.getContext('2d');
 let streetT = 0;
 function hud(dt, fps) {
   $('speed').firstChild.nodeValue = Math.round(Math.abs(ego.vf || 0) * 3.6);
-  const nv = mode === 'foot' && FLEET.length ? nearVehicle() : null;
+  const nv = mode === 'foot' && FLEET.length ? (nearVehicle() || (nearOther() && { def: { name: nearOther().name } })) : null;
   if (flashT > 0) flashT -= dt;
   else { const pr = $('prompt'), txt = nv ? '<b>E</b> — wsiądź: ' + nv.def.name : ''; if (pr.innerHTML !== txt) pr.innerHTML = txt; pr.style.display = txt ? 'block' : 'none'; }
   streetT -= dt;
@@ -2476,6 +2516,7 @@ function step(dt, draw) {
   fpsN++; fpsT += dt; if (fpsT > 1) { fps = Math.round(fpsN / fpsT); fpsN = 0; fpsT = 0; }
   if (!started) { updateTrains(dt); carT += dt; flyover(dt); if (draw) renderer.render(scene, camera); return; }
   if (optOpen) { if (draw) renderer.render(scene, camera); return; }   // pauza w opcjach
+  if (switching) return;   // przebudowa dokładnej mapy — gra stoi
   acc += dt; const STEP = 1 / 120; let n = 0;
   while (acc >= STEP && n++ < 20) { physics(STEP); acc -= STEP; }
   sequence(dt);
@@ -2494,7 +2535,7 @@ function step(dt, draw) {
     V.v.update(carT, dt, o);
   }
   if (mode === 'rail') railPlace(dt);
-  if (mode === 'air') airPlace(dt);
+  if (air.V) airPlace(dt);   // także zaparkowany (pieszy obok)
   // pieszy
   if (PED) {
     PED.g.position.set(ped.x, ped.y, ped.z); PED.g.rotation.set(0, ped.th, 0);
@@ -2503,6 +2544,7 @@ function step(dt, draw) {
   }
   updateCamera(dt); sketchFrame();
   if ((TS.t += dt) > 0.4) { TS.t = 0; streamTick(); ovTick(); }
+  areaCheck(dt);
   sun.position.set(ego.x + SUN_DIR.x * 400, ego.y + SUN_DIR.y * 400, ego.z + SUN_DIR.z * 400); sun.target.position.set(ego.x, ego.y, ego.z);
   hud(dt, fps);
   if (bigOpen && (bmT = (bmT || 0) + dt) > 0.1) { bmT = 0; drawBigMap(); }
@@ -2674,32 +2716,84 @@ $('bExport').onclick = () => {
 $('bRefresh').onclick = async () => { await idb.del(CACHE_KEY); await idb.del(TERR_KEY); location.reload(); };
 $('bHide').onclick = () => { $('help').style.display = 'none'; };
 
+
+// zwolnienie dokładnej mapy (obiekty sceny, siatki zderzeń, dróg, nawierzchni, składy AI); kafle też — wczytają się na nowo
+function unloadWorld() {
+  for (const k of [...TS.loaded.keys()]) freeTile(k);
+  for (const o of W.objs || []) {
+    scene.remove(o);
+    o.traverse(m => { if (m.geometry) m.geometry.dispose(); const ms = Array.isArray(m.material) ? m.material : m.material ? [m.material] : []; for (const mt of ms) if (mt.map && mt.map.isCanvasTexture && mt.map.image && mt.map.image.width >= 2048) mt.map.dispose(); });
+  }
+  collGrid.clear(); roadGrid.clear(); surfGrid.clear(); passGrid.clear(); trains.length = 0; trackCache.clear();
+  for (const k of Object.keys(W)) delete W[k];
+}
+// wejście w inny dokładny obszar: przebudowa świata wokół niego, gracz i pojazdy przesunięci do nowego układu
+let switching = false;
+async function switchArea(a) {
+  if (switching || a === AREA) return;
+  switching = true;
+  const [dx, dz] = toXZ(a.lat, a.lon), sk = !!SK.on;
+  try {
+    $('loader').style.display = 'flex'; status('Wczytuję dokładną mapę: ' + a.name + '…', 0.02);
+    if (sk) setSketch(false);
+    unloadWorld(); setArea(a);
+    await loadArea();
+    const g = toXZ(TS.TL ? TS.TL.G0.lat : 52.23175, TS.TL ? TS.TL.G0.lon : 21.00586); TS.OFF = [g[0], g[1]]; TS.fail.clear();
+    const mv = (o) => { if (o) { o.x -= dx; o.z -= dz; } };
+    mv(ped); for (const V of FLEET) { mv(V.s); mv(V.s.spawn); V.s.rest = false; } if (SPAWN) mv(SPAWN);
+    if (air.sim) { const p = air.sim.state.p; p[0] -= dx; p[2] -= dz; mv(air.spawn); airSync(); }
+    if (mode !== 'air') { for (const V of FLEET) V.s.y = surfaceAt(V.s.x, V.s.z, V.s.y + 2); ped.y = surfaceAt(ped.x, ped.z, ped.y + 2); }
+    camPos.x -= dx; camPos.z -= dz; if (air.off == null) {}
+    if (sk) setSketch(true); if (xray) setXray(true); setNight(night);
+    if (bigOpen) { bmPan = null; drawBigMap(); }
+  } catch (e) { console.error('[W3D] zmiana obszaru', e); flash('Nie udało się wczytać: ' + a.name); }
+  finally { $('loader').style.display = 'none'; switching = false; }
+}
+// co sekundę: gracz w innym dokładnym obszarze (w 3/4 jego boku) — przebudowa
+let areaT = 0;
+function areaCheck(dt) {
+  if ((areaT += dt) < 1 || switching || mode === 'rail' || mode === 'enter' || mode === 'exit') return; areaT = 0;
+  for (const a of Object.values(AREAS)) {
+    if (a === AREA) continue;
+    const [x, z] = toXZ(a.lat, a.lon), h = (a.r + 150) * 0.75;
+    if (Math.abs(ego.x - x) < h && Math.abs(ego.z - z) < h) { switchArea(a); return; }
+  }
+}
+/* ---------- dokładny obszar: dane, teren, budowa świata ---------- */
+async function loadArea() {
+  DATA = null; TERR_RAW = null; HF = null;
+  status('Szukam danych…', 0.02);
+  const local = await loadLocalFile();
+  if (local) { DATA = local.osm; if (local.terrain && local.meta.SEG === SEG) TERR_RAW = Float32Array.from(local.terrain); status('Wczytano dane OSM z pliku', 0.5); }
+  if (!DATA) { DATA = await idb.get(CACHE_KEY); if (DATA) status('Dane OSM z pamięci przeglądarki', 0.5); }
+  if (!DATA) {
+    DATA = await fetchOverpass();
+    if (!DATA) DATA = await fetchOsmApi();
+    if (!DATA) throw new Error('Nie udało się pobrać danych OpenStreetMap');
+    await idb.set(CACHE_KEY, DATA);
+  }
+  let dtm = false;
+  status('Wczytuję model terenu NMT (GUGiK)…', 0.5);
+  const nmt = await loadNMT();
+  if (nmt) { TERR_RAW = nmt; dtm = true; W.terrSrc = 'NMT GUGiK'; }
+  else { SEG = Math.min(400, Math.round(2 * E / 8)); if (TERR_RAW && TERR_RAW.length !== (SEG + 1) ** 2) TERR_RAW = null; W.terrSrc = 'Terrarium'; }
+  if (!TERR_RAW) TERR_RAW = await idb.get(TERR_KEY);
+  if (!TERR_RAW) {
+    try { status('Pobieram wysokości terenu…', 0.5); TERR_RAW = await loadTerrain(); await idb.set(TERR_KEY, TERR_RAW); }
+    catch (e) { console.warn('teren', e); status('Brak danych wysokości — teren płaski', 0.6); TERR_RAW = null; }
+  }
+  if (TERR_RAW) { const t = processTerrain(TERR_RAW, dtm ? null : buildingMask(DATA), dtm); HF = t.h; W.terrBase = t.base; }
+  await frame();
+  seed = 12345;
+  const before = new Set(scene.children);
+  const st = buildWorld(DATA);
+  W.objs = scene.children.filter(o => !before.has(o));   // obiekty dokładnej mapy (do zwolnienia przy zmianie obszaru)
+  return st;
+}
 /* ---------- start ---------- */
 async function main() {
   try {
-    status('Szukam danych…', 0.02);
-    const local = await loadLocalFile();
-    if (local) { DATA = local.osm; if (local.terrain && local.meta.SEG === SEG) TERR_RAW = Float32Array.from(local.terrain); status('Wczytano dane OSM z pliku', 0.5); }
-    if (!DATA) { DATA = await idb.get(CACHE_KEY); if (DATA) status('Dane OSM z pamięci przeglądarki', 0.5); }
-    if (!DATA) {
-      DATA = await fetchOverpass();
-      if (!DATA) DATA = await fetchOsmApi();
-      if (!DATA) throw new Error('Nie udało się pobrać danych OpenStreetMap');
-      await idb.set(CACHE_KEY, DATA);
-    }
-    let dtm = false;
-    status('Wczytuję model terenu NMT (GUGiK)…', 0.5);
-    const nmt = await loadNMT();
-    if (nmt) { TERR_RAW = nmt; dtm = true; W.terrSrc = 'NMT GUGiK'; }
-    else { SEG = Math.min(400, Math.round(2 * E / 8)); if (TERR_RAW && TERR_RAW.length !== (SEG + 1) ** 2) TERR_RAW = null; W.terrSrc = 'Terrarium'; }
-    if (!TERR_RAW) TERR_RAW = await idb.get(TERR_KEY);
-    if (!TERR_RAW) {
-      try { status('Pobieram wysokości terenu…', 0.5); TERR_RAW = await loadTerrain(); await idb.set(TERR_KEY, TERR_RAW); }
-      catch (e) { console.warn('teren', e); status('Brak danych wysokości — teren płaski', 0.6); TERR_RAW = null; }
-    }
-    if (TERR_RAW) { const t = processTerrain(TERR_RAW, dtm ? null : buildingMask(DATA), dtm); HF = t.h; W.terrBase = t.base; }
-    await frame();
-    const st = buildWorld(DATA);
+    const st = await loadArea();
     await tilesInit();
     if (MAP) { document.querySelector('#start .sub').textContent = MAP.name + ' · wybierz, czym ruszasz'; }
     console.log('[W3D] stats', JSON.stringify(st));
@@ -2718,13 +2812,12 @@ async function main() {
     const chosen = QS.get('mode') || await new Promise(res => { for (const b of $('modes').querySelectorAll('button:not(:disabled)')) b.onclick = (e) => res(b.dataset.mode === 'rail' ? 'rail:' + ((e.target.dataset && e.target.dataset.veh) || 'tram') : b.dataset.mode); });
     started = chosen;
     if (chosen === 'drive') { mode = 'car'; ego = car; if (PED) PED.g.visible = false; }   // od razu za kierownicą (doktor mapy)
-    if (chosen === 'air' && !MAP) { location.href = '?map=okecie&mode=air'; return; }   // samolot startuje z Okęcia (osobna mapa)
-    if (chosen === 'air') { $('mload3').style.display = 'flex'; await startAir(); }
+    if (chosen === 'air') { $('mload3').style.display = 'flex'; if (AREA !== AREAS.okecie) await switchArea(AREAS.okecie); await startAir(); }   // samolot startuje z Okęcia
     if (chosen.startsWith('rail')) { $('mload2').style.display = 'flex'; await startRail(chosen.split(':')[1] || 'tram'); }
     $('start').classList.add('out'); setTimeout(() => { $('start').style.display = 'none'; }, 650);
     $('hud').style.display = ''; $('minimap').style.display = ''; $('help').style.display = '';
     updateCamera(0, true);
-    window.__W3D = { step, get car() { return car; }, FLEET, ped, rail, startRail, air, startAir, TS, streamTick, buildTile, tileData, disposeTile, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, E, R, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, version: APP_VERSION };
+    window.__W3D = { step, get car() { return car; }, FLEET, ped, rail, startRail, air, startAir, TS, streamTick, buildTile, tileData, disposeTile, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, get E() { return E; }, get R() { return R; }, get AREA() { return AREA; }, switchArea, AREAS, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, version: APP_VERSION };
     window.dispatchEvent(new Event('w3d-ready'));
   } catch (e) {
     console.error(e);
