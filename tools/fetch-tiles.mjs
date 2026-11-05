@@ -30,24 +30,30 @@ if (process.argv[2] === '--from') {   // tryb testowy: kafle z pliku danych gry
   blocks.sort((a, b) => a[2] - b[2]);
   const EP = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
   let done = 0, skip = 0, fail = 0;
-  for (const [i, j] of blocks) {
-    if (Date.now() > END) { console.log('Limit czasu — reszta przy następnym deployu'); break; }
-    const keys = new Set([key(i, j), key(i + 1, j), key(i, j + 1), key(i + 1, j + 1)]);
-    if ([...keys].every(k => existsSync(`${DIR}/${k}.json`))) { skip++; continue; }
-    let ok = false;
-    for (let a = 0; a < EP.length * 2 && !ok; a++) {
-      const url = EP[a % EP.length];
-      try {
-        const r = await fetch(url, { method: 'POST', body: 'data=' + encodeURIComponent(overpassQuery(tileBBox(i, j, 2))), headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': UA }, signal: AbortSignal.timeout(150000) });
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        const js = await r.json(); if (js.remark && /runtime error|timed out/i.test(js.remark)) throw new Error(js.remark);
-        save(tilesFromElements(js.elements || [], keys)); ok = true; done++;
-        console.log(`blok ${i},${j}: ${(js.elements || []).length} elementów (${url.split('/')[2]})`);
-      } catch (e) { console.warn(`blok ${i},${j}`, url.split('/')[2], e.message); await sleep(4000 * (a + 1)); }
+  const queue = blocks.slice();
+  // dwa zapytania naraz (Overpass pozwala na 2 równoległe z jednego adresu); główny serwer najpierw, zapasowe potem
+  async function worker() {
+    while (queue.length) {
+      if (Date.now() > END) { queue.length = 0; console.log('Limit czasu — reszta przy następnym deployu'); break; }
+      const [i, j] = queue.shift();
+      const keys = new Set([key(i, j), key(i + 1, j), key(i, j + 1), key(i + 1, j + 1)]);
+      if ([...keys].every(k => existsSync(`${DIR}/${k}.json`))) { skip++; continue; }
+      let ok = false;
+      for (let a = 0; a < 4 && !ok; a++) {
+        const url = EP[a < 2 ? 0 : a - 1];
+        try {
+          const r = await fetch(url, { method: 'POST', body: 'data=' + encodeURIComponent(overpassQuery(tileBBox(i, j, 2))), headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': UA }, signal: AbortSignal.timeout(100000) });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const js = await r.json(); if (js.remark && /runtime error|timed out/i.test(js.remark)) throw new Error(js.remark);
+          save(tilesFromElements(js.elements || [], keys)); ok = true; done++;
+          console.log(`blok ${i},${j}: ${(js.elements || []).length} elementów (${url.split('/')[2]})`);
+        } catch (e) { console.warn(`blok ${i},${j}`, url.split('/')[2], e.message); await sleep(3000 * (a + 1)); }
+      }
+      if (!ok) fail++;
+      await sleep(500);
     }
-    if (!ok) fail++;
-    await sleep(1200);
   }
+  await Promise.all([worker(), worker()]);
   console.log(`bloki: pobrane ${done}, gotowe wcześniej ${skip}, nieudane ${fail}, wszystkich ${blocks.length}`);
 }
 const have = readdirSync(DIR).filter(f => /^-?\d+_-?\d+\.json$/.test(f)).map(f => f.slice(0, -5));
