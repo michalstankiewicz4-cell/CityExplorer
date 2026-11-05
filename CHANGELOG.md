@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.11.1 — 2026-11-05
+- Zaparkowany tramwaj lub pociąg (po wysiadce) i jego tor zostają w swoim obszarze: po przejściu do innego obszaru są ukryte (wcześniej zostawały w złym miejscu), po powrocie do centrum stoją tam, gdzie je zostawiłeś.
+
 ## 0.11.0 — 2026-11-05
 - **Wspólna mapa dla wszystkich pojazdów** (krok 2): dokładne obszary (Śródmieście przy PKiN, lotnisko Chopina) leżą w jednym świecie z kaflami. Gra buduje dokładnie ten obszar, w który wjeżdżasz, wchodzisz lub wlatujesz (przy wejściu w inny — przebudowa w locie z kartą ładowania; poprzedni zostaje kaflami). Z Okęcia dolatujesz nad nasze centrum, z centrum dojeżdżasz samochodem na nasze lotnisko. Tryb Samolot z centrum przenosi na Okęcie bez przeładowania strony.
 - **Wysiadanie ze wszystkich pojazdów**: samolot — E po zatrzymaniu na ziemi (owiewka się otwiera, pieszy staje za skrzydłem); tramwaj i pociąg — E na postoju otwiera drzwi, drugie E — wysiadasz przy czole. E przy kabinie samolotu lub przy drzwiach składu — wsiadasz z powrotem (podpowiedź na ekranie).

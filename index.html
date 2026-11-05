@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.11.0</title>
+<title>Warszawa 3D — jazda autem po centrum Warszawy (PKiN) · v0.11.1</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Warszawa 3D, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.11.0"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Warszawa 3D","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.11.1"}
 </script>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#0d1014;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#e8e6e1}
@@ -198,7 +198,7 @@ import * as THREE from 'three';
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
-const APP_VERSION = '0.11.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+const APP_VERSION = '0.11.1';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
 document.getElementById('ver').textContent = 'v' + APP_VERSION; document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
 // dokładne obszary wspólnego świata: gra buduje dokładnie ten, w którym jesteś (przy wejściu w inny — przebudowa w locie);
@@ -1597,7 +1597,7 @@ const outward = (V) => Math.sign(V.def.doorAt.x) * Math.PI / 2;   // kierunek od
 // inne pojazdy przy pieszym: zaparkowany samolot, skład (drzwi przy czole)
 function nearOther() {
   if (air.V && mode === 'foot') { const [x, z] = airDoorAt(); if (Math.hypot(ped.x - x, ped.z - z) < 3) return { kind: 'air', name: air.V.def.name }; }
-  if (rail.V && mode === 'foot') { const [x, z] = railDoorAt(); if (Math.hypot(ped.x - x, ped.z - z) < 3.5) return { kind: 'rail', name: rail.kind === 'tram' ? 'tramwaj' : 'pociąg' }; }
+  if (rail.V && rail.area === AREA && mode === 'foot') { const [x, z] = railDoorAt(); if (Math.hypot(ped.x - x, ped.z - z) < 3.5) return { kind: 'rail', name: rail.kind === 'tram' ? 'tramwaj' : 'pociąg' }; }
   return null;
 }
 function useCar() {
@@ -1999,19 +1999,21 @@ function railTrack(ch, westward) {   // opis toru (łuki, wysokości) dla ciągu
 async function buildRails(T, net) {
   PTRACK = PTRACK || await import(GL + 'js/models/structures/railway/path-track.js');
   if (!T || T.L < 20) return;
-  scene.add(PTRACK.buildPathTrack(T, { lift: RAIL_LIFT[net], sleepers: net === 'rail', ballast: net === 'rail', step: 1.5 }));
+  const tm = PTRACK.buildPathTrack(T, { lift: RAIL_LIFT[net], sleepers: net === 'rail', ballast: net === 'rail', step: 1.5 }); scene.add(tm); railObjs.push(tm);
 }
+// skład gracza i jego tor należą do obszaru, w którym ruszył (centrum): w innym obszarze są ukryte, po powrocie — na swoim miejscu
+const railObjs = [];
 async function loadRail(kind) {
   if (kind === 'tram') {
     TK = TK || await import(GL + 'js/models/train/trams/tramkit.js');
     TRAMPHYS = TRAMPHYS || await import(GL + 'js/behaviors/rail/tram.js');
-    const v = TK.buildTram('swing', {}); prepModel(v.group); scene.add(v.group);
+    const v = TK.buildTram('swing', {}); prepModel(v.group); scene.add(v.group); railObjs.push(v.group);
     return { kind, v, units: v.sections.map((s) => ({ L: s.L })), gap: v.def.gap };
   }
   await import(GL + 'js/core/three-global.js');
   TRAINKIT = TRAINKIT || await import(GL + 'js/models/train/trainkit.js');
   const g = TRAINKIT.buildTrain(TRAINKIT.DEFAULT_TRAIN); prepModel(g);
-  const cars = g.userData.vehicles; for (const c of cars) { g.remove(c); scene.add(c); }
+  const cars = g.userData.vehicles; for (const c of cars) { g.remove(c); scene.add(c); railObjs.push(c); }
   return { kind, g, cars, units: cars.map((c) => ({ L: c.userData.halfLength * 2 - 0.02 })), gap: 0.02 };
 }
 async function startRail(kind) {
@@ -2039,7 +2041,7 @@ async function startRail(kind) {
   if (!at) { flash('Brak toru na mapie'); return; }
   const s0 = at.s;
   await buildRails(at.T, net);
-  Object.assign(rail, { V: R, kind, ch: at.ch, T: at.T, s: s0, v: 0, total, lift: RAIL_LIFT[net], target: 0, derailed: false, sim: null });
+  Object.assign(rail, { area: AREA, V: R, kind, ch: at.ch, T: at.T, s: s0, v: 0, total, lift: RAIL_LIFT[net], target: 0, derailed: false, sim: null });
   if (kind === 'tram') {
     rail.sim = TRAMPHYS.createTramSim(at.T, R.v.def, s0);
     rail.sim.onStep = railForces;
@@ -2744,6 +2746,7 @@ async function switchArea(a) {
     if (air.sim) { const p = air.sim.state.p; p[0] -= dx; p[2] -= dz; mv(air.spawn); airSync(); }
     if (mode !== 'air') { for (const V of FLEET) V.s.y = surfaceAt(V.s.x, V.s.z, V.s.y + 2); ped.y = surfaceAt(ped.x, ped.z, ped.y + 2); }
     camPos.x -= dx; camPos.z -= dz; if (air.off == null) {}
+    for (const o of railObjs) o.visible = rail.area === AREA;
     if (sk) setSketch(true); if (xray) setXray(true); setNight(night);
     if (bigOpen) { bmPan = null; drawBigMap(); }
   } catch (e) { console.error('[W3D] zmiana obszaru', e); flash('Nie udało się wczytać: ' + a.name); }
