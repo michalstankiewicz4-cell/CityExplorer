@@ -9,12 +9,14 @@
 - Boeing (samolot pasażerski).
 - F-15 (odrzutowy).
 - Kafle mapy: tunele, wiadukty, przejścia i tory na kaflach; teren z wysokościami.
+- Dokładna mapa ładowana w locie, po kawałku (kwadraty budowane w tle wokół gracza, zwalniane za nim) zamiast trzech obszarów z ekranem ładowania — **po dokończeniu mapy** (tory, przejścia, trasy), żeby podział nie przesunął obiektów.
+- Publikacja po pushu bez pobierania danych (tylko z cache, ok. 1 min); pobieranie OSM i kafli tylko w przebiegu planowym — **po grze z innymi** (0.19.0).
 
 ## Propozycje (czekają na decyzję)
 - Schody / rampy przy wejściach do podziemi, które doktor mapy zgłasza jako niepodłączone.
 - Tekstura gruntu 8192 px na dużych obszarach (Okęcie, Wisła, `?r=2000`) — na słabszym sprzęcie może być czarna; mniejsza tekstura albo podział na kawałki.
 - Zderzenia okrętu z mostami (maszt przechodzi przez pomost).
-- Przebudowa dokładnego obszaru bez kilkusekundowej przerwy (budowa w tle).
+- Przebudowa dokładnego obszaru bez kilkusekundowej przerwy: ostatni opuszczony obszar trzymany zbudowany (ukryty) — natychmiastowy powrót, ok. 2× pamięci.
 - Woda: mokry pas na kadłubie, piana z pamięcią (kilwater zostający za okrętem), odbicia brzegów — z laboratorium wody.
 - GameLaboratory: ruch okrętu w laboratorium wody, lot samolotu w laboratorium pojazdów (zachowanie testowane w laboratorium swojego środowiska).
 - Skrypty gry jako moduły ES (z jawnym wspólnym stanem zamiast zakresu globalnego).

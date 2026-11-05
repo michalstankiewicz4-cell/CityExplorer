@@ -392,9 +392,10 @@ function buildWorld(D) {
   // tło poza mapą: ramka wokół kwadratu terenu (nie przykrywa niższych miejsc w środku)
   const fr = new THREE.Shape([new THREE.Vector2(-20000, -20000), new THREE.Vector2(20000, -20000), new THREE.Vector2(20000, 20000), new THREE.Vector2(-20000, 20000)]);
   fr.holes.push(new THREE.Path([new THREE.Vector2(-E + 1, -E + 1), new THREE.Vector2(-E + 1, E - 1), new THREE.Vector2(E - 1, E - 1), new THREE.Vector2(E - 1, -E + 1)]));
-  const skirt = new THREE.Mesh(new THREE.ShapeGeometry(fr).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#7f8274', roughness: 1, side: THREE.DoubleSide }));
+  const skirt = new THREE.Mesh(new THREE.ShapeGeometry(fr).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#7f8274', roughness: 1, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: 4, polygonOffsetUnits: 4 }));
   W.xrayMats = [terrain.material, skirt.material]; W.crowns = [trunkM, crownM, crownM2];
-  skirt.position.y = (W.terrBase || 0) - 0.4; skirt.receiveShadow = true; scene.add(skirt);
+  // kilka metrów pod gruntem kafli (ten jest ok. 0,3 m pod terenem): przy 8 cm różnicy z daleka (samolot) grunt kafli i tło migały na zmianę
+  skirt.position.y = (W.terrBase || 0) - 4; skirt.receiveShadow = true; scene.add(skirt);
 
   /* ---------------- drogi do nawigacji / nazw ---------------- */
   for (const l of veh) { const nm = l.t.name || ''; for (let i = 0; i < l.pts.length - 1; i++) roadAdd(l.pts[i][0], l.pts[i][1], l.pts[i + 1][0], l.pts[i + 1][1], nm, l.wd); }

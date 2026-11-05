@@ -18,7 +18,7 @@ async function switchArea(a) {
   switching = true;
   const [dx, dz] = toXZ(a.lat, a.lon), sk = !!SK.on;
   try {
-    $('loader').style.display = 'flex'; status('Wczytuję dokładną mapę: ' + a.name + '…', 0.02);
+    loadBegin('Wczytuję dokładną mapę: ' + a.name + '…');
     if (sk) setSketch(false);
     zClearAll(); unloadWorld(); setArea(a);
     await loadArea();
@@ -34,7 +34,7 @@ async function switchArea(a) {
     if (sk) setSketch(true); if (xray) setXray(true); setNight(night);
     if (bigOpen) { bmPan = null; drawBigMap(); }
   } catch (e) { console.error('[W3D] zmiana obszaru', e); flash('Nie udało się wczytać: ' + a.name); }
-  finally { $('loader').style.display = 'none'; switching = false; }
+  finally { loadEnd(); switching = false; }
 }
 // co sekundę: gracz w innym dokładnym obszarze (w 3/4 jego boku) — przebudowa
 let areaT = 0;
@@ -50,7 +50,7 @@ function areaCheck(dt) {
 // samolot — na Okęciu, okręt — na Wiśle; każdy pojawia się, gdy pierwszy raz zbudujesz jego obszar, i potem już tam stoi
 async function homeVehicles(progress = () => {}) {
   if (AREA === AREAS.centrum) {
-    if (!FLEET.homed && FLEET.length) { const sp = findSpawn(); SPAWN = sp; for (const V of FLEET) { park(V, sp, PARK[V.id] || 0); V.v.group.visible = true; } FLEET.homed = true; }
+    if (!FLEET.homed && FLEET.length) { const sp = findSpawn(); SPAWN = sp; for (const V of FLEET) { park(V, sp, parkAlong(V)); V.v.group.visible = true; } FLEET.homed = true; }
     for (const k of ['tram', 'train']) if (!RAILS[k].V) { progress(k === 'tram' ? 'tramwaj…' : 'pociąg WKD…'); try { await parkRail(k); } catch (e) { console.warn('[W3D] skład', k, e); } }
     for (const R of Object.values(RAILS)) if (R.V && R.area === AREA) for (const tr of trains) if (tr.ch && chKey(tr.ch) === R.chKey) { tr.off = true; for (const m of tr.cars) m.visible = false; }
   }

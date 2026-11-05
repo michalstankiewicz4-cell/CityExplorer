@@ -4,7 +4,9 @@ const html = readFileSync('index.html', 'utf8') + readFileSync('js/core/config.j
 const v = (html.match(/const APP_VERSION = '([\d.]+)'/) || [])[1];
 const t = (html.match(/<title>[^<]*· v([\d.]+)<\/title>/) || [])[1];
 const ld = (html.match(/"softwareVersion":"([\d.]+)"/) || [])[1];
+// miniatura z numerem wersji w adresie (Discord, Facebook itp. pamiętają podgląd po adresie obrazka)
+const og = [...html.matchAll(/og-image\.jpg\?v=([\d.]+)/g)].map(m => m[1]);
 const cl = (log.match(/^## ([\d.]+)/m) || [])[1];
-const ok = v && v === t && v === ld && v === cl;
-console.log(`APP_VERSION=${v} title=${t} JSON-LD=${ld} CHANGELOG=${cl}`);
+const ok = v && v === t && v === ld && v === cl && og.length && og.every(x => x === v);
+console.log(`APP_VERSION=${v} title=${t} JSON-LD=${ld} CHANGELOG=${cl} miniatura=${og.join(',')}`);
 if (!ok) { console.error('Niespójny numer wersji — popraw przed publikacją.'); process.exit(1); }

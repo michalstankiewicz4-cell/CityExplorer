@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wielka Kradzież Aut VI — jazda autem po centrum Warszawy (PKiN) · v0.18.0</title>
+<title>Wielka Kradzież Aut VI — jazda autem po centrum Warszawy (PKiN) · v0.19.0</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Wielka Kradzież Aut VI, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -18,7 +18,7 @@
 <meta property="og:title" content="Wielka Kradzież Aut VI — jedź autem po centrum Warszawy">
 <meta property="og:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta property="og:url" content="https://michalstankiewicz4-cell.github.io/CityExplorer/">
-<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg?v=0.19.0">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Wielka Kradzież Aut VI — Pałac Kultury i Nauki, tramwaj, radiowóz i samochód sportowy">
@@ -26,9 +26,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Wielka Kradzież Aut VI — jedź autem po centrum Warszawy">
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
-<meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg">
+<meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg?v=0.19.0">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Wielka Kradzież Aut VI","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.18.0"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Wielka Kradzież Aut VI","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg?v=0.19.0","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.19.0"}
 </script>
 <link rel="stylesheet" href="css/game.css">
 <script type="importmap">{"imports":{"three":"./lab/vendor/three/three.module.js"}}</script>
@@ -55,14 +55,20 @@
   <div class="panel">
     <div class="ttl">Wielka Kradzież Aut VI <small id="ver2"></small></div>
     <div id="modes">
-      <button data-mode="foot" disabled><i>Tryb 1</i><b>Pieszo i pojazdem</b><span>Spacer po mieście; przy starcie czekają FSO Polonez, M1A2 Abrams i przegubowy Solaris — wsiadasz i wysiadasz klawiszem <kbd data-k="use">F</kbd>.</span><div class="thumbs" data-for="foot"><img src="img/pieszy.jpg" alt="Pieszy" title="Pieszy"><img src="img/polonez.jpg" alt="FSO Polonez" title="FSO Polonez 1500"><img src="img/abrams.jpg" alt="M1A2 Abrams" title="M1A2 Abrams"><img src="img/urbino18.jpg" alt="Solaris Urbino 18" title="Solaris Urbino 18 electric"><span class="soonT">trolejbus 51<br>wkrótce</span></div><div class="mload"><em></em><u>Wczytuję modele…</u></div></button>
-      <button data-mode="rail" disabled><i>Tryb 2</i><b>Szynowy</b><span>Tramwaj PESA Swing na fizyce koło–szyna z aTrain albo nasz pociąg na linii WKD w stronę Pruszkowa (na razie do końca mapy) — kliknij, którym.</span><div class="thumbs" data-for="rail"><img src="img/swing.jpg" alt="Tramwaj PESA Swing" title="Tramwaj PESA Swing 120Na" data-veh="tram"><img src="img/pociag.jpg" alt="Pociąg WKD" title="WKD w stronę Pruszkowa: nasz pociąg (lokomotywa i dwa wagony)" data-veh="train"><span class="soonT">metro<br>wkrótce</span></div><div class="mload" id="mload2" style="display:none"><em></em><u>Wczytuję skład…</u></div></button>
-      <button data-mode="air" disabled><i>Tryb 3</i><b>Samolot</b><span>Supermarine Spitfire Mk I (1940) na progu drogi startowej Okęcia — prawdziwa fizyka lotu: nośna, przeciągnięcie, ciąg śmigła, podwozie na sprężynach.</span><div class="thumbs" data-for="air"><img src="img/spitfire.jpg" alt="Supermarine Spitfire Mk I" title="Supermarine Spitfire Mk I"><span class="soonT">W-3 Sokół, Boeing, F-15<br>wkrótce</span></div><div class="mload" id="mload3" style="display:none"><em></em><u>Wczytuję samolot…</u></div></button>
-      <button data-mode="boat" disabled><i>Tryb 4</i><b>Okręt</b><span>ORP Błyskawica (1937) na Wiśle przy Moście Świętokrzyskim — woda z laboratorium wody: fala dziobowa, kilwater, piana; telegraf i ster.</span><div class="thumbs" data-for="boat"><img src="img/blyskawica.jpg" alt="ORP Błyskawica" title="ORP Błyskawica"></div><div class="mload" id="mload4" style="display:none"><em></em><u>Wczytuję okręt…</u></div></button>
+      <button data-mode="foot"><i>Tryb 1</i><b>Pieszo i pojazdem</b><span>Spacer po mieście; przy starcie czekają FSO Polonez, M1A2 Abrams i przegubowy Solaris — wsiadasz i wysiadasz klawiszem <kbd data-k="use">F</kbd>.</span><div class="thumbs" data-for="foot"><img src="img/pieszy.jpg" alt="Pieszy" title="Pieszy"><img src="img/polonez.jpg" alt="FSO Polonez" title="FSO Polonez 1500"><img src="img/abrams.jpg" alt="M1A2 Abrams" title="M1A2 Abrams"><img src="img/urbino18.jpg" alt="Solaris Urbino 18" title="Solaris Urbino 18 electric"><span class="soonT">trolejbus 51<br>wkrótce</span></div></button>
+      <button data-mode="rail"><i>Tryb 2</i><b>Szynowy</b><span>Tramwaj PESA Swing na fizyce koło–szyna z aTrain albo nasz pociąg na linii WKD w stronę Pruszkowa (na razie do końca mapy) — kliknij, którym.</span><div class="thumbs" data-for="rail"><img src="img/swing.jpg" alt="Tramwaj PESA Swing" title="Tramwaj PESA Swing 120Na" data-veh="tram"><img src="img/pociag.jpg" alt="Pociąg WKD" title="WKD w stronę Pruszkowa: nasz pociąg (lokomotywa i dwa wagony)" data-veh="train"><span class="soonT">metro<br>wkrótce</span></div></button>
+      <button data-mode="air"><i>Tryb 3</i><b>Samolot</b><span>Supermarine Spitfire Mk I (1940) na progu drogi startowej Okęcia — prawdziwa fizyka lotu: nośna, przeciągnięcie, ciąg śmigła, podwozie na sprężynach.</span><div class="thumbs" data-for="air"><img src="img/spitfire.jpg" alt="Supermarine Spitfire Mk I" title="Supermarine Spitfire Mk I"><span class="soonT">W-3 Sokół, Boeing, F-15<br>wkrótce</span></div></button>
+      <button data-mode="boat"><i>Tryb 4</i><b>Okręt</b><span>ORP Błyskawica (1937) na Wiśle przy Moście Świętokrzyskim — woda z laboratorium wody: fala dziobowa, kilwater, piana; telegraf i ster.</span><div class="thumbs" data-for="boat"><img src="img/blyskawica.jpg" alt="ORP Błyskawica" title="ORP Błyskawica"></div></button>
+    </div>
+    <div id="mp">
+      <b>Gra z innymi</b> <small>2–4 osoby, połączenie bezpośrednie (WebRTC)</small>
+      <div class="row"><input id="mpName" maxlength="16" placeholder="Twoje imię"><button id="mpHost">Utwórz pokój</button><input id="mpCode" maxlength="8" placeholder="Kod"><button id="mpJoin">Dołącz</button></div>
+      <div id="mpStatus">Sam albo z innymi: utwórz pokój i podaj kod, albo wpisz kod i dołącz — potem wybierz tryb.</div>
     </div>
   </div>
 </div>
 <div id="prompt"></div>
+<div id="netHud"></div>
 <div id="cross" style="display:none;position:fixed;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;pointer-events:none;z-index:5;background:linear-gradient(#fff,#fff) center/2px 8px no-repeat,linear-gradient(#fff,#fff) center/8px 2px no-repeat;border:1.5px solid #ffffffaa;border-radius:50%;box-shadow:0 0 3px #000"></div>
 <div id="weap" style="display:none;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:5;font:600 13px system-ui;color:#fff;background:#0d1014aa;padding:5px 12px;border-radius:8px;pointer-events:none"></div>
 <div id="opts">
@@ -77,6 +83,7 @@
       <label><input type="checkbox" id="oMini"> Minimapa</label>
       <label><input type="checkbox" id="oHelp"> Pomoc na ekranie</label>
       <label>Kamera <select id="oCam"><option value="0">za plecami</option><option value="1">wysoko</option><option value="2">oczami / z kabiny</option></select></label>
+      <button id="oRespawn" class="wide">Odrodzenie na starcie (pieszo, przy twoich autach)</button>
       <button id="oMenu" class="wide">Ekran startowy (wybór trybu)</button>
     </div>
     <div class="tab" data-tab="gfx" hidden>

@@ -74,6 +74,14 @@ function drawBigMap() {
   }
   bmg.drawImage(W.ov, ox, oy, size, size);
   bmg.strokeStyle = '#ffffff55'; bmg.lineWidth = 1; bmg.strokeRect(ox, oy, size, size);
+  // granica całej mapy (siatka kafli Warszawy): wyraźna obwódka i wymiary
+  if (TS.TL && TS.TL.WARSAW) {
+    const T = TS.TL.T, Wg = TS.TL.WARSAW, x0 = ox + (Wg.i0 * T + TS.OFF[0] + E) * s, y0 = oy + (Wg.j0 * T + TS.OFF[1] + E) * s, w = (Wg.i1 - Wg.i0 + 1) * T * s, h = (Wg.j1 - Wg.j0 + 1) * T * s;
+    bmg.save(); bmg.lineWidth = 6; bmg.strokeStyle = '#000a'; bmg.strokeRect(x0, y0, w, h); bmg.lineWidth = 3; bmg.strokeStyle = '#e9c46a'; bmg.strokeRect(x0, y0, w, h);
+    const txt = `Granica mapy: ${((Wg.i1 - Wg.i0 + 1) * T / 1000).toFixed(0)} × ${((Wg.j1 - Wg.j0 + 1) * T / 1000).toFixed(0)} km`;
+    bmg.font = '600 14px system-ui'; bmg.textAlign = 'left'; bmg.textBaseline = 'bottom'; const tx = Math.max(8, x0 + 6), ty = Math.max(22, y0 - 6);
+    bmg.lineWidth = 4; bmg.strokeStyle = '#000c'; bmg.strokeText(txt, tx, ty); bmg.fillStyle = '#e9c46a'; bmg.fillText(txt, tx, ty); bmg.restore();
+  }
   // etykiety
   bmg.textAlign = 'center'; bmg.textBaseline = 'middle';
   for (const L of W.labels || []) {
@@ -90,7 +98,10 @@ function drawBigMap() {
   bmg.fillStyle = '#c6ae7f'; bmg.beginPath(); bmg.arc(pk[0], pk[1], 5, 0, 7); bmg.fill();
   bmg.font = '600 13px system-ui'; bmg.lineWidth = 3; bmg.strokeStyle = '#000a'; bmg.strokeText('PKiN', pk[0], pk[1] - 14); bmg.fillStyle = '#f3e3c0'; bmg.fillText('PKiN', pk[0], pk[1] - 14);
   if (bmQual) drawQuality(ox, oy, s);
-  // auto
+  // inni gracze (gra z innymi)
+  for (const q of netMapPoints()) netArrow(bmg, ox + (q.x + E) * s, oy + (q.z + E) * s, Math.atan2(Math.cos(q.th), Math.sin(q.th)) + Math.PI / 2, q.col, q.name);
+  bmg.textAlign = 'center';
+  // gracz
   const cx = ox + (ego.x + E) * s, cy = oy + (ego.z + E) * s, fx = Math.sin(ego.th), fz = Math.cos(ego.th);
   bmg.save(); bmg.translate(cx, cy); bmg.rotate(Math.atan2(fz, fx) + Math.PI / 2);
   bmg.fillStyle = '#ff3b30'; bmg.strokeStyle = '#fff'; bmg.lineWidth = 2;

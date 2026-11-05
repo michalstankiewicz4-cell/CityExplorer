@@ -14,7 +14,7 @@
 ## Pliki (kolejność wczytywania)
 | Plik | Zawartość |
 |---|---|
-| `core/config.js` | wersja (`APP_VERSION`), obszary (`AREAS`, `setArea`), karta ładowania (`status`), `fetchT`, IndexedDB |
+| `core/config.js` | wersja (`APP_VERSION`), obszary (`AREAS`, `setArea`), karta ładowania (`status`; `loadBegin` / `loadEnd` / `withLoader` — ekran ładowania przy każdym doładowaniu w trakcie gry, gra wtedy stoi), `fetchT`, IndexedDB |
 | `world/osm.js` | `DATA`, `TERR_RAW`; filtr znaczników OSM, Overpass, API OSM, plik z deployu |
 | `world/terrain.js` | Terrarium, NMT GUGiK, maska budynków, obróbka wysokości |
 | `core/scene.js` | renderer, kamera, światła, niebo, mgła, `GFX`; `H()` (teren, także poza mapą), `bump` (wstrząs kamery) |
@@ -36,6 +36,7 @@
 | `world/tiles.js` | kafle w locie |
 | `ui/export.js` | zapis danych JSON, pobranie od nowa |
 | `world/areas.js` | wspólny świat: zwolnienie i budowa obszaru, `switchArea`, `homeVehicles`, `loadArea` |
+| `net/net.js` | gra z innymi: pokój (PeerJS / `?net=local`), paczki stanu, wygładzanie, zombie gospodarza, zajętość pojazdów ([multiplayer.md](multiplayer.md)) |
 | `core/main.js` | `main()` |
 | `shared/tiles.mjs` | moduł ES wspólny z `tools/fetch-tiles.mjs`: siatka i format kafli |
 

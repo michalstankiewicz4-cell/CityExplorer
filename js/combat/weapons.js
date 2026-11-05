@@ -22,7 +22,7 @@ function fireRifle() {
   const sp = mode === 'foot' && CAM.aim < 0.5 ? 0.03 : 0.006;   // z biodra rozrzut większy niż przy celowaniu
   const { o, d } = aimRay(); d.x += (Math.random() - 0.5) * sp; d.y += (Math.random() - 0.5) * sp; d.normalize();
   const h = rayHit(o, d, 400), m = mode === 'car' ? new THREE.Vector3(car.x + Math.sin(car.th) * 0.5, car.y + 1.3, car.z + Math.cos(car.th) * 0.5) : WPN.rifle.parts.flash.getWorldPosition(new THREE.Vector3());
-  tracer(m, h.p); WPN.rifle.update(carT, 0, { fire: true }); bump = Math.max(bump, 0.08);
+  tracer(m, h.p); netFx('tr', m, h.p); WPN.rifle.update(carT, 0, { fire: true }); bump = Math.max(bump, 0.08);
   if (h.z) zHit(h.z, h.p); else burst(h.p.x, h.p.y, h.p.z, 6, 0x8a8070, 2);
 }
 // wylot lufy czołgu; pocisk leci z wylotu w punkt pod celownikiem (gdy jest przed lufą), inaczej wzdłuż lufy
@@ -37,24 +37,31 @@ function fireTank() {
     WPN.reload = 4;
     const { p, d } = tankMuzzle(5.6);
     const h = rayHit(p, d, 900);
-    tracer(p, h.p, 0xffe0a0); if (h.t < 899) boom(h.p.x, Math.max(h.p.y, H(h.p.x, h.p.z)), h.p.z, 6);
+    tracer(p, h.p, 0xffe0a0); netFx('tr', p, h.p); if (h.t < 899) { const by = Math.max(h.p.y, H(h.p.x, h.p.z)); boom(h.p.x, by, h.p.z, 6); netFx('boom', { x: h.p.x, y: by, z: h.p.z }, null, 6); }
     burst(p.x, p.y, p.z, 30, 0xc8c0b0, 5); bump = Math.max(bump, 0.6);
-    for (const z of ZB.list) if (!z.dead && Math.hypot(z.x - h.p.x, z.z - h.p.z) < 7) zKill(z, Math.atan2(z.x - h.p.x, z.z - h.p.z), false);
+    blastKill(h.p.x, h.p.z, 7);
   } else {
     if (WPN.mgT > 0) return; WPN.mgT = 0.09;
     const { p, d } = tankMuzzle(2.0); d.x += (Math.random() - 0.5) * 0.01; d.y += (Math.random() - 0.5) * 0.01; d.normalize(); p.x += 0.4;
     const h = rayHit(p, d, 600);
-    if (Math.random() < 0.4) tracer(p, h.p, 0xff9a50);
+    if (Math.random() < 0.4) { tracer(p, h.p, 0xff9a50); netFx('tr', p, h.p); }
     if (h.z) zHit(h.z, h.p); else burst(h.p.x, h.p.y, h.p.z, 4, 0x8a8070, 2);
   }
 }
 // mysz zależnie od tego, czym sterujesz: pieszo LPM strzał, PPM celowanie, kółko — broń (Beryl / bez broni);
 // samochód i autobus: PPM celowanie przez okno, LPM strzał; czołg: LPM strzał, PPM przybliżenie, kółko — działo / karabin;
 // samolot: LPM — 8 karabinów Browning w skrzydłach; tramwaj, pociąg, okręt: tylko kamera
+// wybuch: zombie w promieniu giną (u gracza bez gospodarstwa — także u gospodarza, przez sieć)
+function blastKill(x, z, r) {
+  for (const q of ZB.list) if (!q.dead && Math.hypot(q.x - x, q.z - z) < r) zKill(q, Math.atan2(q.x - x, q.z - z), false, true);
+  if (NET.on && !NET.host) { const g = l2g(x, z); netSend(NET.hostId, { t: 'boomk', g, r }); }
+  else if (NET.on) for (const q of ZB.list) if (q.dead && q.nid && !q.sent) { q.sent = true; netSend('*', { t: 'zd', id: q.nid, dir: q.dir, cr: 0 }); }
+}
 const isTank = () => mode === 'car' && ACT && ACT.id === 'abrams';
 const armed = () => (mode === 'foot' && WPN.armed) || isTank() || (mode === 'car' && on('aim')) || mode === 'air';
 function fire() {
   if (!started || optOpen || bigOpen) return;
+  if (isPassenger() && !(mode === 'car' && !isTank() && on('aim'))) return;   // pasażer: tylko strzał przez okno
   if (mode === 'foot') { if (WPN.armed) fireRifle(); }
   else if (isTank()) fireTank();
   else if (mode === 'car' && on('aim')) fireRifle();   // strzał z okna
@@ -85,8 +92,8 @@ function bombsStep(dt) {
     const x = g.position.x, y = g.position.y, z = g.position.z, gy = H(x, z);
     if (y <= gy + 0.2 || (W.inBuilding && W.inBuilding(x, z) && y < gy + 25) || zWall(x, z, y) || f.t > 60) {
       scene.remove(g); f.b.dispose(); BOMBS.falling.splice(i, 1);
-      const r = f.b.info.blast; boom(x, Math.max(y, gy), z, r);
-      for (const zb of ZB.list) if (!zb.dead && Math.hypot(zb.x - x, zb.z - z) < r) zKill(zb, Math.atan2(zb.x - x, zb.z - z), false);
+      const r = f.b.info.blast; boom(x, Math.max(y, gy), z, r); netFx('boom', { x, y: Math.max(y, gy), z }, null, r);
+      blastKill(x, z, r);
     }
   }
 }
@@ -97,7 +104,7 @@ function firePlane() {
   const conv = g.localToWorld(new THREE.Vector3(0, 0.2, 230));
   for (const x of [2.3, -2.3, 3.4, -3.4]) {
     const p = g.localToWorld(new THREE.Vector3(x, -0.1, 0.7)), d = conv.clone().sub(p).normalize(); d.x += (Math.random() - 0.5) * 0.008; d.y += (Math.random() - 0.5) * 0.008; d.normalize();
-    const h = rayHit(p, d, 600); if (Math.random() < 0.5) tracer(p, h.p, 0xffc070);
+    const h = rayHit(p, d, 600); if (Math.random() < 0.5) { tracer(p, h.p, 0xffc070); if (x === 2.3) netFx('tr', p, h.p); }
     if (h.z) zHit(h.z, h.p); else if (h.t < 599) burst(h.p.x, h.p.y, h.p.z, 3, 0x8a8070, 2);
   }
 }

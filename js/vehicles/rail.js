@@ -217,8 +217,8 @@ function railDoors() { if (Math.abs(rail.v) > 0.2) { flash('Zatrzymaj się, żeb
 // „wsiądź / wysiądź” w składzie: na postoju otwiera drzwi, przy otwartych — wysiadasz (prawa strona czoła); E przy drzwiach — wsiadasz z powrotem
 const railDoorAt = (R = rail) => toWorld({ x: R.x, z: R.z, th: R.th }, -2.6, R.kind === 'tram' ? 2.5 : -3);
 function railUse() {
-  if (Math.abs(rail.v) > 0.2) { flash('Zatrzymaj się, żeby otworzyć drzwi'); return; }
-  if (rail.doors < 0.5) { rail.doors = 1; flash('Drzwi otwarte — ' + kb('use') + ': wysiądź'); return; }
+  if (Math.abs(rail.v) > 0.2) { flash(rail.remote ? 'Poczekaj, aż skład stanie' : 'Zatrzymaj się, żeby otworzyć drzwi'); return; }
+  if (rail.doors < 0.5 && !rail.remote) { rail.doors = 1; flash('Drzwi otwarte — ' + kb('use') + ': wysiądź'); return; }
   const [x, z] = railDoorAt();
   Object.assign(ped, { x, z, th: rail.th, vf: 0, vy: 0 }); ped.y = surfaceAt(x, z, rail.y + 1);
   mode = 'foot'; ego = ped; camYaw = rail.th; orbit = 0; if (PED) PED.g.visible = true;

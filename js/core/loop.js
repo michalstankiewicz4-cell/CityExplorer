@@ -20,7 +20,7 @@ function step(dt, draw) {
   fpsN++; fpsT += dt; if (fpsT > 1) { fps = Math.round(fpsN / fpsT); fpsN = 0; fpsT = 0; }
   if (!started) { updateTrains(dt); carT += dt; flyover(dt); if (draw) renderer.render(scene, camera); return; }
   if (optOpen) { if (draw) { renderer.render(scene, camera); if (boat.V) boatRenderWater(); } return; }   // pauza w opcjach
-  if (switching) return;   // przebudowa dokładnej mapy — gra stoi
+  if (switching || loadN) return;   // przebudowa dokładnej mapy albo doładowanie (ekran ładowania) — gra stoi
   acc += dt; const STEP = 1 / 120; let n = 0;
   while (acc >= STEP && n++ < 20) { physics(STEP); acc -= STEP; }
   sequence(dt);
@@ -28,7 +28,7 @@ function step(dt, draw) {
   // pojazdy: obrót wokół pionu na pozycji; koła, gąsienice, zawieszenie, przegub i przechył robi ich model
   carT += dt;
   for (const V of FLEET) {
-    const S = V.s, cth = Math.cos(S.th), sth = Math.sin(S.th), mine = V === ACT && mode === 'car';
+    const S = V.s, cth = Math.cos(S.th), sth = Math.sin(S.th), mine = V === ACT && mode === 'car' && !V.remote;
     V.v.group.position.set(S.x, S.y, S.z); V.v.group.rotation.set(0, S.th, 0);
     const o = {
       speed: S.vf, steer: -S.steer * Math.min(1, 1.6 / (1 + Math.abs(S.vf) / 20)), turn: S.w,
@@ -36,7 +36,8 @@ function step(dt, draw) {
       lights: night && (mine || V.id === 'urbino18'), brake: S.brake, work: S.work,
     };
     if (V.id === 'abrams' && mine) { o.turret = orbit; o.gun = Math.max(-0.15, Math.min(0.35, 0.05 - tilt * 0.5)); }
-    if (V.id === 'abrams') o.searchlight = WPN.search;
+    else if (V.id === 'abrams' && V.remote && V.net) { o.turret = V.net.tur; o.gun = V.net.gun; }   // wieża jak u kierowcy (gra z innymi)
+    if (V.id === 'abrams') o.searchlight = mine ? WPN.search : !!(V.remote && V.net && V.net.sl);
     V.v.update(carT, dt, o);
   }
   if (mode === 'rail') railPlace(dt);
@@ -50,7 +51,7 @@ function step(dt, draw) {
     // celowanie tułów z bronią pochyla się w górę i w dół za celownikiem
     if (WPN.armed && mode === 'foot' && (on('aim') || on('fire'))) { const d = new THREE.Vector3(); camera.getWorldDirection(d); const p = Math.asin(Math.max(-0.9, Math.min(0.9, d.y))); PED.c.rig.chest.rotation.x -= p * 0.6; PED.c.rig.spine.rotation.x -= p * 0.35; }
   }
-  zombiesStep(dt); weaponsStep(dt); fxStep(dt);
+  zombiesStep(dt); weaponsStep(dt); fxStep(dt); netStep(dt);
   updateCamera(dt); sketchFrame();
   if ((TS.t += dt) > 0.4) { TS.t = 0; streamTick(); ovTick(); }
   areaCheck(dt);

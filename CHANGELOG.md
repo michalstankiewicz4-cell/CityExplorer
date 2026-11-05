@@ -2,6 +2,22 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.19.0 — 2026-11-05
+- **Gra z innymi (2–4 osoby)** — połączenie bezpośrednie między przeglądarkami (WebRTC, PeerJS 1.5.5 w `js/vendor/`; serwer PeerJS tylko zestawia połączenie). Na ekranie startowym: imię, „Utwórz pokój” (kod do podania znajomym) albo kod i „Dołącz”, potem wybór trybu. W prawym górnym rogu lista graczy w pokoju (kto prowadzi, kto jest pasażerem).
+- **Gospodarz** (ten, kto utworzył pokój) prowadzi zombie dla wszystkich (pojawiają się, gonią i atakują najbliższego gracza) i rozsyła ich stan 10 razy na sekundę; trafienia, przejechania i wybuchy innych graczy idą do niego, a śmierć zombie widzą wszyscy. Gospodarz ustala też porę dnia.
+- **Pojazdy**: pierwszy, kto wsiądzie, jest kierowcą, kolejni — pasażerami (jadą z nim, kamera jak w pojeździe, sterowanie ma kierowca; z samochodu i autobusu mogą strzelać przez okno). Tramwaj liczy każdy u siebie.
+- **Płynność**: stan graczy 15 razy na sekundę; ruch innych (pieszo i pojazdów, także wieża czołgu, przechyły okrętu, orientacja samolotu) pokazywany z opóźnieniem 120 ms i wygładzany między paczkami. Inni gracze jako postacie z imieniem nad głową; smugacze i wybuchy innych widać u wszystkich.
+- **Każdy gracz ma swoje pojazdy**: na spawnie swój komplet aut (Polonez, Abrams, Solaris — kolejne komplety dalej wzdłuż ulicy), na Okęciu tyle samolotów, ilu graczy (obok siebie na progu), na Wiśle tyle okrętów, ilu graczy; tramwaj i pociąg wspólne. Autem innego gracza też można pojechać (kto pierwszy), samolotem i okrętem steruje tylko właściciel. Porzucone auto stoi u wszystkich w tym samym miejscu.
+- **Zacznij sam, dołącz później**: sekcja „Gra z innymi” jest też w opcjach (Esc → Gra) — pokój można utworzyć albo do niego dołączyć w trakcie gry.
+- **Gracze na mapie**: inni gracze na minimapie (gdy daleko — na brzegu) i na dużej mapie, w swoich kolorach, z imieniem.
+- **Odrodzenie**: opcje → „Odrodzenie na starcie” — z każdego miejsca i pojazdu pieszo na start, przy twoim Polonezie (także w pojedynkę).
+- **Ekran ładowania**: modele, pojazdy i broń wczytują się na pierwszym ekranie ładowania (wcześniej na karcie „Pieszo i pojazdem”); ekran startowy pojawia się, gdy wszystko gotowe, karty trybów od razu aktywne. Każde doładowanie w trakcie gry (zmiana obszaru, samolot, okręt, skład przy wyborze trybu, pojazdy dołączającego gracza) pokazuje ekran ładowania, a gra w tym czasie stoi; odrodzenie poza centrum też (natychmiastowe — bez ekranu).
+- **Duża mapa: granica całej mapy** — złota obwódka siatki kafli Warszawy z wymiarami (30 × 31 km), widoczna po oddaleniu.
+- **Trzy razy więcej zombie**: w dzień do 21 (wcześniej 7), w nocy do 66 (wcześniej 22); pojawiają się 3 razy częściej, pula gotowych zombie do 80.
+- Naprawione miganie gruntu i ulic poza dokładnymi obszarami (z samolotu): tło pod kaflami leżało 8 cm pod ich gruntem — teraz 4 m niżej, z przesunięciem głębi.
+- Miniatura strony z numerem wersji w adresie (`og-image.jpg?v=…`, pilnuje `tools/check-version.mjs`) — Discord i inne serwisy pobiorą nową zamiast pokazywać starą „Warszawę 3D” z pamięci.
+- Położenia w sieci są globalne (metry od PKiN), więc gracze mogą być w różnych obszarach (Centrum, Okęcie, Wisła). Test bez sieci: `?net=local` (karty jednej przeglądarki).
+
 ## 0.18.0 — 2026-11-05
 - **Ekran ładowania**: grafika na cały ekran, postęp (pasek, procent, etap) w prawym dolnym rogu; ta sama grafika jako miniatura strony (`og-image.jpg`). Z ekranu startowego usunięte linie „Wkrótce…”, „Sterowanie…” i podtytuł „Prawdziwe Śródmieście z mapy · wybierz, czym ruszasz”; karty trybów w kolejności 1–4.
 - **Klawisze — jedno źródło prawdy**: każdy opis klawisza (podpowiedź „wsiądź” przy pojeździe — wcześniej na stałe „E”, HUD broni, komunikaty tramwaju i samolotu, podpowiedź mapy, pomoc, ekran startowy) bierze nazwę z ustawień klawiszy.

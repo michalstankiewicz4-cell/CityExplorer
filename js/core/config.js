@@ -5,7 +5,7 @@
    KONFIGURACJA
    ?lat=..&lon=..&r=..  (promień w metrach, domyślnie 1000)
    ========================================================================= */
-const APP_VERSION = '0.18.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
+const APP_VERSION = '0.19.0';   // SemVer; zmiana wersji: tutaj, w <title>, w JSON-LD (softwareVersion) i w CHANGELOG.md — sprawdza tools/check-version.mjs
 document.getElementById('ver').textContent = 'v' + APP_VERSION; document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 const QS = new URLSearchParams(location.search);
 // dokładne obszary wspólnego świata: gra buduje dokładnie ten, w którym jesteś (przy wejściu w inny — przebudowa w locie);
@@ -37,6 +37,12 @@ const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.p
 /* ---------- UI ładowania ---------- */
 const $ = id => document.getElementById(id);
 function status(msg, pct) { $('log').textContent = msg; if (pct != null) { $('bar').firstElementChild.style.width = (pct * 100).toFixed(0) + '%'; $('pct').textContent = Math.round(pct * 100) + '%'; } console.log('[W3D]', msg); }
+// ekran ładowania (#loader) w trakcie gry: każde doładowanie (obszar, samolot, okręt, skład, pojazdy innego gracza) go pokazuje;
+// licznik, bo doładowania mogą się zagnieżdżać (np. tryb Samolot: zmiana obszaru, potem samolot)
+let loadN = 1;   // na starcie strony ekran ładowania jest widoczny
+function loadBegin(msg, pct = 0.02) { loadN++; $('loader').style.display = 'flex'; if (msg) status(msg, pct); }
+function loadEnd() { loadN = Math.max(0, loadN - 1); if (!loadN) $('loader').style.display = 'none'; }
+async function withLoader(msg, fn) { loadBegin(msg); try { return await fn(); } finally { loadEnd(); } }
 const frame = () => new Promise(r => setTimeout(r, 16));   // nie rAF: w karcie w tle rAF stoi
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function fetchT(url, opt = {}, ms = 45000) {

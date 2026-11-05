@@ -11,6 +11,8 @@ Ekran startowy wybiera, od czego zaczynasz; pozostałe pojazdy i tak stoją na s
 **pieszo i pojazdem** (centrum: Polonez, Abrams, Solaris), **szynowy** (tramwaj PESA Swing albo pociąg na linii WKD),
 **samolot** (Spitfire Mk I na Okęciu), **okręt** (ORP Błyskawica na Wiśle). Szczegóły: [docs/pojazdy.md](docs/pojazdy.md).
 
+**Gra z innymi** (2–4 osoby, WebRTC): na ekranie startowym „Utwórz pokój” i podaj kod albo wpisz kod i „Dołącz”. Gospodarz prowadzi zombie; w pojeździe pierwszy jest kierowcą, kolejni pasażerami. Szczegóły: [docs/multiplayer.md](docs/multiplayer.md).
+
 ## Sterowanie (domyślne)
 Klawisze można zmienić w opcjach (Esc → Klawisze); lista w lewym dolnym rogu (H) pokazuje klawisze dla tego, czym teraz sterujesz.
 
@@ -53,6 +55,8 @@ js/combat/            zombies.js (zombie, ciała, efekty) · weapons.js (karabin
                       i bomby samolotu, latarka, celownik)
 js/ui/                camera.js · hud.js · bigmap.js · options.js · view.js (rentgen, noc) · export.js
 js/render/sketch.js   styl „rysunek”
+js/net/net.js         gra z innymi (WebRTC: pokój, gospodarz, zombie, pojazdy, wygładzanie ruchu)
+js/vendor/            PeerJS (połączenie WebRTC)
 js/shared/tiles.mjs   kafle mapy: format i siatka (gra i tools/fetch-tiles.mjs)
 lab/                  pliki z GameLaboratory (te same ścieżki co tam): lab/entries.json, lab/SOURCE.json
 tools/                fetch-osm.mjs, fetch-tiles.mjs, sync-lab.mjs, check-version.mjs

@@ -20,6 +20,8 @@ Dodanie akcji: wpis w `ACTIONS` (z grupą), obsługa przez `on()` albo w `keydow
 | Samolot | ster kierunku · podwozie · klapy · zrzut bomby | Q / E · G · B · Z (też PPM) |
 | Inne | powrót na start · noc · rentgen · pixel-art · pomoc | R · N · X · P · H |
 
+Odrodzenie (pieszo na start, przy twoim Polonezie, z każdego miejsca i pojazdu): opcje (Esc) → „Odrodzenie na starcie”. Gra z innymi: [multiplayer.md](multiplayer.md).
+
 ## Mysz
 Kliknięcie w grę łapie mysz (Pointer Lock): ruch obraca kamerę bez przycisku; Esc puszcza mysz i otwiera opcje.
 Bez złapania — LPM + przeciągnij. Zależnie od tego, czym sterujesz: pieszo LPM strzał, PPM celowanie, kółko — broń

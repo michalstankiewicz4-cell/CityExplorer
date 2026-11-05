@@ -16,6 +16,9 @@ function airSpawnPoint() {
   let d = 50; while (d < rw.L - 600 && (Math.abs(a[0] + ux * d) > E - 60 || Math.abs(a[1] + uz * d) > E - 60)) d += 20;   // próg poza mapą: pierwszy kawałek na mapie
   return { x: a[0] + ux * d, z: a[1] + uz * d, th: Math.atan2(ux, uz) };
 }
+// miejsce gracza na progu (gra z innymi): kolejne samoloty obok, w poprzek drogi startowej
+const AIR_SIDE = [0, 16, -16, 32];
+function airSlotPoint(slot) { const sp = airSpawnPoint(), d = AIR_SIDE[slot || 0]; return { x: sp.x + Math.cos(sp.th) * d, z: sp.z - Math.sin(sp.th) * d, th: sp.th }; }
 function airReset() {
   const sp = air.spawn, def = air.V.def, h = H(sp.x, sp.z);
   air.sim = FLY.createFlight(def.flight, def.mass, { p: [sp.x, h + def.rest.y, sp.z], yaw: sp.th, pitch: -def.rest.pitch });
@@ -28,7 +31,7 @@ async function parkAir() {
   if (air.V) return;
   if (!AIRK) [AIRK, FLY] = await Promise.all([import(GL + 'js/models/air/airkit.js'), import(GL + 'js/behaviors/air/flight.js')]);
   air.V = AIRK.buildAircraft('spitfire', {}); prepModel(air.V.group); scene.add(air.V.group);
-  air.spawn = airSpawnPoint(); airReset(); air.work = 1;
+  air.spawn = airSlotPoint(mySlot()); airReset(); air.work = 1;
 }
 async function startAir() {
   if (!air.V) await parkAir();

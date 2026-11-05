@@ -1,8 +1,8 @@
 # Zombie i broń
 
 ## Zombie (`combat/zombies.js`)
-Człowiek z LifeKit ze skórą i ubraniem zombie, warstwy ruchu „zombie” i „atak”. W dzień do 7, powolne (0,4–0,7 m/s);
-w nocy do 22, biegnące (2,4–3,4 m/s). Pojawiają się 45–115 m od gracza (z samolotu 80–380 m), idą do niego i przy nim
+Człowiek z LifeKit ze skórą i ubraniem zombie, warstwy ruchu „zombie” i „atak”. W dzień do 21, powolne (0,4–0,7 m/s);
+w nocy do 66, biegnące (2,4–3,4 m/s). Pojawiają się 45–115 m od gracza (z samolotu 80–380 m), idą do niego i przy nim
 (także przy pojeździe) atakują **bez szkód**. Znikają daleko za plecami (190 m; z samolotu 480 m). Zabite: upadek na
 wznak, kałuża krwi (przy przejechaniu — smuga), do 50 ciał. Rozjeżdżanie: pojazd jadący szybciej niż 2,5 m/s.
 
@@ -21,4 +21,4 @@ Latarka (`light`, pieszo) świeci tam, gdzie patrzy kamera. Pocisk sprawdza zomb
   ma stałe światło.
 - **Rozgrzanie shaderów** (`fxWarm`) w trakcie wczytywania: materiały wybuchu, dymu, smugacza, cząstek i plam są
   kompilowane od razu — pierwszy strzał bez przycięcia.
-- **Pula zombie**: 6 gotowych przy starcie; zabrane z dala wracają do puli (do 26) zamiast być budowane od nowa.
+- **Pula zombie**: 6 gotowych przy starcie; zabrane z dala wracają do puli (do 80) zamiast być budowane od nowa.

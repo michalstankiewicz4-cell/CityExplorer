@@ -2,11 +2,13 @@
 // Skrypt klasyczny: wspólny zakres globalny z pozostałymi plikami gry (kolejność: js/boot.mjs).
 'use strict';
 function physics(dt) {
-  if (mode === 'air') airStep(dt);
-  if (mode === 'boat') boatStep(dt);
+  // pojazd prowadzony przez innego gracza (jesteś pasażerem albo stoisz obok) — bez fizyki, stan z sieci (js/net/net.js)
+  if (mode === 'air' && !air.remote) airStep(dt);
+  if (mode === 'boat' && !boat.remote) boatStep(dt);
   if (mode === 'foot') walk(dt);
-  if (mode === 'rail') railStep(dt);
+  if (mode === 'rail' && !rail.remote) railStep(dt);
   if (FLEET.homed) for (const V of FLEET) {
+    if (V.remote) continue;
     const drive = mode === 'car' && V === ACT;
     if (!drive && V.s.rest) continue;          // stojący pojazd nie wymaga liczenia
     car = V.s; VDEF = V.def;

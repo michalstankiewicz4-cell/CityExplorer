@@ -56,6 +56,7 @@ function toggleOptions(force) {
 for (const b of document.querySelectorAll('#opts .tabs button')) b.onclick = () => { for (const x of document.querySelectorAll('#opts .tabs button')) x.classList.toggle('on', x === b); for (const t of document.querySelectorAll('#opts .tab')) t.hidden = t.dataset.tab !== b.dataset.tab; rebinding = null; drawKeys(); };
 $('oResume').onclick = () => toggleOptions(false);
 $('oMenu').onclick = () => location.reload();
+$('oRespawn').onclick = () => { toggleOptions(false); respawn(); };
 $('oNight').onchange = e => setNight(e.target.checked);
 $('oXray').onchange = e => setXray(e.target.checked);
 $('oPix').onchange = e => { pixelMode = e.target.checked; canvas.classList.toggle('pix', pixelMode); onResize(); };

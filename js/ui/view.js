@@ -15,6 +15,7 @@ function setXray(on) {
 /* ---------- noc ---------- */
 let night = false;
 function setNight(on) {
+  if (typeof NET !== 'undefined' && NET.on && NET.host) netSend('*', { t: 'night', on: !!on });   // gospodarz: pora dnia dla wszystkich
   night = on;
   scene.background.copy(on ? NIGHT.sky : DAY.sky); scene.fog.color.copy(on ? NIGHT.fog : DAY.fog);
   hemi.intensity = on ? 0.18 : 1.15; sun.intensity = on ? 0.12 : 2.4; sun.color.set(on ? '#9fb4ff' : '#fff3df');

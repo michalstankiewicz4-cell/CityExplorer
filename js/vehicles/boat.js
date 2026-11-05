@@ -79,8 +79,11 @@ async function parkBoat() {
   best = best || { x: wc[0], z: wc[1], th: 0 };
   const hs = []; for (let a = -600; a <= 600; a += 25) for (let b = -600; b <= 600; b += 25) if (isWater(best.x + a, best.z + b)) hs.push(H(best.x + a, best.z + b));
   hs.sort((p, q) => p - q); boat.yw = (hs.length ? hs[Math.floor(hs.length * 0.9)] : H(best.x, best.z)) + 0.3;
-  boat.spawn = best; boatReset();
+  boat.base = best; boat.spawn = boatSlotPoint(mySlot()); boatReset();
 }
+// miejsce gracza na rzece (gra z innymi): kolejne okręty wzdłuż nurtu, co 160 m (gdy tam woda)
+const BOAT_ALONG = [0, 160, -160, 320];
+function boatSlotPoint(slot) { const b = boat.base, d = BOAT_ALONG[slot || 0], x = b.x + Math.sin(b.th) * d, z = b.z + Math.cos(b.th) * d; return d && isWater(x, z) ? { x, z, th: b.th } : d ? { x: b.x - Math.cos(b.th) * 40 * Math.sign(d), z: b.z + Math.sin(b.th) * 40 * Math.sign(d), th: b.th } : b; }
 async function startBoat() {
   if (!boat.V) await parkBoat();
   mode = 'boat'; ego = boat.ego; boat.off = null; if (PED) PED.g.visible = false;

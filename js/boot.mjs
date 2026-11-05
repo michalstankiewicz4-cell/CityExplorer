@@ -30,6 +30,7 @@ const FILES = [
   'world/tiles.js',
   'ui/export.js',
   'world/areas.js',
+  'net/net.js',
   'core/main.js',
 ];
 for (const f of FILES) await new Promise((res, rej) => {

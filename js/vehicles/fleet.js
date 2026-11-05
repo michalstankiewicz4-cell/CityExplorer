@@ -7,10 +7,14 @@
    ========================================================================= */
 const GL = new URL('lab/', location.href).href;   // pliki z GameLaboratory skopiowane do gry (tools/sync-lab.mjs); ta sama kopia Three.js r186
 let RK = null, PED = null, ENV = null;
-const FLEET = [];                       // { id, def, v (model), s (stan) }
+const FLEET = [];                       // { id, key, slot, def, v (model), s (stan) } — komplet pojazdów każdego gracza (gra z innymi: miejsce 0–3)
 let ACT = null, car = null, VDEF = null; // pojazd gracza (ostatnio używany); car / VDEF — stan i opis liczonego teraz pojazdu
 const VEH_IDS = ['polonez', 'abrams', 'urbino18'];
 const PARK = { urbino18: 18, polonez: 0, abrams: -10 };     // ustawienie na starcie: metry wzdłuż ulicy
+const SLOT_ALONG = [0, 45, -45, 90];   // komplet kolejnego gracza dalej wzdłuż tej samej ulicy
+const parkAlong = (V) => (PARK[V.id] || 0) + SLOT_ALONG[V.slot || 0];
+const mySlot = () => (typeof NET !== 'undefined' && NET.on ? NET.slot : 0);
+const vkey = (id, slot) => slot ? id + '#' + slot : id;
 const TUNE = {                          // przyspieszenie w grze (zwykłe / Shift), kamera (odległość, wysokość), oczy w kabinie
   polonez: { acc: 6, accT: 9, steer: 0.6, cam: [8.5, 3.2], eye: ['body', 0.36, 1.15, -0.25] },
   abrams: { acc: 2.6, accT: 3.6, cam: [13, 5], eye: ['turret', -0.7, 1.33, 0.05] },
@@ -47,12 +51,7 @@ async function loadModels(progress = () => {}) {
   progress(0.02, 'Pojazdy drogowe (RoadKit)…');
   RK = await import(GL + 'js/models/road/roadkit.js');
   ENV = carEnv();
-  for (let i = 0; i < VEH_IDS.length; i++) {
-    const id = VEH_IDS[i], def = RK.vehicleInfo(id);
-    progress(0.1 + i * 0.22, def.name + '…'); await frame();
-    const v = RK.buildVehicle(id, id === 'abrams' ? { searchlight: true } : {}); prepModel(v.group); scene.add(v.group);
-    FLEET.push({ id, def, v, s: { x: 0, z: 0, y: 0, vy: 0, air: false, th: 0, vx: 0, vz: 0, steer: 0, w: 0, vf: 0, brake: false, work: 0, rest: false, spawn: null } });
-  }
+  await fleetSet(mySlot(), (i, name) => progress(0.1 + i * 0.22, name + '…'));   // twój komplet (komplety innych graczy: js/net/net.js)
   ACT = FLEET.find(V => V.id === 'polonez'); car = ACT.s; VDEF = ACT.def;
   // pieszy: człowiek z laboratorium ludzi (LifeKit, klasyczne skrypty na globalnym THREE)
   progress(0.8, 'Pieszy (LifeKit)…'); await frame();
@@ -68,6 +67,26 @@ async function loadModels(progress = () => {}) {
     PED = { c, g: c.group };
   } catch (e) { console.warn('[W3D] pieszy', e); }
   progress(1, 'Gotowe');
+}
+// komplet pojazdów gracza na miejscu `slot` (0 — gospodarz albo gra w pojedynkę); gdy pojazdy już stoją w centrum — od razu na miejscu
+async function fleetSet(slot, progress = () => {}) {
+  for (let i = 0; i < VEH_IDS.length; i++) {
+    const id = VEH_IDS[i]; if (FLEET.some(V => V.id === id && V.slot === slot)) continue;
+    const def = RK.vehicleInfo(id); progress(i, def.name); await frame();
+    const v = RK.buildVehicle(id, id === 'abrams' ? { searchlight: true } : {}); prepModel(v.group); scene.add(v.group);
+    const V = { id, key: vkey(id, slot), slot, def, v, s: { x: 0, z: 0, y: 0, vy: 0, air: false, th: 0, vx: 0, vz: 0, steer: 0, w: 0, vf: 0, brake: false, work: 0, rest: false, spawn: null } };
+    FLEET.push(V); if (SK.on) setSketch(true);   // styl „rysunek” także dla nowego kompletu
+    if (FLEET.homed && SPAWN) park(V, SPAWN, parkAlong(V)); else if (slot) v.group.visible = AREA === AREAS.centrum;
+  }
+}
+function fleetDrop(slot) {   // gracz wyszedł: jego komplet znika (poza pojazdem, w którym siedzisz)
+  for (let i = FLEET.length - 1; i >= 0; i--) { const V = FLEET[i]; if (V.slot !== slot || (V === ACT && mode !== 'foot')) continue;
+    scene.remove(V.v.group); V.v.group.traverse(o => { if (o.isMesh) o.geometry.dispose(); }); FLEET.splice(i, 1);
+    if (V === ACT) { ACT = FLEET.find(q => q.id === 'polonez' && q.slot === mySlot()) || FLEET[0]; car = ACT.s; VDEF = ACT.def; } }
+}
+// zmiana miejsca (dołączenie do pokoju w trakcie gry): twój komplet dostaje nowe miejsce; nieruszone pojazdy jadą na nie
+function fleetReslot(from, to) {
+  for (const V of FLEET) if (V.slot === from) { const sp = V.s.spawn, still = sp && Math.hypot(V.s.x - sp.x, V.s.z - sp.z) < 1; V.slot = to; V.key = vkey(V.id, to); if (still && FLEET.homed && SPAWN) park(V, SPAWN, parkAlong(V)); }
 }
 function makeCar() { const v = RK.buildVehicle('polonez', {}); return { g: v.group, v }; }   // dla doktora mapy
 const ped = { x: 0, z: 0, y: 0, vy: 0, air: false, th: 0, vf: 0, steer: 0 };
@@ -91,6 +110,7 @@ function nearOther() {
 function useCar() {
   if (mode === 'foot') {
     const o = nearOther();
+    if (o && o.kind === 'air' && remoteDriven('air')) { flash('Samolot ma jedno miejsce — leci nim ' + netName(driverOf('air'))); return; }
     if (o && o.kind === 'air') { mode = 'air'; ego = air.ego; air.work = 0; if (PED) PED.g.visible = false; air.off = null; return; }
     if (o && o.kind === 'rail') { rail = o.R; mode = 'rail'; ego = rail; if (PED) PED.g.visible = false; return; }
     if (o && o.kind === 'boat') { mode = 'boat'; ego = boat.ego; boat.off = null; if (PED) PED.g.visible = false; return; }
@@ -140,11 +160,22 @@ function resetCar() {
   }
   const s = car.spawn; Object.assign(car, { x: s.x, z: s.z, th: s.th, vx: 0, vz: 0, vy: 0, steer: 0, w: 0, vf: 0 }); car.y = surfaceAt(s.x, s.z, H(s.x, s.z));
 }
+// odrodzenie: z każdego miejsca i pojazdu pieszo na start, przy drzwiach twojego Poloneza na jego miejscu (auto zostaje, gdzie jest)
+async function respawn() {
+  if (!started || switching) return;
+  if (mode !== 'foot') { mode = 'foot'; ego = ped; air.work = 1; air.c.throttle = 0; boat.c.throttle = 0; camera.up.set(0, 1, 0); }
+  if (AREA !== AREAS.centrum) await switchArea(AREAS.centrum);
+  const V = FLEET.find(q => q.id === 'polonez' && q.slot === mySlot()) || FLEET.find(q => q.id === 'polonez'); if (!V) return;
+  const sp = V.s.spawn || V.s, [dx, dz] = toWorld(sp, V.def.doorAt.x, V.def.doorAt.z);
+  ACT = V; car = V.s; VDEF = V.def;
+  Object.assign(ped, { x: dx + Math.cos(sp.th) * 1.2 * Math.sign(V.def.doorAt.x), z: dz - Math.sin(sp.th) * 1.2 * Math.sign(V.def.doorAt.x), th: sp.th, vf: 0, vy: 0 }); ped.y = surfaceAt(ped.x, ped.z, H(ped.x, ped.z) + 1);
+  if (PED) PED.g.visible = true; camYaw = sp.th; orbit = 0; updateCamera(0, true); flash('Odrodzenie na starcie');
+}
 let SPAWN = null;
 function startAt(s) {   // pojazdy zaparkowane rzędem wzdłuż ulicy, człowiek przy drzwiach Poloneza
   SPAWN = s;
-  for (const V of FLEET) park(V, s, PARK[V.id] || 0);
-  ACT = FLEET.find(V => V.id === 'polonez'); car = ACT.s; VDEF = ACT.def;
+  for (const V of FLEET) park(V, s, parkAlong(V));
+  ACT = FLEET.find(V => V.id === 'polonez' && V.slot === mySlot()) || FLEET.find(V => V.id === 'polonez'); car = ACT.s; VDEF = ACT.def;
   mode = 'foot'; ego = ped; resetCar(); camYaw = s.th; orbit = 0;
 }
 function findSpawn() {

@@ -27,6 +27,10 @@ function hud(dt, fps) {
   if (TS.TL) for (const k of TS.loaded.keys()) { const c = TS.ov.get(k); if (!c) continue; const [i, j] = k.split('_').map(Number), T = TS.TL.T; mmg.drawImage(c, (i * T + TS.OFF[0] - ego.x) * W.os, (j * T + TS.OFF[1] - ego.z) * W.os, T * W.os, T * W.os); }   // kafle wokół
   mmg.drawImage(W.ov, -(ego.x + E) * W.os, -(ego.z + E) * W.os);
   mmg.restore();
+  // inni gracze (gra z innymi): na brzegu, gdy daleko
+  { const r = -Math.PI / 2 - Math.atan2(fz, fx), c = Math.cos(r), sn = Math.sin(r), R = Sz / 2 - 16;
+    for (const q of netMapPoints()) { let dx = (q.x - ego.x) * zoom, dz = (q.z - ego.z) * zoom, px = dx * c - dz * sn, py = dx * sn + dz * c; const L = Math.hypot(px, py); if (L > R) { px *= R / L; py *= R / L; }
+      netArrow(mmg, Sz / 2 + px, Sz / 2 + py, Math.atan2(Math.cos(q.th), Math.sin(q.th)) + Math.PI / 2 + r, q.col, q.name, 1.3); } }
   mmg.fillStyle = '#ff3b30'; mmg.strokeStyle = '#fff'; mmg.lineWidth = 2;
   mmg.beginPath(); mmg.moveTo(Sz / 2, Sz / 2 - 14); mmg.lineTo(Sz / 2 + 9, Sz / 2 + 10); mmg.lineTo(Sz / 2, Sz / 2 + 5); mmg.lineTo(Sz / 2 - 9, Sz / 2 + 10); mmg.closePath(); mmg.fill(); mmg.stroke();
   // kierunek północy

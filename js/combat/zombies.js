@@ -9,7 +9,7 @@
    ========================================================================= */
 const ZB = { pool: [], list: [], corpses: [], decals: [], t: 0, def: null, LK: null, spawnT: 0, kills: 0 };
 const FX = { tracers: [], booms: [], parts: null, pv: [], pi: 0 };
-const zMax = () => night ? 22 : 7;
+const zMax = () => night ? 66 : 21;
 const zSpeedOf = () => night ? 2.4 + Math.random() * 1.0 : 0.4 + Math.random() * 0.3;
 // krew: nieregularna plama (raz, płótno 128 px)
 const BLOOD_TEX = (() => {
@@ -87,14 +87,15 @@ function zBuild() {
 function zClearAll() { for (const z of ZB.list) zFree(z); ZB.list.length = 0; ZB.corpses.length = 0; for (const m of ZB.decals) { scene.remove(m); m.material.dispose(); } ZB.decals.length = 0; }
 // zombie wracają do puli zamiast znikać (budowa nowego człowieka zajmuje chwilę — przycięcie przy pojawianiu)
 function zFree(z) {
-  if (ZB.pool.length < 26) { z.c.group.visible = false; z.c.group.rotation.set(0, 0, 0); ZB.pool.push(z.c); return; }
+  if (ZB.pool.length < 80) { z.c.group.visible = false; z.c.group.rotation.set(0, 0, 0); ZB.pool.push(z.c); return; }
   scene.remove(z.c.group); z.c.group.traverse(o => { if (o.isMesh) o.geometry.dispose(); });
 }
 // pula na start (w trakcie wczytywania): kilka gotowych zombie
 function zPrebuild(n) { for (let i = 0; i < n; i++) { const c = zBuild(); if (!c) return; c.group.visible = false; ZB.pool.push(c); } }
-function zSpawn() {
+function zSpawn(t) {
+  const c0 = t || ego, far = t ? t.air || (!t.remote && mode === 'air') : mode === 'air';
   for (let k = 0; k < 12; k++) {
-    const a = Math.random() * 6.28, d = mode === 'air' ? 80 + Math.random() * 300 : 45 + Math.random() * 70, x = ego.x + Math.sin(a) * d, z = ego.z + Math.cos(a) * d;
+    const a = Math.random() * 6.28, d = far ? 80 + Math.random() * 300 : 45 + Math.random() * 70, x = c0.x + Math.sin(a) * d, z = c0.z + Math.cos(a) * d;
     if (W.inBuilding && W.inBuilding(x, z)) continue; if (boat.mask && isWater(x, z)) continue;
     if (zWall(x, z, H(x, z) + 1)) continue;
     const c = ZB.pool.pop() || zBuild(); if (!c) return; c.group.visible = true; c.group.rotation.set(0, 0, 0);
@@ -113,7 +114,9 @@ function egoShape() {
   return { x: ped.x, z: ped.z, th: ped.th, hl: 0, r: 0.4, v: 0 };
 }
 function capDist(S, x, z) { const fx = Math.sin(S.th), fz = Math.cos(S.th), dx = x - S.x, dz = z - S.z, al = Math.max(-S.hl, Math.min(S.hl, dx * fx + dz * fz)); return Math.hypot(dx - fx * al, dz - fz * al) - S.r; }
-function zKill(z, dir, crushed) {
+// fromNet: śmierć przyszła z sieci (albo zgłoszenie idzie osobno) — gospodarz nie rozsyła jej drugi raz
+function zKill(z, dir, crushed, fromNet) {
+  if (NET.on && NET.host && z.nid && !fromNet) { z.sent = true; netSend('*', { t: 'zd', id: z.nid, dir, cr: crushed ? 1 : 0 }); }
   z.dead = true; z.fall = 0; z.dir = dir; z.crushed = crushed;
   z.c.animate(carT, 1, { gait: 'idle' });   // rozluźniony, potem upada na wznak
   const y = surfaceAt(z.x, z.z, z.y + 1);
@@ -121,34 +124,38 @@ function zKill(z, dir, crushed) {
   if (crushed) { const fx = Math.sin(dir), fz = Math.cos(dir); decal(BLOOD_TEX, z.x + fx * 2.5, z.z + fz * 2.5, 1.1, 4.5, dir, y); }
   burst(z.x, y + 1.1, z.z, crushed ? 50 : 25, 0x7a0a0a, crushed ? 6 : 3);
   ZB.corpses.push(z); ZB.kills++;
-  if (ZB.corpses.length > 50) { const old = ZB.corpses.shift(); zFree(old); ZB.list.splice(ZB.list.indexOf(old), 1); }
+  if (ZB.corpses.length > 50) { const old = ZB.corpses.shift(); zFree(old); ZB.list.splice(ZB.list.indexOf(old), 1); if (old.net) NET.zmap.delete(old.nid); }
 }
 function zHit(z, p) {
   burst(p.x, p.y, p.z, 14, 0x8a0b0b, 2.5);
-  z.hp -= p.y > z.y + 1.5 ? 3 : 1;   // w głowę — od razu
-  if (z.hp <= 0) zKill(z, Math.atan2(z.x - ego.x, z.z - ego.z), false);
+  const head = p.y > z.y + 1.5, dir = Math.atan2(z.x - ego.x, z.z - ego.z);
+  if (z.net) { netSend(NET.hostId, { t: 'hit', id: z.nid, head: head ? 1 : 0, dir }); return; }   // zombie gospodarza: trafienie liczy on
+  z.hp -= head ? 3 : 1;   // w głowę — od razu
+  if (z.hp <= 0) zKill(z, dir, false);
 }
 function zombiesStep(dt) {
   if (!started || switching || !window.LifeKit) return;
+  if (NET.on && !NET.host) { netZombiesStep(dt); return; }   // z innymi: zombie prowadzi gospodarz
   ZB.spawnT -= dt;
-  const alive = ZB.list.filter(z => !z.dead);
-  if (ZB.spawnT <= 0 && alive.length < zMax() && mode !== 'boat') { ZB.spawnT = night ? 0.6 : 2.5; zSpawn(); }
-  const S = egoShape();
+  const alive = ZB.list.filter(z => !z.dead), T = netTargets(), nP = T.length;
+  if (ZB.spawnT <= 0 && alive.length < zMax() * Math.min(2, (1 + nP) / 2)) { ZB.spawnT = (night ? 0.2 : 0.85) / nP; const t = T[Math.floor(Math.random() * nP)]; if (!t.water) zSpawn(t); }
   for (let i = ZB.list.length - 1; i >= 0; i--) {
     const z = ZB.list[i];
     if (z.dead) {   // upadek na wznak (0,6 s), potem leży
       if (z.fall < 1) { z.fall = Math.min(1, z.fall + dt / 0.6); const k = z.fall * z.fall; z.c.group.rotation.set(-Math.PI / 2 * k, z.th, 0, 'YXZ'); z.c.group.position.y = z.y + 0.12 * k; }
       continue;
     }
-    const d0 = Math.hypot(z.x - ego.x, z.z - ego.z);
-    if (d0 > (mode === 'air' ? 480 : 190)) { zFree(z); ZB.list.splice(i, 1); continue; }   // z samolotu widać dalej   // za daleko — zniknął
+    // najbliższy gracz (pieszo albo pojazd); za daleko od wszystkich — znika (z samolotu widać dalej)
+    let S = T[0], dc = capDist(S, z.x, z.z), far = true;
+    for (const t of T) { const dd = Math.hypot(z.x - t.x, z.z - t.z); if (dd < (t.air || (t === T[0] && mode === 'air') ? 480 : 190)) far = false; const c = capDist(t, z.x, z.z); if (c < dc) { dc = c; S = t; } }
+    if (far) { zFree(z); ZB.list.splice(i, 1); continue; }
+    const d0 = Math.hypot(z.x - S.x, z.z - S.z);
     // przejechany: pojazd w ruchu przez zombie
-    const dc = capDist(S, z.x, z.z);
-    if (S.v > 2.5 && dc < 0.35 && !S.air) { zKill(z, S.th, true); if (mode === 'car' && ACT && ACT.id !== 'abrams') bump = Math.max(bump, 0.25); continue; }
+    if (S.v > 2.5 && dc < 0.35 && !S.air) { zKill(z, S.th, true); if (!S.remote && mode === 'car' && ACT && ACT.id !== 'abrams') bump = Math.max(bump, 0.25); continue; }
     z.sp = night ? Math.max(z.sp, 2.4) : Math.min(z.sp, 0.7);
     let want = z.th, go = 0, atk = 0;
     if (d0 < 75 && !S.air) {   // goni gracza; przy nim (i przy pojeździe) atakuje — bez szkód
-      want = Math.atan2(ego.x - z.x, ego.z - z.z);
+      want = Math.atan2(S.x - z.x, S.z - z.z);
       if (dc < 0.9) atk = 1; else go = z.sp;
       if (S.water && boat.mask && isWater(z.x + Math.sin(want) * 1.5, z.z + Math.cos(want) * 1.5)) { go = 0; atk = 1; }
     } else { z.wander += (Math.random() - 0.5) * dt; want = z.wander; go = 0.35; }
@@ -159,7 +166,7 @@ function zombiesStep(dt) {
       if (!zWall(nx, nz, z.y + 1) && !(W.inBuilding && W.inBuilding(nx, nz))) { z.x = nx; z.z = nz; } else { z.wander = z.th + (Math.random() < 0.5 ? 1.4 : -1.4); z.th = z.wander; }
     }
     z.y = surfaceAt(z.x, z.z, z.y + 0.8);
-    z.atk += (atk - z.atk) * Math.min(1, 6 * dt);
+    z.atk += (atk - z.atk) * Math.min(1, 6 * dt); z.go = go;
     z.c.group.position.set(z.x, z.y, z.z); z.c.group.rotation.set(0, z.th, 0);
     z.c.animate(carT + z.t0, dt, { gait: go > 0.05 ? (go > 1.9 ? 'run' : 'walk') : 'idle', speed: Math.max(0.4, go), layers: { zombie: 1, attack: z.atk } });
   }
