@@ -9,7 +9,7 @@ Modele i zachowania powstają w GameLaboratory i są w `lab/` ([laboratorium.md]
 | FSO Polonez, Solaris Urbino 18 | RoadKit | `driveWheels`: przyspieszenie z `TUNE`, poślizg boczny, ręczny, spadki | centrum, przy ulicy (najlepiej Marszałkowska) | `use` przy drzwiach (sekwencja drzwi), wysiadanie po zatrzymaniu |
 | M1A2 Abrams | RoadKit (z reflektorem szperaczem) | `driveTank`: gąsienice, obrót w miejscu; wieża i armata za kamerą | centrum | jak wyżej (właz) |
 | PESA Swing 120Na | TramKit + zachowanie „koło na szynie” (fizyka aTrain) | nastawnik prędkości, hamulec, wykolejenie | centrum, na linii tramwajowej | `use`: drzwi, drugi raz — wysiadka przy czole |
-| Pociąg (TrainKit) | TrainKit | po wygładzonym torze WKD: napęd, hamowanie, spadek, koniec mapy | centrum, Śródmieście WKD | jak tramwaj |
+| Pociąg (TrainKit) | TrainKit | cała trasa WKD Śródmieście WKD → Pruszków WKD (16,5 km, geometria torów 1:1 z OSM, `data/wkd.json`): napęd, hamowanie, spadek, koniec trasy | centrum, Śródmieście WKD | jak tramwaj |
 | Supermarine Spitfire Mk I | AirKit + zachowanie „lot w atmosferze” | 6 stopni swobody: nośna, przeciągnięcie, ciąg, stery, podwozie | Okęcie, próg drogi startowej 29 | `use` na ziemi po zatrzymaniu (owiewka się otwiera) |
 | ORP Błyskawica | ShipKit + zachowanie „okręt na wodzie”; woda WaterKit | telegraf, ster, cyrkulacja, kołysanie, mielizna | Wisła przy Moście Świętokrzyskim | `use` na postoju przy brzegu |
 

@@ -30,6 +30,7 @@ async function switchArea(a) {
     if (mode !== 'air') { for (const V of FLEET) V.s.y = surfaceAt(V.s.x, V.s.z, V.s.y + 2); ped.y = surfaceAt(ped.x, ped.z, ped.y + 2); }
     camPos.x -= dx; camPos.z -= dz; if (air.off == null) {}
     for (const R of Object.values(RAILS)) for (const o of R.objs || []) o.visible = R.area === AREA;
+    wkdShow(RAILS.train.area === AREA);   // szyny trasy WKD należą do centrum
     await homeVehicles(t => status('Ustawiam pojazdy na ich miejscach: ' + t, 0.95));
     if (sk) setSketch(true); if (xray) setXray(true); setNight(night);
     if (bigOpen) { bmPan = null; drawBigMap(); }

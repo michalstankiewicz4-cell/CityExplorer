@@ -61,10 +61,54 @@ function railTrack(ch, westward) {   // opis toru (łuki, wysokości) dla ciągu
   }
   return trackCache.get(key);
 }
+/* ---------- WKD: cała trasa Śródmieście WKD → Pruszków WKD (data/wkd.json, z OSM przez tools/fetch-wkd.mjs) ----------
+   Geometria torów 1:1 z mapy. Wysokości: na dokładnej mapie z jej linii WKD (tunel pod Śródmieściem, wykopy), dalej grunt
+   kafli. Szyny i podkłady budowane kawałkami po 1 km, gdy skład (albo gracz) jest blisko — reszta trasy nie obciąża klatki. */
+let WKD = null;
+async function wkdTrack() {
+  if (WKD) return WKD;
+  const d = await fetch('data/wkd.json').then(r => r.json());
+  let la = 0, lo = 0; const pts = [];
+  for (let i = 0; i < d.pts.length; i += 2) { la += d.pts[i]; lo += d.pts[i + 1]; const [x, z] = toXZ(la / 1e6, lo / 1e6); pts.push([x, z]); }
+  // wysokości z próbek linii WKD dokładnej mapy (najbliższa próbka do 6 m), poza mapą — grunt
+  const S = []; for (const l of W.lines) if (l.net === 'rail' && l.samples && /Kolej Dojazdowa/.test(l.t.name || '')) for (const p of l.samples) S.push(p);
+  const lim = E - 25;
+  for (const p of pts) {
+    let y = H(p[0], p[1]);
+    if (Math.abs(p[0]) < lim && Math.abs(p[1]) < lim) { let bd = 36; for (const q of S) { const dd = (q[0] - p[0]) ** 2 + (q[1] - p[1]) ** 2; if (dd < bd) { bd = dd; y = q[2]; } } }
+    p.push(y);
+  }
+  WKD = { data: d, T: PATH.pathTrack(pts, { step: 4, smooth: 3 }), chunks: new Map() };
+  return WKD;
+}
+const WKD_CHUNK = 1000;
+// kawałek toru [a, b] jako osobny opis (te same łuki i proste, s od początku kawałka) — dla path-track.js
+function subTrack(T, a, b) {
+  const segs = T.segs.filter(g => g.s0 + g.len > a && g.s0 < b).map(g => ({ ...g, s0: g.s0 - a }));
+  return { segs, L: Math.min(b, T.L) - a, station: (s) => T.station(s + a), height: (s) => T.height(s + a) };
+}
+// szyny WKD w promieniu ok. 1,5 km od składu i od gracza; dalekie kawałki zwalniane
+let wkdT = 0;
+function wkdRails(dt) {
+  if ((wkdT += dt) < 0.4) return; wkdT = 0;
+  const R = RAILS.train, Q = [[R.x, R.z], [ego.x, ego.z]];
+  if (!WKD || !PTRACK || !RAILS.train.V || RAILS.train.area !== AREA) return;
+  const T = WKD.T, n = Math.ceil(T.L / WKD_CHUNK);
+  for (let k = 0; k < n; k++) {
+    const p = T.station(Math.min(T.L, (k + 0.5) * WKD_CHUNK)), d = Math.min(...Q.map(([x, z]) => Math.hypot(p.px - x, p.pz - z))) - WKD_CHUNK / 2, have = WKD.chunks.get(k);
+    if (d < 1000 && !have) {
+      const tm = PTRACK.buildPathTrack(subTrack(T, k * WKD_CHUNK, Math.min(T.L, (k + 1) * WKD_CHUNK + 1)), { lift: RAIL_LIFT.rail, sleepers: true, ballast: true, step: 1.5 });
+      scene.add(tm); WKD.chunks.set(k, tm); return;   // jeden kawałek na wywołanie — bez przycięcia klatki
+    }
+    if (d > 2000 && have) { scene.remove(have); have.traverse(o => { if (o.isMesh) o.geometry.dispose(); }); WKD.chunks.delete(k); }
+  }
+}
+function wkdShow(on) { if (WKD) for (const m of WKD.chunks.values()) m.visible = on; }
 // szyny: na początek tylko na linii, po której jedzie gracz (pierwsza linia tramwajowa / kolejowa); reszta później
 async function buildRails(T, net) {
   PTRACK = PTRACK || await import(GL + 'js/models/structures/railway/path-track.js');
   if (!T || T.L < 20) return;
+  if (WKD && T === WKD.T) return;   // trasa WKD: kawałkami (wkdRails)
   const tm = PTRACK.buildPathTrack(T, { lift: RAIL_LIFT[net], sleepers: net === 'rail', ballast: net === 'rail', step: 1.5 }); scene.add(tm); (rail.objs = rail.objs || []).push(tm);
 }
 // skład i jego tor należą do obszaru, w którym stoi (centrum): w innym obszarze są ukryte, po powrocie — na swoim miejscu
@@ -96,11 +140,14 @@ async function parkRail_(kind) {
   const R = await loadRail(kind);
   const total = R.units.reduce((a, u) => a + u.L, 0) + R.gap * (R.units.length - 1);
   // ciąg: na mapie, zmieści się skład, jak najwięcej toru na powierzchni, blisko centrum
-  // WKD: linia Warszawskiej Kolei Dojazdowej, start na wschodnim końcu (Śródmieście WKD), czołem w stronę Pruszkowa — do końca mapy
+  // WKD: cała trasa Warszawskiej Kolei Dojazdowej ze Śródmieścia WKD do Pruszkowa WKD (data/wkd.json), czołem w stronę Pruszkowa;
+  // gdy plik się nie wczyta — linia z dokładnej mapy do jej końca
   let at = null, bestD = 1e9, any = null;
   if (kind === 'train') {
-    const ch = namedChain(/Kolej Dojazdowa/), T = ch && railTrack(ch, true);
-    if (T && T.L > total + 40) at = { ch, T, s: total + 15 };
+    const ch = namedChain(/Kolej Dojazdowa/);
+    try { const w = await wkdTrack(); if (w.T.L > total + 40) at = { ch: ch || { names: ['WKD'], len: w.T.L }, T: w.T, s: total + 15 }; }
+    catch (e) { console.warn('[W3D] trasa WKD (data/wkd.json)', e); }
+    if (!at) { const T = ch && railTrack(ch, true); if (T && T.L > total + 40) at = { ch, T, s: total + 15 }; }
   }
   const above = (T, s) => { const p = T.station(s); return T.height(s) > H(p.px, p.pz) - 1.5; };
   if (!at) for (const ch of RAIL_CHAINS[net]) {
@@ -153,7 +200,7 @@ function railStep(dt) {
   if (R.doors > 0.5) a = -Math.sign(R.v) * Math.min(Math.abs(R.v) / dt, 3);
   const v0 = R.v; R.v += a * dt; if ((em || (!up && !dn) || R.doors > 0.5) && Math.sign(R.v) !== Math.sign(v0) && v0 !== 0) R.v = 0;
   R.v = Math.max(-5, Math.min(T.vmax, R.v)); R.s += R.v * dt;
-  if (R.s > R.T.L - 2) { R.s = R.T.L - 2; if (R.v > 0) { if (R.v > 2) bump = Math.min(1, R.v / 8); R.v = 0; flash('Koniec mapy — dalej trasa do Pruszkowa później. ' + kb('back') + ': jazda wstecz'); } }
+  if (R.s > R.T.L - 2) { R.s = R.T.L - 2; if (R.v > 0) { if (R.v > 2) bump = Math.min(1, R.v / 8); R.v = 0; flash((WKD && R.T === WKD.T ? WKD.data.to + ' — koniec trasy. ' : 'Koniec toru. ') + kb('back') + ': jazda wstecz'); } }
   if (R.s - R.total < 2) { R.s = R.total + 2; if (R.v < 0) { R.v = 0; flash('Koniec toru'); } }
   R.brake = (dn && R.v > 0.1) || em; R.vf = R.v;
 }

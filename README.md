@@ -8,7 +8,7 @@ tramwajem, pociągiem WKD, samolotem Spitfire i okrętem ORP Błyskawica — w j
 
 ## Tryby
 Ekran startowy wybiera, od czego zaczynasz; pozostałe pojazdy i tak stoją na swoich miejscach:
-**pieszo i pojazdem** (centrum: Polonez, Abrams, Solaris), **szynowy** (tramwaj PESA Swing albo pociąg na linii WKD),
+**pieszo i pojazdem** (centrum: Polonez, Abrams, Solaris), **szynowy** (tramwaj PESA Swing albo pociąg WKD — cała trasa ze Śródmieścia do Pruszkowa, tory 1:1 z mapy),
 **samolot** (Spitfire Mk I na Okęciu), **okręt** (ORP Błyskawica na Wiśle). Szczegóły: [docs/pojazdy.md](docs/pojazdy.md).
 
 **Gra z innymi** (2–4 osoby, WebRTC): na ekranie startowym „Utwórz pokój” i podaj kod albo wpisz kod i „Dołącz”. Gospodarz prowadzi zombie; w pojeździe pierwszy jest kierowcą, kolejni pasażerami. Szczegóły: [docs/multiplayer.md](docs/multiplayer.md).

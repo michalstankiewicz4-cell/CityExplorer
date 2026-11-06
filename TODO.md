@@ -2,7 +2,7 @@
 
 ## Ustalone, na później
 - Tory: poprawienie torów (ciągłość, łuki pod fizykę kół); pozostałe linie tramwajowe i kolejowe.
-- WKD — cała trasa do Pruszkowa; tramwaj — pełna trasa linii.
+- Tramwaj — pełna trasa linii; WKD dalej za Pruszków (Grodzisk, Milanówek), perony i wiaty na przystankach poza centrum.
 - Metro — na początek tylko linia M1.
 - Trolejbus linii 51 (1983–1995, Dworzec Południowy — Puławska — Piaseczno).
 - Śmigłowiec W-3 Sokół (z własną fizyką wirnika w GameLaboratory).

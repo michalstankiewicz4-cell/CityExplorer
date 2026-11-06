@@ -52,3 +52,11 @@ Overpass na żywo (poza Warszawą, kafel po kaflu). Duża mapa (M): wyśrodkowan
 | `?mode=foot` / `rail:tram` / `rail:train` / `air` / `boat` | start bez ekranu wyboru (`drive` — od razu w aucie, dla doktora mapy) |
 | `?map=okecie` / `?map=wisla` | start w obszarze lotniska / Wisły |
 | `?lat=…&lon=…&r=…` | własny obszar startowy (promień 300–2500 m; dane pobiorą się z OSM w przeglądarce) |
+
+## Trasa WKD (Śródmieście WKD → Pruszków WKD)
+
+`data/wkd.json` — jeden tor linii (ten, którym jedzie się na zachód) z OSM, 16,5 km, 13 przystanków; punkty w mikrostopniach
+zapisane przyrostami, warstwa punktu (tunel / teren / most) i przystanki z odległością od początku. Odświeżanie:
+`node tools/fetch-wkd.mjs` (Overpass) albo `node tools/fetch-wkd.mjs odpowiedź-overpass.json`. W grze (`js/vehicles/rail.js`):
+współrzędne tak jak cała mapa (1:1), wysokości na dokładnej mapie z jej linii WKD (tunel pod Śródmieściem), dalej grunt kafli;
+szyny, podkłady i podsypka budowane kawałkami po 1 km w promieniu ok. 1 km od składu i od gracza, dalsze zwalniane.

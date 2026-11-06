@@ -41,6 +41,7 @@ function step(dt, draw) {
     V.v.update(carT, dt, o);
   }
   if (mode === 'rail') railPlace(dt);
+  wkdRails(dt);   // szyny trasy WKD kawałkami wokół składu i gracza
   if (air.V) airPlace(dt);   // także zaparkowany (pieszy obok)
   if (boat.V && boat.sim) boatPlace(dt);
   // pieszy

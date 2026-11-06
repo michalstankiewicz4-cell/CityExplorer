@@ -2,6 +2,9 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.20.0 — 2026-11-07
+- **WKD do Pruszkowa**: pociąg WKD jedzie całą trasą ze Śródmieścia WKD do Pruszkowa WKD (16,5 km, 13 przystanków) po prawdziwej geometrii torów z OpenStreetMap, w skali 1:1 z resztą mapy — także poza dokładnym obszarem centrum, nad kaflami. Tunel pod Śródmieściem jak na dokładnej mapie, dalej tor na gruncie. Szyny budowane kawałkami po 1 km wokół składu i gracza. Dane: `data/wkd.json` (`tools/fetch-wkd.mjs`). Na końcu: „Pruszków WKD — koniec trasy”.
+
 ## 0.19.2 — 2026-11-07
 - **Kamera podąża za graczem i pojazdem**: 1,5 s po ostatnim ruchu myszą sama wraca za plecy — pieszo, gdy idziesz (nie przy celowaniu ani przy biegu w stronę kamery), i za każdym pojazdem w ruchu: auta, tramwaj, pociąg, a teraz także samolot i okręt (czołg bez zmian: mysz celuje wieżą).
 - **Duża mapa wyśrodkowana na graczu** przy każdym przybliżeniu i podąża za nim; przeciągnięcie przesuwa mapę, PPM wraca na gracza.
