@@ -40,12 +40,13 @@ let bmPan = null, bmDrag = null, bmMoved = false;
 bm.addEventListener('pointerdown', e => { if (!bmView) return; bmDrag = { x: e.clientX, y: e.clientY, cx: bmView.cx, cz: bmView.cz }; bmMoved = false; });
 addEventListener('pointermove', e => { if (!bmDrag || !bigOpen) return; const dx = e.clientX - bmDrag.x, dy = e.clientY - bmDrag.y; if (Math.hypot(dx, dy) > 4) bmMoved = true; if (bmMoved) { bmPan = { x: bmDrag.cx - dx / bmView.s, z: bmDrag.cz - dy / bmView.s }; drawBigMap(); } });
 addEventListener('pointerup', () => { bmDrag = null; });
+bm.addEventListener('contextmenu', e => { e.preventDefault(); bmPan = null; drawBigMap(); });   // PPM: z powrotem na gracza
 bm.addEventListener('click', e => {
   if (!bmView || bmMoved) { bmMoved = false; return; }
   const x = (e.clientX - bmView.ox) / bmView.s - E, z = (e.clientY - bmView.oy) / bmView.s - E;
   if (W.inBuilding && W.inBuilding(x, z)) { $('bigmapHint').textContent = 'Tam stoi budynek — wybierz ulicę lub plac'; return; }
   if (mode === 'car') { Object.assign(car, { x, z, vx: 0, vz: 0, vy: 0 }); car.y = surfaceAt(x, z, H(x, z)); } else if (mode === 'foot') { Object.assign(ped, { x, z, vy: 0, vf: 0 }); ped.y = surfaceAt(x, z, H(x, z)); } updateCamera(0, true); toggleBigMap();
-  $('bigmapHint').textContent = 'Mapa — kliknij, aby się tam przenieść · przeciągnij = przesuwanie · kółko = zoom · ' + kb('map') + ' zamyka';
+  $('bigmapHint').textContent = 'Mapa — kliknij, aby się tam przenieść · przeciągnij = przesuwanie · PPM = na gracza · kółko = zoom · ' + kb('map') + ' zamyka';
 });
 function drawBigMap() {
   if (!bigOpen) return;
@@ -55,8 +56,8 @@ function drawBigMap() {
   bmg.clearRect(0, 0, innerWidth, innerHeight);
   const size = Math.min(innerWidth, innerHeight) * 0.92 * bmZoom;
   const s = size / (2 * E);
-  // środek: przesunięty myszą, przy zoomie gracz, inaczej środek mapy
-  const vcx = bmPan ? bmPan.x : bmZoom > 1 ? ego.x : 0, vcz = bmPan ? bmPan.z : bmZoom > 1 ? ego.z : 0;
+  // środek: gracz (mapa podąża za nim), po przeciągnięciu — tam, gdzie przesunięto; PPM wraca do gracza
+  const vcx = bmPan ? bmPan.x : ego.x, vcz = bmPan ? bmPan.z : ego.z;
   let ox = innerWidth / 2 - (vcx + E) * s, oy = innerHeight / 2 - (vcz + E) * s;
   bmView = { ox, oy, s, cx: vcx, cz: vcz };
   bmg.imageSmoothingEnabled = true;

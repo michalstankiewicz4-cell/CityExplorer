@@ -15,7 +15,7 @@ Modele i zachowania powstają w GameLaboratory i są w `lab/` ([laboratorium.md]
 
 ## Kamera
 `ui/camera.js`: TPP i FPP (`cam`). Pieszo kamera przez prawe ramię, przy celowaniu bliżej i węższy kąt. W pojeździe
-kamera wraca za pojazd 1,5 s po ruchu myszą (poza czołgiem), `lookBack` — spójrz za siebie, kąt widzenia rośnie
+kamera wraca za pojazd 1,5 s po ruchu myszą, gdy jedzie (auta, tramwaj, pociąg, samolot, okręt; poza czołgiem), `lookBack` — spójrz za siebie, kąt widzenia rośnie
 z prędkością. Samolot i okręt mają własne kamery (`airCamera`, `boatCamera`; FPP — kabina, mostek).
 
 ## Woda

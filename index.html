@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wielka Kradzież Aut VI — jazda autem po centrum Warszawy (PKiN) · v0.19.1</title>
+<title>Wielka Kradzież Aut VI — jazda autem po centrum Warszawy (PKiN) · v0.19.2</title>
 <meta name="description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta name="keywords" content="Wielka Kradzież Aut VI, gra Warszawa, jazda autem po Warszawie, Pałac Kultury i Nauki 3D, PKiN, Śródmieście 3D, symulator jazdy przeglądarka, mapa 3D Warszawy, three.js, OpenStreetMap">
 <meta name="author" content="Michał Stankiewicz">
@@ -18,7 +18,7 @@
 <meta property="og:title" content="Wielka Kradzież Aut VI — jedź autem po centrum Warszawy">
 <meta property="og:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
 <meta property="og:url" content="https://michalstankiewicz4-cell.github.io/CityExplorer/">
-<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg?v=0.19.1">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg?v=0.19.2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Wielka Kradzież Aut VI — Pałac Kultury i Nauki, tramwaj, radiowóz i samochód sportowy">
@@ -26,9 +26,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Wielka Kradzież Aut VI — jedź autem po centrum Warszawy">
 <meta name="twitter:description" content="Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.">
-<meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg?v=0.19.1">
+<meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg?v=0.19.2">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Wielka Kradzież Aut VI","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg?v=0.19.1","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.19.1"}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Wielka Kradzież Aut VI","alternateName":"CityExplorer","url":"https://michalstankiewicz4-cell.github.io/CityExplorer/","image":"https://michalstankiewicz4-cell.github.io/CityExplorer/og-image.jpg?v=0.19.2","description":"Darmowa gra w przeglądarce: spaceruj, jedź Polonezem, czołgiem Abrams, przegubowym Solarisem, tramwajem Swing i pociągiem po trójwymiarowym centrum Warszawy zbudowanym z prawdziwej mapy. Pałac Kultury i Nauki, Śródmieście, wiadukty, tunele, metro i tramwaje — dane OpenStreetMap i NMT GUGiK.","inLanguage":"pl","genre":["Symulator jazdy","Gra przeglądarkowa","Eksploracja miasta"],"gamePlatform":"Przeglądarka internetowa","applicationCategory":"Game","operatingSystem":"Dowolny (przeglądarka z WebGL)","offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},"author":{"@type":"Person","name":"Michał Stankiewicz","url":"https://github.com/michalstankiewicz4-cell"},"contentLocation":{"@type":"Place","name":"Śródmieście, Warszawa","geo":{"@type":"GeoCoordinates","latitude":52.23175,"longitude":21.00586}},"softwareVersion":"0.19.2"}
 </script>
 <link rel="stylesheet" href="css/game.css">
 <script type="importmap">{"imports":{"three":"./lab/vendor/three/three.module.js"}}</script>
@@ -111,7 +111,7 @@
 <canvas id="minimap" width="440" height="440" style="display:none"></canvas>
 <canvas id="bigmap"></canvas>
 <button id="bmQual" title="Pokaż, które obszary są dopracowane, a które wygenerowane automatycznie">Dopracowanie obszarów</button>
-<div id="bigmapHint">Mapa — kliknij, aby się tam przenieść · przeciągnij = przesuwanie · kółko = zoom · M zamyka</div>
+<div id="bigmapHint">Mapa — kliknij, aby się tam przenieść · przeciągnij = przesuwanie · PPM = na gracza · kółko = zoom · M zamyka</div>
 <div id="help" style="display:none">
   <div id="helpKeys"></div>
   <div class="btns">

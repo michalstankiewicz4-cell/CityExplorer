@@ -146,6 +146,7 @@ function boatCamera(dt, snap) {
     camLook.set(camPos.x + Math.sin(h) * Math.cos(tl) * 50, camPos.y + Math.sin(tl) * 50, camPos.z + Math.cos(h) * Math.cos(tl) * 50);
     if (camera.near !== 0.3) { camera.near = 0.3; camera.updateProjectionMatrix(); }
   } else {
+    if (!dragging && performance.now() - mouse.last > 1500 && Math.abs(s.vf) > 0.5) { orbit *= Math.exp(-1.6 * dt); tilt *= Math.exp(-1.6 * dt); }   // kamera sama wraca za okręt
     const far = camMode === 1, d0 = far ? 290 : 135, h0 = far ? 95 : 38, h = s.th + orbit;
     const r = Math.hypot(d0, h0) * camDist, el = Math.max(0.03, Math.min(1.4, Math.atan2(h0, d0) + tilt));
     const want = new THREE.Vector3(-Math.sin(h) * Math.cos(el) * r, Math.sin(el) * r, -Math.cos(h) * Math.cos(el) * r);

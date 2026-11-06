@@ -83,6 +83,7 @@ function airCamera(dt, snap) {
     camLook.set(camPos.x + d[0] * 20, camPos.y + d[1] * 20, camPos.z + d[2] * 20); camera.up.set(u[0], u[1], u[2]);
     if (camera.near !== 0.05) { camera.near = 0.05; camera.updateProjectionMatrix(); }
   } else {
+    if (!dragging && performance.now() - mouse.last > 1500) { orbit *= Math.exp(-2.2 * dt); tilt *= Math.exp(-2.2 * dt); }   // kamera sama wraca za samolot
     const h = Math.atan2(f[0], f[2]) + orbit, far = camMode === 1;
     const r = Math.hypot(far ? 40 : 16, far ? 12 : 4.5) * camDist, el = Math.max(-0.3, Math.min(1.4, Math.atan2(far ? 12 : 4.5, far ? 40 : 16) + tilt));
     const want = new THREE.Vector3(-Math.sin(h) * Math.cos(el) * r, Math.sin(el) * r, -Math.cos(h) * Math.cos(el) * r);

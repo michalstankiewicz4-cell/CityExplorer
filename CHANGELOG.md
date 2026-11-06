@@ -2,6 +2,10 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.19.2 — 2026-11-07
+- **Kamera podąża za graczem i pojazdem**: 1,5 s po ostatnim ruchu myszą sama wraca za plecy — pieszo, gdy idziesz (nie przy celowaniu ani przy biegu w stronę kamery), i za każdym pojazdem w ruchu: auta, tramwaj, pociąg, a teraz także samolot i okręt (czołg bez zmian: mysz celuje wieżą).
+- **Duża mapa wyśrodkowana na graczu** przy każdym przybliżeniu i podąża za nim; przeciągnięcie przesuwa mapę, PPM wraca na gracza.
+
 ## 0.19.1 — 2026-11-05
 - **Szybka publikacja**: po pushu strona publikuje się w ok. minutę z danymi z cache (wcześniej: kolejka za przebiegiem kafli i 12 minut pobierania OSM przy każdym pushu, razem nawet godzina). Dane OSM i kafle pobiera osobne zadanie co 2 godziny, które nie blokuje publikacji ([docs/deploy.md](docs/deploy.md)).
 

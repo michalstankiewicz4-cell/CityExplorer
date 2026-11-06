@@ -24,7 +24,7 @@ Odrodzenie (pieszo na start, przy twoim Polonezie, z każdego miejsca i pojazdu)
 
 ## Mysz
 Kliknięcie w grę łapie mysz (Pointer Lock): ruch obraca kamerę bez przycisku; Esc puszcza mysz i otwiera opcje.
-Bez złapania — LPM + przeciągnij. Zależnie od tego, czym sterujesz: pieszo LPM strzał, PPM celowanie, kółko — broń
+Kamera podąża za graczem jak w grach z widokiem zza pleców: 1,5 s po ostatnim ruchu myszą sama wraca za plecy (pieszo, gdy idziesz — nie przy celowaniu ani przy biegu w stronę kamery) i za pojazd, gdy jedzie (poza czołgiem, w którym mysz celuje wieżą). Bez złapania — LPM + przeciągnij. Zależnie od tego, czym sterujesz: pieszo LPM strzał, PPM celowanie, kółko — broń
 (Beryl / bez broni); auto, autobus: PPM celowanie przez okno, LPM strzał, kółko — odległość kamery; czołg: mysz —
 wieża i armata, LPM strzał, PPM przybliżenie, kółko — działo / karabin; samolot: LPM karabiny, PPM bomba;
 tramwaj, pociąg, okręt — rozglądanie, kółko — odległość kamery.

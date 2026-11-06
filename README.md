@@ -27,14 +27,14 @@ Klawisze można zmienić w opcjach (Esc → Klawisze); lista w lewym dolnym rogu
 | Samochód, autobus, czołg | |
 |---|---|
 | W / S | gaz / hamulec, wstecz · A D — skręt · Spacja — ręczny · Shift — turbo |
-| Mysz | rozglądanie (kamera wraca za pojazd); czołg: wieża i armata |
+| Mysz | rozglądanie (kamera sama wraca za gracza i za pojazd); czołg: wieża i armata |
 | PPM + LPM | strzał przez okno; czołg: LPM — strzał, PPM — przybliżenie, kółko / Tab — działo / karabin, L — reflektor |
 | C | spójrz za siebie · F — wysiądź |
 
 | Wszędzie | |
 |---|---|
 | V | kamera: TPP (za plecami) / FPP (oczami, z kabiny) |
-| M / K | mapa (przeciągnij, kółko, klik = przeniesienie) / minimapa |
+| M / K | mapa na graczu (przeciągnij, PPM = z powrotem na gracza, kółko, klik = przeniesienie) / minimapa |
 | N · X · P · R · H | noc · rentgen · pixel-art · powrót na start · pomoc |
 
 Samolot: W/S drążek, A/D lotki, Q/E ster kierunku, Shift/Ctrl gaz, Spacja hamulce kół, G podwozie, B klapy, LPM karabiny w skrzydłach, PPM / Z zrzut bomby (2 × 250 lb, uzbrajane po wylądowaniu), F wysiądź. Okręt: W/S telegraf, A/D ster, Spacja stop maszyn, F zejście na ląd. Tramwaj i pociąg: W/S napęd i hamowanie, Spacja hamulec nagły, F drzwi / wysiądź.

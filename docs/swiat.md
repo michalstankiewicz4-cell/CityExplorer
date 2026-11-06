@@ -43,7 +43,7 @@ rogu kafla). W zasięgu widoku w stronę ruchu kafle się wczytują, daleko za p
 teksturą i ścianami w siatce zderzeń). Kafel: płaski grunt z malowanymi drogami, obszarami, wodą, torami i lotniskami,
 budynki z płaskimi dachami. Od krawędzi dokładnej mapy teren schodzi łagodnie (300 m) do poziomu kafli (`H()`).
 Źródła: gotowe pliki `tiles/<i>_<j>.json` całej Warszawy (deploy, [deploy.md](deploy.md)) → pamięć przeglądarki →
-Overpass na żywo (poza Warszawą, kafel po kaflu). Duża mapa (M): przesuwanie, oddalanie, podglądy kafli, przycisk
+Overpass na żywo (poza Warszawą, kafel po kaflu). Duża mapa (M): wyśrodkowana na graczu i podąża za nim, przesuwanie (PPM — z powrotem na gracza), oddalanie, podglądy kafli, przycisk
 „Dopracowanie obszarów”, złota obwódka granicy całej mapy (siatka kafli Warszawy, `WARSAW` w `js/shared/tiles.mjs`) z wymiarami, inni gracze (gra z innymi).
 
 ## Parametry URL

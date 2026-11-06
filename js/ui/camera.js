@@ -40,8 +40,14 @@ function updateCamera(dt, snap) {
   if (mode === 'air') return airCamera(dt, snap);
   if (mode === 'boat') return boatCamera(dt, snap);
   const onFoot = ego === ped;
-  // w pojeździe kamera sama wraca za pojazd 1,5 s po ruchu myszą, gdy jedzie (w czołgu nie: kamera celuje wieżą)
-  if (!onFoot && !dragging && !(mode === 'car' && ACT && ACT.id === 'abrams') && performance.now() - mouse.last > 1500 && Math.abs(ego.vf || 0) > 1) { orbit *= Math.exp(-2.2 * dt); tilt *= Math.exp(-2.2 * dt); }
+  // kamera podąża za graczem: 1,5 s po ruchu myszą sama wraca za plecy / za pojazd, gdy gracz się porusza
+  // (w czołgu nie: kamera celuje wieżą; pieszo nie przy celowaniu ani przy biegu w stronę kamery)
+  const idle = !dragging && performance.now() - mouse.last > 1500;
+  if (!onFoot && idle && !(mode === 'car' && ACT && ACT.id === 'abrams') && Math.abs(ego.vf || 0) > 1) { orbit *= Math.exp(-2.2 * dt); tilt *= Math.exp(-2.2 * dt); }
+  if (onFoot && idle && mode === 'foot' && ped.vf > 0.6 && !on('aim') && !on('fire') && camMode !== 2) {
+    camYaw += orbit; orbit = 0; const d = Math.atan2(Math.sin(ped.th - camYaw), Math.cos(ped.th - camYaw));
+    if (Math.abs(d) < 2.2) { const k = 1 - Math.exp(-(0.9 + 0.25 * ped.vf) * dt); camYaw += d * k; tilt += (0.12 - tilt) * k; }
+  }
   const back = !onFoot && on('lookBack') ? Math.PI : 0;   // spójrz za siebie (kamera przeskakuje od razu, bez przejazdu przez pojazd)
   if (back !== CAM.back) { CAM.back = back; snap = true; }
   const th = (onFoot ? camYaw : ego.th) + orbit + back, fx = Math.sin(th), fz = Math.cos(th);
