@@ -81,11 +81,13 @@ function buildWorld(D) {
   const lines = [];
   for (const w of D.ways) {
     const t = w.t; if (!t) continue;
-    if (t.indoor === 'yes' || t.highway === 'corridor' || t.highway === 'elevator') continue;
+    // ciągi piesze pod ziemią (przejścia, schody, korytarze stacji metra): tunel pieszy, także gdy w OSM to indoor / level < 0
+    const footHw = /^(footway|steps|corridor|path|pedestrian)$/.test(t.highway || ''), below = num(t.level) < 0 || num(t.layer) < 0 || t.location === 'underground';
+    if (t.highway === 'elevator' || ((t.indoor === 'yes' || t.highway === 'corridor') && !(footHw && below))) continue;
     const isB = !!t.bridge && t.bridge !== 'no';
     // tory pod ziemią bez znacznika tunelu (stacja podziemna: level < 0 albo location=underground) to tunel
-    const isT = (!!t.tunnel && t.tunnel !== 'no' && t.tunnel !== 'culvert') || (!!t.railway && !isB && (num(t.level) < 0 || t.location === 'underground'));
-    let L = num(t.layer);
+    const isT = (!!t.tunnel && t.tunnel !== 'no' && t.tunnel !== 'culvert') || (!!t.railway && !isB && (num(t.level) < 0 || t.location === 'underground')) || (footHw && below && !isB);
+    let L = num(t.layer); if (isNaN(L) && footHw && num(t.level) < 0) L = num(t.level);
     const passage = isT && !t.railway && (t.tunnel === 'building_passage' || isNaN(L));
     if (!isT && !isB && L < 0 && t.railway) L = 0;   // tor w wykopie (layer −1 bez tunelu): zjazd z portalu w wykopie robią konstrukcje
     if (!isT && !isB && (L < 0 || num(t.level) < 0 || t.location === 'underground')) continue;

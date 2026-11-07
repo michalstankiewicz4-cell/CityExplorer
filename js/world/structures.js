@@ -23,18 +23,20 @@ function gridAdd(grid, cell, x0, z0, x1, z1, pad, item) {
   for (let i = a0; i <= a1; i++) for (let j = b0; j <= b1; j++) { const k = i * 100003 + j; let a = grid.get(k); if (!a) grid.set(k, a = []); a.push(item); }
 }
 // wysokość nawierzchni pod punktem: najwyższa powierzchnia nie wyżej niż yRef+1.1 (wjazd na rampę), inaczej najniższa
-function surfaceAt(x, z, yRef) {
-  let best = -1e9, low = 1e9, inTube = false;
+function surfaceAt(x, z, yRef, foot = false) {   // foot: pieszy (także posadzki przejść, schody, kładki)
+  let best = -1e9, low = 1e9, inTube = false, inStair = false;
   const a = surfGrid.get(Math.floor(x / SURF_CELL) * 100003 + Math.floor(z / SURF_CELL));
   if (a) for (const s of a) {
     const dx = s[3] - s[0], dz = s[5] - s[2], l2 = dx * dx + dz * dz;
     let t = l2 > 0 ? ((x - s[0]) * dx + (z - s[2]) * dz) / l2 : 0; t = t < 0 ? 0 : t > 1 ? 1 : t;
+    if (s[8] && !foot) continue;
     const d = Math.hypot(x - s[0] - dx * t, z - s[2] - dz * t); if (d > s[6] + 0.3) continue;
     const y = s[1] + (s[4] - s[1]) * t;
     if (s[7] && yRef < y + s[7] - 1) inTube = true;   // jesteśmy w tunelu: teren nad nami to strop
+    if (s[8] && yRef < y + 2.5 && y <= yRef + 1.1 && y < H(x, z) - 0.3) inStair = true;       // pieszy na schodach / posadzce przejścia w wykopie: resztki terenu nad nim się nie liczą
     if (y <= yRef + 1.1 && y > best) best = y; if (y < low) low = y;
   }
-  if (!inTube) { const th = H(x, z); if (th <= yRef + 1.1 && th > best) best = th; if (th < low) low = th; }
+  if (!inTube && !inStair) { const th = H(x, z); if (th <= yRef + 1.1 && th > best) best = th; if (th < low) low = th; }
   return best > -1e8 ? best : low;
 }
 
@@ -72,7 +74,8 @@ function buildStructures(lines, ctx) {
   for (const net in nets) for (const n of nets[net].values()) {
     const tun = n.ways.filter(l => l.kind === 'tunnel'); if (!tun.length) continue;
     const D = Math.max(...tun.map(l => tunnelDepth(net, l.L)));
-    const free = n.ways.some(l => l.kind === 'free');
+    // schody prowadzące do przejścia podziemnego to zejście, nie powierzchnia: węzeł u ich stóp jest już pod ziemią, w dół schodzą schody
+    const free = n.ways.some(l => l.kind === 'free' && !(net === 'foot' && l.t.highway === 'steps'));
     if (!free) { off.set(K(net, n.id), -D); continue; }
     // portal: wykop już w NMT? patrzymy 15 m w głąb tunelu
     const l = tun[0], i = l.ids.indexOf(n.id), dir = i === 0 ? 1 : -1;
@@ -215,7 +218,7 @@ function buildStructures(lines, ctx) {
         let y;
         if (va.a != null && vb.a != null) y = va.a + (vb.a - va.a) * t;
         else { const oa = va.o ?? (va.a - H(a[0], a[1])), ob = vb.o ?? (vb.a - H(b[0], b[1])); y = h + oa + (ob - oa) * t; }
-        if (l.kind === 'tunnel') y = Math.min(y, h - 0.4);
+        if (l.kind === 'tunnel' && l.net !== 'foot') y = Math.min(y, h - 0.4);   // przejście pieszych: przy wejściu posadzka równo z terenem (otwarta klatka schodowa)
         const uc = underCuts.get(l);
         if (uc) { const d = l.cum[i] + (l.cum[i + 1] - l.cum[i]) * t; for (const [s0, s1, h1, h2, ymax] of uc) if (d > s0 && d < s1) { const f = (d - s0) / (s1 - s0), yl = Math.min(h1 + (h2 - h1) * f, ymax); y = Math.min(y, yl); } }
         S.push([x, z, y, h]); maxOff = Math.max(maxOff, Math.abs(y - h));
@@ -272,7 +275,8 @@ function buildStructures(lines, ctx) {
     f(v(0, 1, 0), v(1, 1, 0), v(1, 1, 1), v(0, 1, 1), [0, 1, 0]);
   };
   const collEdge = (S, i0, i1, side, w, y0f, y1f, kind = 'w') => { for (let i = i0; i < i1; i++) { const ra = frameAt(S, i), rb = frameAt(S, i + 1); collAdd(S[i][0] + ra[0] * side * w, S[i][1] + ra[1] * side * w, S[i + 1][0] + rb[0] * side * w, S[i + 1][1] + rb[1] * side * w, 0, Math.min(y0f(i), y0f(i + 1)), Math.max(y1f(i), y1f(i + 1)), kind); } };
-  const addSurf = (S, i0, i1, hw, hT = 0) => { for (let i = i0; i < i1; i++) { const a = S[i], b = S[i + 1]; gridAdd(surfGrid, SURF_CELL, a[0], a[1], b[0], b[1], hw + 0.5, [a[0], a[2], a[1], b[0], b[2], b[1], hw, hT]); } };
+  // nawierzchnia pod nogami / kołami; foot = tylko dla pieszych (posadzki przejść, schody, kładki — auta tam nie wjeżdżają)
+  const addSurf = (S, i0, i1, hw, hT = 0, foot = 0) => { for (let i = i0; i < i1; i++) { const a = S[i], b = S[i + 1]; gridAdd(surfGrid, SURF_CELL, a[0], a[1], b[0], b[1], hw + (foot ? 0.2 : 0.5), [a[0], a[2], a[1], b[0], b[2], b[1], hw, hT, foot]); } };
   const cuts = [], stats = { bridges: 0, tunnels: 0, ramps: 0, passages: 0 };
   // indeks jezdni: krawędzi nasypu/bariery nie stawiamy w pasie innej jezdni (np. druga jezdnia dwujezdniowej ulicy)
   const roadIdx = new Map();
@@ -323,19 +327,25 @@ function buildStructures(lines, ctx) {
         const r = frameAt(S, i), xs = w > 14 ? [-w / 3, w / 3] : [0];
         for (const o of xs) { const x = S[i][0] + r[0] * o, z = S[i][1] + r[1] * o, g0 = H(x, z) - 0.5; if (onLineBelow(x, z, S[i][2])) continue; box(G.conc, x, g0, z, 1.4, S[i][2] - 1.1 - g0, 1.4, CONC_D); collAdd(x, z, x, z, 0.85, g0 - 1, S[i][2] - 1.2, 'p'); }
       }
-      if (net === 'road') addSurf(S, 0, n, hw);
+      if (net === 'road') addSurf(S, 0, n, hw); else if (net === 'foot') addSurf(S, 0, n, hw, 0, 1);
     } else if (l.kind === 'tunnel') {
       stats.tunnels++;
       const hT = TUBE_H[net] || 5.6, col = TUBE_C[net] || TUBE_C.road;
       ribbon(G.deck[dk], S, 0, n, w, 0.02, 1, uvLen);
+      // wejście do podziemi (pieszy): tam, gdzie posadzka jest płycej niż wysokość przejścia, to otwarta klatka schodowa —
+      // wycięty teren, bez stropu, mur do 0,9 m nad terenem zamiast ściany tuby
+      const open = S.map(p => net === 'foot' && p[3] - p[2] < hT + 0.4);
+      for (let i = 0; i <= n; i++) if (open[i]) cuts.push([S[i][0], S[i][1], S[i][2], hw + 0.5]);
+      const wallTop = k => open[k] ? Math.max(S[k][2] + 0.9, S[k][3] + 0.9) : S[k][2] + hT;
       // ściany boczne; tam, gdzie obok biegnie drugi tunel tej sieci (np. dwa tory WKD w osobnych tubach), ściany między nimi nie ma — jeden szerszy tunel
       for (const side of [-1, 1]) {
         const tw = S.map((p, i) => twinTube(l, S, i, side, hw)); let i0 = 0;
-        for (let i = 0; i <= n; i++) if (i === n || tw[i] !== tw[i0]) { const i1 = Math.min(n, i); if (!tw[i0] && i1 > i0) { wall(G.tube, S, i0, i1, side, hw + 0.4, k => S[k][2] - 0.2, k => S[k][2] + hT, col, -1); collEdge(S, i0, i1, side, hw + 0.3, k => S[k][2] - 1, k => S[k][2] + hT); } i0 = i; }
+        for (let i = 0; i <= n; i++) if (i === n || tw[i] !== tw[i0]) { const i1 = Math.min(n, i); if (!tw[i0] && i1 > i0) { wall(G.tube, S, i0, i1, side, hw + 0.4, k => S[k][2] - 0.2, wallTop, col, -1); collEdge(S, i0, i1, side, hw + 0.3, k => S[k][2] - 1, wallTop); } i0 = i; }
       }
-      ribbon(G.tube, S, 0, n, w + 0.8, hT, -1, 10);
+      // strop tylko nad zamkniętą częścią (klatka schodowa jest otwarta)
+      for (let i = 0, j0 = 0; i <= n; i++) if (i === n || open[i] !== open[j0]) { if (!open[j0] && i > j0) ribbon(G.tube, S, j0, i, w + 0.8, hT, -1, 10); j0 = i; }
       // lampy pod stropem
-      for (let i = 0; i < n; i += 2) { const p = S[i]; G.lamp.tri([p[0] - 0.35, p[2] + hT - 0.05, p[1] - 0.35], [p[0] + 0.35, p[2] + hT - 0.05, p[1] - 0.35], [p[0] + 0.35, p[2] + hT - 0.05, p[1] + 0.35], CONC, -1); G.lamp.tri([p[0] - 0.35, p[2] + hT - 0.05, p[1] - 0.35], [p[0] + 0.35, p[2] + hT - 0.05, p[1] + 0.35], [p[0] - 0.35, p[2] + hT - 0.05, p[1] + 0.35], CONC, -1); }
+      for (let i = 0; i < n; i += 2) { const p = S[i]; if (open[i]) continue; G.lamp.tri([p[0] - 0.35, p[2] + hT - 0.05, p[1] - 0.35], [p[0] + 0.35, p[2] + hT - 0.05, p[1] - 0.35], [p[0] + 0.35, p[2] + hT - 0.05, p[1] + 0.35], CONC, -1); G.lamp.tri([p[0] - 0.35, p[2] + hT - 0.05, p[1] - 0.35], [p[0] + 0.35, p[2] + hT - 0.05, p[1] + 0.35], [p[0] - 0.35, p[2] + hT - 0.05, p[1] + 0.35], CONC, -1); }
       // ściany czołowe portali
       for (const end of [0, n]) {
         const node = nets[net].get(end ? l.ids[l.ids.length - 1] : l.ids[0]); if (!node || !node.portal) continue;
@@ -346,7 +356,7 @@ function buildStructures(lines, ctx) {
         G.conc.tri(A, B, B1, CONC, out); G.conc.tri(A, B1, A1, CONC, out);
         collAdd(A[0], A[2], B[0], B[2], 0, yb - 0.3, top + 1.5, 'h');   // mur nad portalem (z góry nie wjedziesz do wykopu)
       }
-      if (net === 'road') addSurf(S, 0, n, hw, hT);
+      if (net === 'road') addSurf(S, 0, n, hw, hT); else if (net === 'foot') addSurf(S, 0, n, hw, hT, 1);
     } else if (l.kind === 'ramp') {
       stats.ramps++;
       // odcinki z przesunięciem > 0.12 m
@@ -373,7 +383,7 @@ function buildStructures(lines, ctx) {
           }
         }
         for (let i = a; i <= b; i++) if (S[i][2] < S[i][3] - 0.2) cuts.push([S[i][0], S[i][1], S[i][2], hw + 0.6]);
-        if (net === 'road') addSurf(S, a, b, hw);
+        if (net === 'road') addSurf(S, a, b, hw); else if (net === 'foot') addSurf(S, a, b, hw, 0, 1);
       };
       for (let i = 0; i <= n; i++) {
         const big = Math.abs(S[i][2] - S[i][3]) > 0.12;

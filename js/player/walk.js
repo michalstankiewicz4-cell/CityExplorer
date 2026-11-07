@@ -36,7 +36,7 @@ function walk(dt) {
       if (d < rr && d > 1e-6) { ped.x += (ped.x - cx) / d * (rr - d); ped.z += (ped.z - cz) / d * (rr - d); }
     }
   }
-  const sy = surfaceAt(ped.x, ped.z, ped.y + 0.4);
+  const sy = surfaceAt(ped.x, ped.z, ped.y + 0.4, true);
   if (ped.y - sy > 0.35 || ped.vy > 0.5) { ped.vy -= 9.81 * dt; ped.y += ped.vy * dt; if (ped.y <= sy) { ped.y = sy; ped.vy = 0; } ped.air = ped.y > sy + 0.05; }
   else { ped.y += (sy - ped.y) * Math.min(1, 14 * dt); ped.vy = 0; ped.air = false; }
 

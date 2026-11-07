@@ -99,7 +99,7 @@ function zSpawn(t) {
     if (W.inBuilding && W.inBuilding(x, z)) continue; if (boat.mask && isWater(x, z)) continue;
     if (zWall(x, z, H(x, z) + 1)) continue;
     const c = ZB.pool.pop() || zBuild(); if (!c) return; c.group.visible = true; c.group.rotation.set(0, 0, 0);
-    const y = surfaceAt(x, z, H(x, z) + 1);
+    const y = surfaceAt(x, z, H(x, z) + 1, true);
     ZB.list.push({ c, x, z, y, th: Math.random() * 6.28, sp: zSpeedOf(), hp: 2, wander: Math.random() * 6.28, atk: 0, t0: Math.random() * 10 });
     return;
   }
@@ -119,7 +119,7 @@ function zKill(z, dir, crushed, fromNet) {
   if (NET.on && NET.host && z.nid && !fromNet) { z.sent = true; netSend('*', { t: 'zd', id: z.nid, dir, cr: crushed ? 1 : 0 }); }
   z.dead = true; z.fall = 0; z.dir = dir; z.crushed = crushed;
   z.c.animate(carT, 1, { gait: 'idle' });   // rozluźniony, potem upada na wznak
-  const y = surfaceAt(z.x, z.z, z.y + 1);
+  const y = surfaceAt(z.x, z.z, z.y + 1, true);
   decal(BLOOD_TEX, z.x - Math.sin(z.th) * 0.9, z.z - Math.cos(z.th) * 0.9, 1.6 + Math.random(), 1.6 + Math.random(), Math.random() * 6.28, y);
   if (crushed) { const fx = Math.sin(dir), fz = Math.cos(dir); decal(BLOOD_TEX, z.x + fx * 2.5, z.z + fz * 2.5, 1.1, 4.5, dir, y); }
   burst(z.x, y + 1.1, z.z, crushed ? 50 : 25, 0x7a0a0a, crushed ? 6 : 3);
@@ -165,7 +165,7 @@ function zombiesStep(dt) {
       const nx = z.x + Math.sin(z.th) * go * dt, nz = z.z + Math.cos(z.th) * go * dt;
       if (!zWall(nx, nz, z.y + 1) && !(W.inBuilding && W.inBuilding(nx, nz))) { z.x = nx; z.z = nz; } else { z.wander = z.th + (Math.random() < 0.5 ? 1.4 : -1.4); z.th = z.wander; }
     }
-    z.y = surfaceAt(z.x, z.z, z.y + 0.8);
+    z.y = surfaceAt(z.x, z.z, z.y + 0.8, true);
     z.atk += (atk - z.atk) * Math.min(1, 6 * dt); z.go = go;
     z.c.group.position.set(z.x, z.y, z.z); z.c.group.rotation.set(0, z.th, 0);
     z.c.animate(carT + z.t0, dt, { gait: go > 0.05 ? (go > 1.9 ? 'run' : 'walk') : 'idle', speed: Math.max(0.4, go), layers: { zombie: 1, attack: z.atk } });

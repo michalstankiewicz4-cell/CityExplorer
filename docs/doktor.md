@@ -8,7 +8,7 @@ Uruchamia grę w ramce (`?mode=drive`) i bada zbudowany świat:
 | Widoczność | jezdnia / tor w budynku, nawierzchnia pod terenem, tunel wystający nad teren, budynek w tunelu |
 | Ciągłość torów | przerwy, ślepe końce, skoki wysokości, spadki (kolej 4%, metro 5%, tramwaj 9%), ostre załamania; cała trasa WKD (`data/wkd.json`): tor nad terenem bez mostu, tor pod terenem bez tunelu i wykopu, budynki i przeszkody na torze (obrys składu 1,25 m od osi), miejsce startu względem peronu Śródmieścia WKD |
 | Wiadukty | budynek albo zadaszenie w pasie jezdni wiaduktu (do 4,5 m nad pomostem), ulice pod wiaduktem — zablokowane (filar, budynek) albo z prześwitem < 4,2 m (każde przejście wypisane z prześwitem), uskoki tam, gdzie ulice dochodzą do wiaduktu |
-| Przejścia i tunele | przejścia podziemne bez wejścia, wejścia do podziemi niepodłączone, bramy bez budynku, płytkie tunele drogowe |
+| Przejścia i tunele | przejścia podziemne bez wejścia, wejścia do podziemi niepodłączone (pieszy idzie od ulicy w głąb przejścia krokami po 0,5 m; uskok > 1 m albo zostaje > 1,5 m nad posadzką), bramy bez budynku, płytkie tunele drogowe |
 | Modele | auto, tramwaj, metro, pociąg — doktor modeli z GameLaboratory (kopia w `lab/tools/doctor/modeldoctor.js`) |
 | Kafle mapy | gotowe kafle Warszawy, luki na trasie centrum — Okęcie, czy kafle w promieniu 4 km się wczytują i budują |
 

@@ -81,7 +81,10 @@ async function wkdTrack() {
   }
   // warstwa w punkcie toru (tunel −1, teren 0, most 1) — doktor mapy porównuje wysokość toru z terenem
   const layerAt = (s) => { let i = 0; while (i < cum.length - 1 && cum[i + 1] < s) i++; return d.layer[i] || 0; };
-  WKD = { data: d, T: PATH.pathTrack(pts, { step: 4, smooth: 3 }), chunks: new Map(), layerAt };
+  const T = PATH.pathTrack(pts, { step: 4, smooth: 3 });
+  // na dokładnej mapie tory WKD rysuje mapa (oba tory, rozjazdy) — własne szyny trasy dopiero od jej krawędzi
+  let sOut = 0; for (let s = 0; s < T.L; s += 5) { const p = T.station(s); if (Math.abs(p.px) >= lim || Math.abs(p.pz) >= lim) { sOut = s; break; } }
+  WKD = { data: d, T, chunks: new Map(), layerAt, sOut };
   return WKD;
 }
 const WKD_CHUNK = 1000;
@@ -100,7 +103,9 @@ function wkdRails(dt) {
   for (let k = 0; k < n; k++) {
     const p = T.station(Math.min(T.L, (k + 0.5) * WKD_CHUNK)), d = Math.min(...Q.map(([x, z]) => Math.hypot(p.px - x, p.pz - z))) - WKD_CHUNK / 2, have = WKD.chunks.get(k);
     if (d < 1000 && !have) {
-      const tm = PTRACK.buildPathTrack(subTrack(T, k * WKD_CHUNK, Math.min(T.L, (k + 1) * WKD_CHUNK + 1)), { lift: RAIL_LIFT.rail, sleepers: true, ballast: true, step: 1.5 });
+      const a = Math.max(k * WKD_CHUNK, WKD.sOut), b = Math.min(T.L, (k + 1) * WKD_CHUNK + 1);
+      if (b - a < 5) { WKD.chunks.set(k, new THREE.Group()); return; }   // kawałek na dokładnej mapie: szyny są w mapie
+      const tm = PTRACK.buildPathTrack(subTrack(T, a, b), { lift: RAIL_LIFT.rail, sleepers: true, ballast: true, step: 1.5 });
       scene.add(tm); WKD.chunks.set(k, tm); return;   // jeden kawałek na wywołanie — bez przycięcia klatki
     }
     if (d > 2000 && have) { scene.remove(have); have.traverse(o => { if (o.isMesh) o.geometry.dispose(); }); WKD.chunks.delete(k); }

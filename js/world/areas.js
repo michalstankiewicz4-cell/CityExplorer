@@ -27,7 +27,7 @@ async function switchArea(a) {
     mv(ped); for (const V of FLEET) { mv(V.s); mv(V.s.spawn); V.s.rest = false; } if (SPAWN) mv(SPAWN);
     if (air.sim) { const p = air.sim.state.p; p[0] -= dx; p[2] -= dz; mv(air.spawn); airSync(); }
     if (boat.sim) { mv(boat.sim.state); mv(boat.spawn); boat.mask = null; boatSync(); boatMask(boat.sim.state.x, boat.sim.state.z); }
-    if (mode !== 'air') { for (const V of FLEET) V.s.y = surfaceAt(V.s.x, V.s.z, V.s.y + 2); ped.y = surfaceAt(ped.x, ped.z, ped.y + 2); }
+    if (mode !== 'air') { for (const V of FLEET) V.s.y = surfaceAt(V.s.x, V.s.z, V.s.y + 2); ped.y = surfaceAt(ped.x, ped.z, ped.y + 2, true); }
     camPos.x -= dx; camPos.z -= dz; if (air.off == null) {}
     for (const R of Object.values(RAILS)) for (const o of R.objs || []) o.visible = R.area === AREA;
     wkdShow(RAILS.train.area === AREA);   // szyny trasy WKD należą do centrum

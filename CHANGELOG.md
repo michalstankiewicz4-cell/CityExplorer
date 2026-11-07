@@ -2,6 +2,12 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.21.0 — 2026-11-07
+- **Wejścia do podziemi**: do przejść podziemnych i korytarzy stacji metra da się zejść i nimi przejść. Posadzki przejść, schody i kładki są nawierzchnią dla pieszych (i zombie), nie dla aut. Schody prowadzące do przejścia schodzą od ulicy do posadzki (wcześniej leżały płasko na ulicy, a przejście nurkowało 5 m na kilku metrach). Przy wejściu otwarta klatka schodowa: wycięcie w terenie, bez stropu, murek 0,9 m; dalej zamknięty korytarz z lampami.
+- **Korytarze metra i przejścia z OSM** oznaczone poziomem poniżej zera, `location=underground` albo `indoor` (pod ziemią) są tunelami pieszymi (wcześniej pomijane).
+- **WKD w centrum**: na dokładnej mapie tory WKD rysuje tylko mapa (oba tory i rozjazdy) — własne szyny trasy zaczynają się na krawędzi mapy (wcześniej nakładały się na tory mapy i na rentgenie wyglądały jak tory przecinające kolejkę).
+- **Doktor mapy**: wejścia do podziemi — przechodnie 56 → ok. 85 ze 144 (przed zmianami 0 z 84); próg uskoku jak u pieszego w grze (wchodzi na stopień do ok. 1,5 m).
+
 ## 0.20.1 — 2026-11-07
 - **Wiadukty** (zasady budowy mapy, nie pojedyncze miejsca): zadaszenia i wiaty, które w OSM są w większości dachem, to cienkie daszki bez okien biurowca (np. przy Centralnej wzdłuż Chałubińskiego i Jana Pawła II wyglądały jak budynki zawieszone w powietrzu z jezdnią w środku); obiekty z warstwą ≥ 1 nad pomostem stoją na pomoście; filary nie stają na jezdniach i torach pod wiaduktem; obiekty z warstwą ≥ 1 nad wykopem (np. dworzec Warszawa Ochota nad WKD) stoją na poziomie ulicy i nie zamykają ścianami wykopu.
 - **Tunele i wykopy dwutorowe**: gdy obok biegnie drugi tor tej samej sieci w osobnej tubie lub wykopie, ściany między nimi nie ma — skład WKD nie wchodzi już w ścianę (było 0,8–1,4 m od osi do ściany, teraz ok. 2,6 m).

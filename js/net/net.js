@@ -159,7 +159,7 @@ function netShowPlayers(dt) {
     const [x, z] = g2l(d.p[0], d.p[1]), onFoot = d.k === 'foot';
     let tagY = 0;
     if (onFoot) {
-      const y = surfaceAt(x, z, (p.y ?? H(x, z)) + 1); p.y = y;
+      const y = surfaceAt(x, z, (p.y ?? H(x, z)) + 1, true); p.y = y;
       p.av.group.visible = true; p.av.group.position.set(x, y, z); p.av.group.rotation.set(0, d.th, 0);
       const sp = Math.abs(d.sp); p.av.animate(carT, dt, { gait: sp < 0.15 ? 'idle' : sp > 2.6 ? 'run' : 'walk', speed: Math.max(0.6, sp), layers: { aim: d.an && d.an[2] ? 1 : 0, sneak: d.an && d.an[1] ? 1 : 0 } });
       tagY = y + 2.2;
@@ -265,7 +265,7 @@ function netZombiesStep(dt) {
     if (z.dead) { if (z.fall < 1) { z.fall = Math.min(1, z.fall + dt / 0.6); const k = z.fall * z.fall; z.c.group.rotation.set(-Math.PI / 2 * k, z.th, 0, 'YXZ'); z.c.group.position.y = z.y + 0.12 * k; } continue; }
     if (z.tx == null) continue;
     const k = Math.min(1, 8 * dt); z.x += (z.tx - z.x) * k; z.z += (z.tz - z.z) * k; z.th = lerpA(z.th, z.tth, k); z.atk += ((z.tatk || 0) - z.atk) * k;
-    z.y = surfaceAt(z.x, z.z, z.y + 0.8);
+    z.y = surfaceAt(z.x, z.z, z.y + 0.8, true);
     if (S.v > 2.5 && !S.air && capDist(S, z.x, z.z) < 0.35) { netSend(NET.hostId, { t: 'kill', id: z.nid, dir: S.th, cr: 1 }); zKill(z, S.th, true, true); continue; }
     z.c.group.position.set(z.x, z.y, z.z); z.c.group.rotation.set(0, z.th, 0);
     z.c.animate(carT + z.t0, dt, { gait: z.go > 0.05 ? (z.go > 1.9 ? 'run' : 'walk') : 'idle', speed: Math.max(0.4, z.go || 0), layers: { zombie: 1, attack: z.atk } });
