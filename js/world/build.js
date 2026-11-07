@@ -193,12 +193,12 @@ function buildWorld(D) {
   const chunkOf = c => { const k = Math.floor(c[0] / CH) * 1000 + Math.floor(c[1] / CH); let o = chunks.get(k); if (!o) chunks.set(k, o = { w: new Geo(true), r: new Geo(false) }); return o; };
   const tmpC = new THREE.Color();
   const parseCol = (s, fb) => { const c = new THREE.Color(fb); if (s) { try { const m = /^[0-9a-f]{6}$/i.test(s) ? '#' + s : s; const cc = new THREE.Color(); cc.setStyle(m.replace(/_/g, '')); c.copy(cc); } catch (e) { } } return c; };
-  const footprints = [];
+  const footprints = [], bvol = [];
   let nB = 0;
   for (const b of bl) {
     const t = b.t;
     if (!b.part && hasParts(b)) continue;
-    const isRoof = t.building === 'roof' || t['building:part'] === 'roof' || t.covered === 'yes';
+    let isRoof = t.building === 'roof' || t['building:part'] === 'roof' || t.covered === 'yes';
     const lv = num(t['building:levels']), rl = num(t['roof:levels']);
     let h = num(t.height), rh = num(t['roof:height']);
     let minH = num(t.min_height); if (isNaN(minH)) { const ml = num(t['building:min_level']); minH = isNaN(ml) ? 0 : ml * 3.2; }
@@ -208,7 +208,12 @@ function buildWorld(D) {
       if (!isNaN(lv)) h = lv * 3.2 + (isNaN(rh) ? 0 : rh);
       else { const bt = t.building || t['building:part']; h = /^(garage|garages|shed|kiosk|carport|hut|toilets|service|container)$/.test(bt) ? 3 : /^(house|detached|semidetached_house|bungalow)$/.test(bt) ? 8 : bt === 'roof' ? 6 : bt === 'church' ? 22 : 14; }
     }
-    if (isRoof && isNaN(num(t.min_height)) && isNaN(num(t['building:min_level']))) minH = Math.max(0, h - 1.2);
+    // zadaszenie, galeria, wiata: część, której wysokość w większości zajmuje dach (roof:height ≥ 70% wysokości części) —
+    // rysowana jak dach (bez okien biurowca); np. zadaszone przejścia wzdłuż wiaduktu Chałubińskiego przy Centralnej
+    const rhTag = num(t['roof:height']);
+    let canopy = false;
+    if (!isRoof && !isNaN(rhTag) && h > minH && rhTag >= 0.7 * (h - minH) && isNaN(lv)) { isRoof = true; canopy = true; }
+    if (isRoof && (canopy || (isNaN(num(t.min_height)) && isNaN(num(t['building:min_level']))))) minH = Math.max(minH, h - 1.2);   // daszek, nie bryła
     if (h <= minH) h = minH + 1;
     // wymiar do domyślnej wysokości dachu
     let maxR = 0; for (const p of b.outer) maxR = Math.max(maxR, Math.hypot(p[0] - b.c[0], p[1] - b.c[1]));
@@ -217,8 +222,13 @@ function buildWorld(D) {
     else rh = 0;
     rh = Math.min(rh, (h - minH) * 0.95);
     let gmin = 1e9; for (const p of b.outer) gmin = Math.min(gmin, H(p[0], p[1])); gmin = Math.min(gmin, H(b.c[0], b.c[1]));
-    const G = gmin - 0.3;
-    const y0 = G + (minH > 0 ? minH : -1.5), wallTop = G + h - rh, top = G + h;
+    // na moście / wiadukcie (layer ≥ 1 nad pomostem): wysokości z OSM liczone od pomostu, nie od ziemi pod nim
+    let deck = -1e9; if (num(t.layer) >= 1) for (const p of [b.c, ...b.outer]) { const y = surfaceAt(p[0], p[1], H(p[0], p[1]) + 60); if (y > H(p[0], p[1]) + 2) deck = Math.max(deck, y); }
+    // poza wiaduktem layer ≥ 1 znaczy „nad czymś” (np. dworzec Ochota nad wykopem WKD): od poziomu ulicy, bez ścian w dół
+    let gmax = -1e9; if (num(t.layer) >= 1 && deck < -1e8) for (const p of b.outer) gmax = Math.max(gmax, H(p[0], p[1]));
+    const up = gmax - gmin > 2;   // pod spodem coś głębszego niż ulica (wykop, tory) — inaczej zwykły budynek na zboczu
+    const G = deck > -1e8 ? deck : up ? gmax - 0.3 : gmin - 0.3;
+    const y0 = G + (minH > 0 ? minH : up ? 0 : -1.5), wallTop = G + h - rh, top = G + h;
     // kolory
     const r1 = hash(Math.abs(b.id) % 2147483647 | 0);
     const tall = h > 45;
@@ -247,7 +257,7 @@ function buildWorld(D) {
           const ax = a[0] + dx * ta, az = a[1] + dz * ta, bx = a[0] + dx * tb, bz = a[1] + dz * tb;
           const ua = u0 + (u1 - u0) * ta, ub = u0 + (u1 - u0) * tb, vb = (yb - G) / 12.8;
           // na skarpie dół ściany idzie za terenem (nie schodzi do najniższego punktu działki, np. do tunelu)
-          const ya = yb === y0 && minH <= 0 ? Math.min(wallTop - 0.5, Math.max(yb, H(ax, az) - 1.5)) : yb, yb2 = yb === y0 && minH <= 0 ? Math.min(wallTop - 0.5, Math.max(yb, H(bx, bz) - 1.5)) : yb;
+          const ya = yb === y0 && minH <= 0 && !up ? Math.min(wallTop - 0.5, Math.max(yb, H(ax, az) - 1.5)) : yb, yb2 = yb === y0 && minH <= 0 && !up ? Math.min(wallTop - 0.5, Math.max(yb, H(bx, bz) - 1.5)) : yb;
           const va = (ya - G) / 12.8, vb2 = (yb2 - G) / 12.8;
           const A0 = [ax, ya, az], B0 = [bx, yb2, bz], B1 = [bx, wallTop, bz], A1 = [ax, wallTop, az];
           if (WB) {
@@ -282,6 +292,7 @@ function buildWorld(D) {
       if (minH > 2) for (const [a, c, d] of faces) R_.tri([all[a][0], y0, all[a][1]], [all[c][0], y0, all[c][1]], [all[d][0], y0, all[d][1]], wc, -1);
     }
     if (minH < 2.5 && !isRoof) footprints.push(b);
+    bvol.push({ outer: b.outer, y0, top, roof: isRoof, id: b.id, c: b.c });   // bryły (doktor mapy: budynki przecinające wiadukty)
     nB++;
   }
   const bGroup = new THREE.Group();
@@ -411,7 +422,7 @@ function buildWorld(D) {
   const os = OV / (2 * E); og.fillStyle = '#4b4741';
   for (const b of footprints) { og.beginPath(); b.outer.forEach((p, i) => i ? og.lineTo((p[0] + E) * os, (p[1] + E) * os) : og.moveTo((p[0] + E) * os, (p[1] + E) * os)); og.closePath(); og.fill(); }
   W.ov = ov; W.os = os;
-  W.footprints = footprints;
+  W.footprints = footprints; W.bvol = bvol;
   W.stats = { buildings: nB, trees: trees.length, roads: veh.length, areas: areas.length, tex: S, ...W.structStats, trains: W.nTrains, terrain: W.terrSrc };
   return W.stats;
 }

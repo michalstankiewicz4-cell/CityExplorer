@@ -2,6 +2,13 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.20.1 — 2026-11-07
+- **Wiadukty** (zasady budowy mapy, nie pojedyncze miejsca): zadaszenia i wiaty, które w OSM są w większości dachem, to cienkie daszki bez okien biurowca (np. przy Centralnej wzdłuż Chałubińskiego i Jana Pawła II wyglądały jak budynki zawieszone w powietrzu z jezdnią w środku); obiekty z warstwą ≥ 1 nad pomostem stoją na pomoście; filary nie stają na jezdniach i torach pod wiaduktem; obiekty z warstwą ≥ 1 nad wykopem (np. dworzec Warszawa Ochota nad WKD) stoją na poziomie ulicy i nie zamykają ścianami wykopu.
+- **Tunele i wykopy dwutorowe**: gdy obok biegnie drugi tor tej samej sieci w osobnej tubie lub wykopie, ściany między nimi nie ma — skład WKD nie wchodzi już w ścianę (było 0,8–1,4 m od osi do ściany, teraz ok. 2,6 m).
+- **WKD**: tor zaczyna się na koźle oporowym na Śródmieściu WKD, skład stoi czołem przy peronie (wcześniej w tunelu za stacją).
+- **Doktor mapy**: nowe sprawdzenia „Wiadukty” (bryły na jezdni, ulice pod wiaduktami — przejazd i prześwit, uskoki na wjazdach) i cała trasa WKD (tor a teren, przeszkody, start).
+- **Publikacja**: przebieg planowy zapisuje cache i publikuje stronę tylko, gdy dane OSM albo kafle się zmieniły (wcześniej co 2 godziny te same 50 MB i ta sama strona).
+
 ## 0.20.0 — 2026-11-07
 - **WKD do Pruszkowa**: pociąg WKD jedzie całą trasą ze Śródmieścia WKD do Pruszkowa WKD (16,5 km, 13 przystanków) po prawdziwej geometrii torów z OpenStreetMap, w skali 1:1 z resztą mapy — także poza dokładnym obszarem centrum, nad kaflami. Tunel pod Śródmieściem jak na dokładnej mapie, dalej tor na gruncie. Szyny budowane kawałkami po 1 km wokół składu i gracza. Dane: `data/wkd.json` (`tools/fetch-wkd.mjs`). Na końcu: „Pruszków WKD — koniec trasy”.
 

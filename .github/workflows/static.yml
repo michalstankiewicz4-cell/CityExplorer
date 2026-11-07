@@ -26,6 +26,9 @@ jobs:
     concurrency:
       group: "data"
       cancel-in-progress: false
+    # publikacja po przebiegu planowym tylko wtedy, gdy dane się zmieniły
+    outputs:
+      changed: ${{ steps.osmsum.outputs.changed == 'true' || steps.tiles.outputs.new != '0' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,6 +46,8 @@ jobs:
             wisla.json
           key: osm-v1-${{ github.run_id }}
           restore-keys: osm-v1-
+      - name: Suma kontrolna danych OSM przed pobraniem
+        run: cat warszawa-centrum.json warszawa-r2000.json okecie.json wisla.json 2>/dev/null | sha256sum > /tmp/osm-before || true
       - name: Pobierz dane OSM (centrum, r2000, Okęcie, Wisła)
         continue-on-error: true
         timeout-minutes: 40
@@ -51,7 +56,13 @@ jobs:
           node tools/fetch-osm.mjs 52.23175 21.00586 2000 || true
           node tools/fetch-osm.mjs 52.1657 20.9671 2000 okecie.json || true
           node tools/fetch-osm.mjs 52.2400 21.0370 1500 wisla.json || true
-      - name: Zapisz dane OSM (cache)
+      - name: Czy dane OSM się zmieniły
+        id: osmsum
+        run: |
+          cat warszawa-centrum.json warszawa-r2000.json okecie.json wisla.json 2>/dev/null | sha256sum > /tmp/osm-after || true
+          if cmp -s /tmp/osm-before /tmp/osm-after; then echo "changed=false" >> "$GITHUB_OUTPUT"; echo "Dane OSM bez zmian"; else echo "changed=true" >> "$GITHUB_OUTPUT"; echo "Dane OSM zmienione"; fi
+      - name: Zapisz dane OSM (cache, tylko gdy zmienione)
+        if: steps.osmsum.outputs.changed == 'true'
         continue-on-error: true
         uses: actions/cache/save@v4
         with:
@@ -68,13 +79,14 @@ jobs:
           key: tiles-v1-${{ github.run_id }}
           restore-keys: tiles-v1-
       - name: Pobierz brakujące kafle Warszawy (tiles/, najpierw trasa centrum — Okęcie)
+        id: tiles
         continue-on-error: true
         timeout-minutes: 50
         env:
           TILE_MINUTES: '40'
         run: node tools/fetch-tiles.mjs
-      - name: Zapisz kafle (cache)
-        if: always()
+      - name: Zapisz kafle (cache, tylko gdy przybyły nowe)
+        if: always() && steps.tiles.outputs.new != '0'
         continue-on-error: true
         uses: actions/cache/save@v4
         with:
@@ -84,7 +96,7 @@ jobs:
   deploy:
     name: Publikacja
     needs: data
-    if: ${{ !cancelled() && (needs.data.result == 'success' || needs.data.result == 'skipped') }}
+    if: ${{ !cancelled() && (needs.data.result == 'skipped' || (needs.data.result == 'success' && (github.event_name != 'schedule' || needs.data.outputs.changed == 'true'))) }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

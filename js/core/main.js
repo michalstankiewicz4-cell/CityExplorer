@@ -33,7 +33,7 @@ async function main() {
     $('start').classList.add('out'); setTimeout(() => { $('start').style.display = 'none'; }, 650);
     $('hud').style.display = ''; $('minimap').style.display = ''; $('help').style.display = '';
     updateCamera(0, true);
-    window.__W3D = { step, get car() { return car; }, FLEET, ped, ZB, WPN, fire, zSpawn, get rail() { return rail; }, RAILS, startRail, air, startAir, boat, startBoat, isWater, TS, streamTick, buildTile, tileData, disposeTile, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, get E() { return E; }, get R() { return R; }, get AREA() { return AREA; }, switchArea, AREAS, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, NET, version: APP_VERSION };
+    window.__W3D = { get WKD() { return WKD; }, step, get car() { return car; }, FLEET, ped, ZB, WPN, fire, zSpawn, get rail() { return rail; }, RAILS, startRail, air, startAir, boat, startBoat, isWater, TS, streamTick, buildTile, tileData, disposeTile, get mode() { return mode; }, useCar, startAt, PED: () => PED, W, keys, H, scene, camera, renderer, setNight, setXray, surfaceAt, trains, stats: st, physics, updateCamera, passageGaps, passGrid, surfGrid, collGrid, COLL_CELL, SURF_CELL, get E() { return E; }, get R() { return R; }, get AREA() { return AREA; }, switchArea, AREAS, THREE, makeCar, makeTrainCar, TRAIN_T, TUBE_H, setCamMode: m => { camMode = m; }, NET, version: APP_VERSION };
     window.dispatchEvent(new Event('w3d-ready'));
   } catch (e) {
     console.error(e);

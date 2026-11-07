@@ -279,6 +279,26 @@ function buildStructures(lines, ctx) {
   for (const l of lines) if (l.net === 'road' && l.samples) for (let i = 0; i < l.pts.length - 1; i++) gridAdd(roadIdx, 20, l.pts[i][0], l.pts[i][1], l.pts[i + 1][0], l.pts[i + 1][1], 0, [l, i]);
   const inOtherRoad = (l, x, z) => { for (const [o, i] of roadIdx.get(Math.floor(x / 20) * 100003 + Math.floor(z / 20)) || []) { if (o === l) continue; if (segDist(x, z, [o.pts[i][0], o.pts[i][1], o.pts[i + 1][0], o.pts[i + 1][1]])[0] < (o.wd || 6) / 2 + 1.2) return true; } return false; };
 
+  // co biegnie pod wiaduktem (jezdnie, tory): filar nie może stanąć na nich
+  const belowIdx = new Map();
+  for (const o of lines) if (o.samples && o.kind !== 'bridge' && o.kind !== 'tunnel' && /^(road|rail|tram|subway)$/.test(o.net)) {
+    const S = o.samples; for (let i = 0; i < S.length - 1; i++) gridAdd(belowIdx, 20, S[i][0], S[i][1], S[i + 1][0], S[i + 1][1], 0, [o, i]);
+  }
+  // drugi tunel tej samej sieci tuż obok (po danej stronie osi, na podobnej wysokości) — wspólne wnętrze, bez ściany między tubami
+  const tubeIdx = new Map();
+  for (const o of lines) if (o.samples && (o.kind === 'tunnel' || o.kind === 'ramp')) { const S = o.samples; for (let i = 0; i < S.length - 1; i++) gridAdd(tubeIdx, 20, S[i][0], S[i][1], S[i + 1][0], S[i + 1][1], 7, [o, i]); }
+  const twinTube = (l, S, i, side, hw) => {
+    const p = S[i], r = frameAt(S, i);
+    for (const [o, k] of tubeIdx.get(Math.floor(p[0] / 20) * 100003 + Math.floor(p[1] / 20)) || []) {
+      if (o === l || o.net !== l.net || o.net === 'road') continue; const a = o.samples[k], b = o.samples[k + 1];
+      if (Math.abs((a[2] + b[2]) / 2 - p[2]) > 3) continue;
+      const [d, cx, cz] = segDist(p[0], p[1], [a[0], a[1], b[0], b[1]]), lim = hw + (o.wd || 4.6) / 2 + 1.0;
+      if (d > 0.5 && d < lim && ((cx - p[0]) * r[0] + (cz - p[1]) * r[1]) * side > 0) return true;
+    }
+    return false;
+  };
+  const onLineBelow = (x, z, yTop) => { for (const [o, i] of belowIdx.get(Math.floor(x / 20) * 100003 + Math.floor(z / 20)) || []) { const a = o.samples[i], b = o.samples[i + 1]; if (Math.min(a[2], b[2]) > yTop - 2.5) continue; if (segDist(x, z, [a[0], a[1], b[0], b[1]])[0] < (o.wd || (o.net === 'road' ? 6 : 3.4)) / 2 + 1.2) return true; } return false; };
+
   for (const l of lines) {
     const S = l.samples; if (!S || S.length < 2) continue;
     const net = l.net, w = l.wd || 4.6, hw = w / 2, n = S.length - 1, dk = deckKind(net);
@@ -301,14 +321,18 @@ function buildStructures(lines, ctx) {
         if (acc < 24) continue; acc = 0;
         const clear = S[i][2] - 1.1 - S[i][3]; if (clear < 2.4) continue;
         const r = frameAt(S, i), xs = w > 14 ? [-w / 3, w / 3] : [0];
-        for (const o of xs) { const x = S[i][0] + r[0] * o, z = S[i][1] + r[1] * o, g0 = H(x, z) - 0.5; box(G.conc, x, g0, z, 1.4, S[i][2] - 1.1 - g0, 1.4, CONC_D); collAdd(x, z, x, z, 0.85, g0 - 1, S[i][2] - 1.2, 'p'); }
+        for (const o of xs) { const x = S[i][0] + r[0] * o, z = S[i][1] + r[1] * o, g0 = H(x, z) - 0.5; if (onLineBelow(x, z, S[i][2])) continue; box(G.conc, x, g0, z, 1.4, S[i][2] - 1.1 - g0, 1.4, CONC_D); collAdd(x, z, x, z, 0.85, g0 - 1, S[i][2] - 1.2, 'p'); }
       }
       if (net === 'road') addSurf(S, 0, n, hw);
     } else if (l.kind === 'tunnel') {
       stats.tunnels++;
       const hT = TUBE_H[net] || 5.6, col = TUBE_C[net] || TUBE_C.road;
       ribbon(G.deck[dk], S, 0, n, w, 0.02, 1, uvLen);
-      for (const side of [-1, 1]) { wall(G.tube, S, 0, n, side, hw + 0.4, i => S[i][2] - 0.2, i => S[i][2] + hT, col, -1); collEdge(S, 0, n, side, hw + 0.3, i => S[i][2] - 1, i => S[i][2] + hT); }
+      // ściany boczne; tam, gdzie obok biegnie drugi tunel tej sieci (np. dwa tory WKD w osobnych tubach), ściany między nimi nie ma — jeden szerszy tunel
+      for (const side of [-1, 1]) {
+        const tw = S.map((p, i) => twinTube(l, S, i, side, hw)); let i0 = 0;
+        for (let i = 0; i <= n; i++) if (i === n || tw[i] !== tw[i0]) { const i1 = Math.min(n, i); if (!tw[i0] && i1 > i0) { wall(G.tube, S, i0, i1, side, hw + 0.4, k => S[k][2] - 0.2, k => S[k][2] + hT, col, -1); collEdge(S, i0, i1, side, hw + 0.3, k => S[k][2] - 1, k => S[k][2] + hT); } i0 = i; }
+      }
       ribbon(G.tube, S, 0, n, w + 0.8, hT, -1, 10);
       // lampy pod stropem
       for (let i = 0; i < n; i += 2) { const p = S[i]; G.lamp.tri([p[0] - 0.35, p[2] + hT - 0.05, p[1] - 0.35], [p[0] + 0.35, p[2] + hT - 0.05, p[1] - 0.35], [p[0] + 0.35, p[2] + hT - 0.05, p[1] + 0.35], CONC, -1); G.lamp.tri([p[0] - 0.35, p[2] + hT - 0.05, p[1] - 0.35], [p[0] + 0.35, p[2] + hT - 0.05, p[1] + 0.35], [p[0] - 0.35, p[2] + hT - 0.05, p[1] + 0.35], CONC, -1); }
@@ -332,10 +356,13 @@ function buildStructures(lines, ctx) {
         ribbon(G.deck[dk], S, a, b, w, 0.04, 1, uvLen);
         for (const side of [-1, 1]) {
           const edgeH = i => { const r = frameAt(S, i); return H(S[i][0] + r[0] * side * (hw + 0.3), S[i][1] + r[1] * side * (hw + 0.3)); };
-          // nasyp: ściana w dół do terenu; wykop: mur oporowy w górę do terenu
-          wall(G.conc, S, a, b, side, hw + 0.3, i => Math.min(S[i][2], edgeH(i) - 0.4), i => S[i][2] + 0.05, CONC, 1);
-          wall(G.conc, S, a, b, side, hw + 0.3, i => S[i][2] - 0.05, i => Math.max(S[i][2], edgeH(i) + 0.6), CONC_D, -1);
+          // nasyp: ściana w dół do terenu; wykop: mur oporowy w górę do terenu — bez muru między dwoma torami obok siebie (wspólny wykop / nasyp)
+          const tw = []; for (let i = a; i <= b; i++) tw[i] = twinTube(l, S, i, side, hw);
+          for (let i = a, j0 = a; i <= b; i++) if (i === b || tw[i] !== tw[j0]) { const j1 = Math.min(b, i); if (!tw[j0] && j1 > j0) {
+            wall(G.conc, S, j0, j1, side, hw + 0.3, i => Math.min(S[i][2], edgeH(i) - 0.4), i => S[i][2] + 0.05, CONC, 1);
+            wall(G.conc, S, j0, j1, side, hw + 0.3, i => S[i][2] - 0.05, i => Math.max(S[i][2], edgeH(i) + 0.6), CONC_D, -1); } j0 = i; }
           for (let i = a; i < b; i++) {
+            if (tw[i]) continue;
             const up = Math.max(S[i][2] - S[i][3], S[i + 1][2] - S[i + 1][3]);
             const dn = Math.min(S[i][2] - S[i][3], S[i + 1][2] - S[i + 1][3]);
             const r = frameAt(S, i), ex = S[i][0] + r[0] * side * (hw + 0.3), ez = S[i][1] + r[1] * side * (hw + 0.3);

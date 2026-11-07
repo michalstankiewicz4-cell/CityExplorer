@@ -4,7 +4,8 @@ Dwa zadania:
 - **dane** — tylko co 2 godziny i ręcznie (nie po pushu): dane OSM obszarów (`tools/fetch-osm.mjs lat lon r [plik]`:
   `warszawa-centrum.json`, `warszawa-r2000.json`, `okecie.json`, `wisla.json`) i brakujące kafle Warszawy
   (`tools/fetch-tiles.mjs`, blokami 2 × 2 km, dwa zapytania Overpass naraz, najpierw trasa centrum — Okęcie, do 40 minut);
-  wszystko zapisywane w cache (`osm-v1-…`, `tiles-v1-…`).
+  do cache (`osm-v1-…`, `tiles-v1-…`) zapisuje tylko to, co się zmieniło (suma kontrolna danych OSM, liczba nowych kafli);
+  publikacja po tym zadaniu — tylko gdy dane się zmieniły (inaczej strona jest ta sama).
 - **publikacja** — po każdym pushu, po zadaniu „dane” i ręcznie, ok. minuty:
   1. `tools/check-version.mjs` — numer wersji ten sam w `APP_VERSION` (`js/core/config.js`), `<title>`, JSON-LD
      (`softwareVersion`) i adres miniatury (`og-image.jpg?v=…`) w `index.html` oraz na górze `CHANGELOG.md`; inaczej publikacja się zatrzymuje.

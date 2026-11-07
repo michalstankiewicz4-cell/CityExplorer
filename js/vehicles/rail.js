@@ -70,6 +70,7 @@ async function wkdTrack() {
   const d = await fetch('data/wkd.json').then(r => r.json());
   let la = 0, lo = 0; const pts = [];
   for (let i = 0; i < d.pts.length; i += 2) { la += d.pts[i]; lo += d.pts[i + 1]; const [x, z] = toXZ(la / 1e6, lo / 1e6); pts.push([x, z]); }
+  const cum = [0]; for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
   // wysokości z próbek linii WKD dokładnej mapy (najbliższa próbka do 6 m), poza mapą — grunt
   const S = []; for (const l of W.lines) if (l.net === 'rail' && l.samples && /Kolej Dojazdowa/.test(l.t.name || '')) for (const p of l.samples) S.push(p);
   const lim = E - 25;
@@ -78,7 +79,9 @@ async function wkdTrack() {
     if (Math.abs(p[0]) < lim && Math.abs(p[1]) < lim) { let bd = 36; for (const q of S) { const dd = (q[0] - p[0]) ** 2 + (q[1] - p[1]) ** 2; if (dd < bd) { bd = dd; y = q[2]; } } }
     p.push(y);
   }
-  WKD = { data: d, T: PATH.pathTrack(pts, { step: 4, smooth: 3 }), chunks: new Map() };
+  // warstwa w punkcie toru (tunel −1, teren 0, most 1) — doktor mapy porównuje wysokość toru z terenem
+  const layerAt = (s) => { let i = 0; while (i < cum.length - 1 && cum[i + 1] < s) i++; return d.layer[i] || 0; };
+  WKD = { data: d, T: PATH.pathTrack(pts, { step: 4, smooth: 3 }), chunks: new Map(), layerAt };
   return WKD;
 }
 const WKD_CHUNK = 1000;
@@ -145,7 +148,8 @@ async function parkRail_(kind) {
   let at = null, bestD = 1e9, any = null;
   if (kind === 'train') {
     const ch = namedChain(/Kolej Dojazdowa/);
-    try { const w = await wkdTrack(); if (w.T.L > total + 40) at = { ch: ch || { names: ['WKD'], len: w.T.L }, T: w.T, s: total + 15 }; }
+    // czoło składu przy peronie Śródmieścia WKD (tor zaczyna się na koźle oporowym za peronem)
+    try { const w = await wkdTrack(), st0 = w.data.stations[0]; if (w.T.L > total + 40) at = { ch: ch || { names: ['WKD'], len: w.T.L }, T: w.T, s: Math.max(total + 15, st0 ? st0.s : 0) }; }
     catch (e) { console.warn('[W3D] trasa WKD (data/wkd.json)', e); }
     if (!at) { const T = ch && railTrack(ch, true); if (T && T.L > total + 40) at = { ch, T, s: total + 15 }; }
   }

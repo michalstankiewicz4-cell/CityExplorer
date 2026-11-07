@@ -71,6 +71,7 @@ const CHECKS = {
   widok: 'Widoczność',
   tory: 'Ciągłość torów',
   przejscia: 'Przejścia i tunele',
+  wiadukty: 'Wiadukty (ulice pod nimi i przy nich)',
   modele: 'Modele (doktor GameLaboratory)',
   kafle: 'Kafle mapy (wczytywane w locie)',
 };
@@ -286,6 +287,72 @@ function checkPassages() {
   }
 }
 
+/* ---------- 4a. trasa WKD (cała, także poza dokładną mapą): wysokość toru a teren, budynki i przeszkody, start ---------- */
+function checkWkd() {
+  const Wk = G.WKD; if (!Wk) { add('tory', 'w', 'Trasa WKD nie wczytana', 'data/wkd.json', null); return; }
+  const T = Wk.T, S = [];
+  for (let s = 0; s <= T.L; s += 4) { const p = T.station(s); S.push([p.px, p.pz, T.height(s), s]); }
+  const inMap = p => Math.max(Math.abs(p[0]), Math.abs(p[1])) < G.E - 25;
+  const myRuns = (test) => { const out = []; let cur = null; S.forEach((p, k) => { const v = test(p); if (v && cur && cur.v === v) cur.k1 = k; else { if (cur) out.push(cur); cur = v ? { v, k0: k, k1: k } : null; } }); if (cur) out.push(cur);
+    return out.map(r => { const a = S[r.k0], b = S[r.k1], m = S[(r.k0 + r.k1) >> 1]; return { v: r.v, len: b[3] - a[3], at: [m[0], m[2], m[1]], s: Math.round(m[3]), heading: Math.atan2(b[0] - a[0], b[1] - a[1]) }; }); };
+  const where = (s) => { const st = Wk.data.stations; let n = st[0]; for (const q of st) if (q.s <= s) n = q; return 'za: ' + n.name + ', ' + (s / 1000).toFixed(2) + ' km'; };
+  // tor a teren: nad terenem bez mostu, pod terenem bez tunelu / wykopu
+  for (const r of myRuns(p => { const g = G.H(p[0], p[1]), L = Wk.layerAt(p[3]), dy = p[2] - g; return dy > 1.2 && L <= 0 ? 'nad' : dy < -1.0 && L >= 0 ? 'pod' : null; }))
+    if (r.len >= 8) add('tory', 'w', r.v === 'nad' ? 'WKD: tor nad terenem bez mostu' : 'WKD: tor pod terenem bez tunelu i wykopu', `${Math.round(r.len)} m (${where(r.s)})`, r.at, { heading: r.heading });
+  // budynki i przeszkody na torze (na dokładnej mapie)
+  for (const r of myRuns(p => { if (!inMap(p)) return null; if (G.W.inBuilding(p[0], p[1]) && p[2] > G.H(p[0], p[1]) - 1.5) return 'b'; const o = obstaclesAt(p[0], p[1], p[2], 1.25).filter(k => k !== 'g'); return o.length ? o[0] : null; }))
+    add('tory', 'e', `WKD: przeszkoda na torze: ${KIND[r.v] || r.v}`, `${Math.max(4, Math.round(r.len))} m (${where(r.s)})`, r.at, { heading: r.heading });
+  // budynki na kaflach (poza dokładną mapą): bryły z kafli wczytanych w doktorze
+  const R = G.RAILS.train;
+  add('tory', 'i', `WKD: ${(T.L / 1000).toFixed(2)} km, ${Wk.data.stations.length} przystanków; skład czołem ${Math.round(R.s)} m od kozła (peron Śródmieście WKD: ${Wk.data.stations[0].s} m)`, '', null);
+}
+
+/* ---------- 4b. wiadukty: bryły na jezdni, ulice pod wiaduktami (przejazd, prześwit), ulice dochodzące do wiaduktów ---------- */
+const pipD = (p, poly) => { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a[1] > p[1]) !== (b[1] > p[1]) && p[0] < (b[0] - a[0]) * (p[1] - a[1]) / (b[1] - a[1]) + a[0]) c = !c; } return c; };
+const segX = (a, b, c, d) => { const r = [b[0] - a[0], b[1] - a[1]], s = [d[0] - c[0], d[1] - c[1]], den = r[0] * s[1] - r[1] * s[0]; if (Math.abs(den) < 1e-9) return null; const t = ((c[0] - a[0]) * s[1] - (c[1] - a[1]) * s[0]) / den, u = ((c[0] - a[0]) * r[1] - (c[1] - a[1]) * r[0]) / den; return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [t, u] : null; };
+function checkBridges() {
+  const roads = G.W.lines.filter(l => l.net === 'road' && l.samples && l.samples.length > 1), bridges = roads.filter(l => l.kind === 'bridge');
+  const BV = G.W.bvol || [], BI = new Map(), BC = 40;
+  for (const b of BV) { let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9; for (const p of b.outer) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); z0 = Math.min(z0, p[1]); z1 = Math.max(z1, p[1]); }
+    for (let i = Math.floor(x0 / BC); i <= Math.floor(x1 / BC); i++) for (let j = Math.floor(z0 / BC); j <= Math.floor(z1 / BC); j++) { const k = i * 100003 + j; (BI.get(k) || BI.set(k, []).get(k)).push(b); } }
+  let under = 0, underBad = 0, ends = 0, endsBad = 0;
+  for (const l of bridges) {
+    const S = l.samples, nm = lineName(l);
+    // 1. bryła (budynek, zadaszenie) w pasie jezdni wiaduktu: od pomostu do 4,5 m nad nim
+    for (const r of runs(S, p => { for (const b of BI.get(Math.floor(p[0] / BC) * 100003 + Math.floor(p[1] / BC)) || []) if (b.top > p[2] + 0.3 && b.y0 < p[2] + 4.5 && pipD(p, b.outer)) return b.roof ? 'dach' : 'bud'; return null; }))
+      add('wiadukty', r.v === 'bud' ? 'e' : 'w', r.v === 'bud' ? 'Budynek przecina jezdnię wiaduktu' : 'Zadaszenie na wysokości jezdni wiaduktu', `${nm} · ${Math.max(1, Math.round(r.len))} m`, r.at, { heading: r.heading });
+    // 2. ulice pod wiaduktem: przecięcie w planie, ulica niżej — przejazd i prześwit w miejscu przecięcia
+    for (const q of roads) {
+      if (q === l || q.kind === 'bridge' || q.passage) continue;
+      const Q = q.samples;
+      for (let i = 0; i < S.length - 1; i++) for (let k = 0; k < Q.length - 1; k++) {
+        const x = segX(S[i], S[i + 1], Q[k], Q[k + 1]); if (!x) continue;
+        const yb = S[i][2] + (S[i + 1][2] - S[i][2]) * x[0], yr = Q[k][2] + (Q[k + 1][2] - Q[k][2]) * x[1];
+        const px = Q[k][0] + (Q[k + 1][0] - Q[k][0]) * x[1], pz = Q[k][1] + (Q[k + 1][1] - Q[k][1]) * x[1];
+        if (!inArea([px, pz]) || yb - yr < 1.5) continue;   // nie pod spodem (skrzyżowanie w poziomie albo ulica wyżej)
+        under++;
+        const clr = yb - 1.1 - yr, obs = obstaclesAt(px, pz, yr, 1.2).filter(o => o !== 'w' && o !== 'g' && o !== 'r');
+        const heading = Math.atan2(Q[k + 1][0] - Q[k][0], Q[k + 1][1] - Q[k][1]);
+        if (obs.length) { underBad++; add('wiadukty', 'e', `Ulica pod wiaduktem zablokowana: ${KIND[obs[0]] || obs[0]}`, `${lineName(q)} pod ${nm}`, [px, yr, pz], { heading }); }
+        else if (clr < 4.2) { underBad++; add('wiadukty', 'w', `Niski prześwit pod wiaduktem: ${clr.toFixed(1)} m`, `${lineName(q)} pod ${nm}`, [px, yr, pz], { heading }); }
+        else add('wiadukty', 'i', `Przejazd pod wiaduktem: prześwit ${clr.toFixed(1)} m`, `${lineName(q)} pod ${nm}`, [px, yr, pz], { heading });
+      }
+    }
+    // 3. ulice dochodzące do wiaduktu (wspólny węzeł na końcu albo przy wjeździe): ta sama wysokość
+    for (const [end, idx] of [[0, 0], [1, S.length - 1]]) {
+      const id = end ? l.ids[l.ids.length - 1] : l.ids[0], p = S[idx]; if (!inArea(p)) continue;
+      for (const q of roads) {
+        if (q === l) continue; const j = q.ids.indexOf(id); if (j < 0) continue;
+        let best = null, bd = 1e9; for (const s of q.samples) { const d = Math.hypot(s[0] - p[0], s[1] - p[1]); if (d < bd) { bd = d; best = s; } }
+        if (!best || bd > 1) continue; ends++;
+        const dy = Math.abs(best[2] - p[2]);
+        if (dy > 0.3) { endsBad++; add('wiadukty', dy > 1 ? 'e' : 'w', `Uskok ${dy.toFixed(1)} m na wjeździe na wiadukt`, `${nm} ↔ ${lineName(q)}`, [p[0], p[2], p[1]]); }
+      }
+    }
+  }
+  add('wiadukty', 'i', `Wiadukty drogowe: ${bridges.length} odcinków; ulice pod nimi: ${under} (z problemem ${underBad}); połączenia na końcach: ${ends} (z uskokiem ${endsBad})`, '', null);
+}
+
 /* ---------- 5. modele: doktor modeli z GameLaboratory ---------- */
 async function checkModels() {
   let MD;
@@ -334,8 +401,9 @@ async function examine() {
   F = []; const t0 = performance.now();
   status('Badam przejezdność…'); await tick(); checkDrive();
   status('Badam widoczność…'); await tick(); checkView();
-  status('Badam tory…'); await tick(); checkRails();
+  status('Badam tory…'); await tick(); checkRails(); checkWkd();
   status('Badam przejścia…'); await tick(); checkPassages();
+  status('Badam wiadukty…'); await tick(); checkBridges();
   status('Doktor modeli…'); await tick(); await checkModels();
   status('Kafle mapy…'); await tick(); await checkTiles();
   const order = { e: 0, w: 1, i: 2 };

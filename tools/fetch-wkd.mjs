@@ -43,8 +43,11 @@ const layerOf = (t) => t.tunnel === 'yes' || t.covered === 'yes' || (+t.layer < 
 const ends = new Map(); for (const w of ways) for (const [id, first] of [[w.nodes[0], true], [w.nodes[w.nodes.length - 1], false]]) { (ends.get(id) || ends.set(id, []).get(id)).push({ w, first }); }
 const S0 = st.get(FROM), S1 = st.get(TO); if (!S0 || !S1) throw new Error('brak przystanku ' + (!S0 ? FROM : TO));
 const P0 = xz(S0), P1 = xz(S1);
-let best = null;   // węzeł końcowy drogi najbliższy Śródmieściu
-for (const [id, a] of ends) { const p = xz(N.get(id)), d = Math.hypot(p[0] - P0[0], p[1] - P0[1]); if (!best || d < best.d) best = { id, d, a }; }
+// początek: ślepy koniec toru (kozioł oporowy) przy Śródmieściu WKD — najdalej na wschód w promieniu 400 m od stacji
+const deg = new Map(); for (const e of j.elements) if (e.type === 'way' && e.nodes) for (const id of e.nodes) deg.set(id, (deg.get(id) || 0) + 1);
+let best = null;
+for (const [id, a] of ends) { if (deg.get(id) !== 1) continue; const p = xz(N.get(id)), d = Math.hypot(p[0] - P0[0], p[1] - P0[1]); if (d < 400 && (!best || p[0] > best.x)) best = { id, d, a, x: p[0] }; }
+if (!best) for (const [id, a] of ends) { const p = xz(N.get(id)), d = Math.hypot(p[0] - P0[0], p[1] - P0[1]); if (!best || d < best.d) best = { id, d, a }; }
 // z dwóch torów przy czole wybieramy ten, który dalej biegnie na zachód (pierwszy w kierunku Pruszkowa)
 const pts = [], lay = [], used = new Set();
 let curId = best.id, dir = null;

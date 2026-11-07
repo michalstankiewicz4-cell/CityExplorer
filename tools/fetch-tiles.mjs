@@ -3,7 +3,7 @@
 // (np. z cache poprzedniego deployu) są pomijane, więc kolejne deploye dopełniają mapę; limit czasu jednego uruchomienia:
 // TILE_MINUTES (domyślnie 25). Na końcu zapisuje tiles/index.json (lista gotowych kafli).
 // Test bez sieci: node tools/fetch-tiles.mjs --from plik-osm.json [dx dz]  (dane w formacie gry v2, przesunięte o dx, dz metrów)
-import { writeFileSync, existsSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
+import { writeFileSync, existsSync, mkdirSync, readdirSync, readFileSync, appendFileSync } from 'node:fs';
 import { WARSAW, T, key, tileBBox, overpassQuery, tilesFromElements, toG, KX, KY, G0 } from '../js/shared/tiles.mjs';
 
 const DIR = 'tiles'; mkdirSync(DIR, { recursive: true });
@@ -55,6 +55,8 @@ if (process.argv[2] === '--from') {   // tryb testowy: kafle z pliku danych gry
   }
   await Promise.all([worker(), worker()]);
   console.log(`bloki: pobrane ${done}, gotowe wcześniej ${skip}, nieudane ${fail}, wszystkich ${blocks.length}`);
+  // GitHub Actions: czy przybyły nowe kafle (zapis cache i publikacja tylko wtedy)
+  if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `new=${done}\n`);
 }
 const have = readdirSync(DIR).filter(f => /^-?\d+_-?\d+\.json$/.test(f)).map(f => f.slice(0, -5));
 writeFileSync(`${DIR}/index.json`, JSON.stringify({ T, G0, keys: have }));

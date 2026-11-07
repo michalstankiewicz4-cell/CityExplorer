@@ -2,6 +2,7 @@
 
 ## Ustalone, na później
 - Tory: poprawienie torów (ciągłość, łuki pod fizykę kół); pozostałe linie tramwajowe i kolejowe.
+- Tory pod budynkami z warstwą ≥ 1 (dworzec Warszawa Ochota nad WKD — doktor: „WKD: przeszkoda na torze: budynek”): wykop z prześwitem obejmujący cały ciąg toru (sąsiednie odcinki OSM też), bo obniżanie jednego odcinka daje uskoki.
 - Tramwaj — pełna trasa linii; WKD dalej za Pruszków (Grodzisk, Milanówek), perony i wiaty na przystankach poza centrum.
 - Metro — na początek tylko linia M1.
 - Trolejbus linii 51 (1983–1995, Dworzec Południowy — Puławska — Piaseczno).
