@@ -245,6 +245,9 @@ function buildWorld(D) {
     let deck = -1e9; if (num(t.layer) >= 1) for (const p of [b.c, ...b.outer]) { const y = surfaceAt(p[0], p[1], H(p[0], p[1]) + 60); if (y > H(p[0], p[1]) + 2) deck = Math.max(deck, y); }
     // poza wiaduktem layer ≥ 1 znaczy „nad czymś” (np. dworzec Ochota nad wykopem WKD): od poziomu ulicy, bez ścian w dół
     let gmax = -1e9; if (num(t.layer) >= 1 && deck < -1e8) for (const p of b.outer) gmax = Math.max(gmax, H(p[0], p[1]));
+    // pozostałości usuniętych wiaduktów i przejść (daszki wejść, wiaty na pomostach): część z layer ≥ 1 zawieszona w powietrzu
+    // (min_height > 0), pod którą nie ma pomostu — pomijana
+    if (num(t.layer) >= 1 && deck < -1e8 && t['building:part'] && minH > 0) continue;
     const up = gmax - gmin > 2;   // pod spodem coś głębszego niż ulica (wykop, tory) — inaczej zwykły budynek na zboczu
     const G = deck > -1e8 ? deck : up ? gmax - 0.3 : gmin - 0.3;
     const y0 = G + (minH > 0 ? minH : up ? 0 : -1.5), wallTop = G + h - rh, top = G + h;

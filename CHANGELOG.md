@@ -2,6 +2,9 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.23.7 — 2026-11-20
+- **Al. Jana Pawła II / Rondo Czterdziestolatka**: usunięte wiszące klocki po wiaduktach i przejściach — części budynków z `layer` ≥ 1 uniesione nad ziemię (`min_height` > 0), pod którymi nie ma już pomostu (np. daszki wejść do przejścia podziemnego).
+
 ## 0.23.6 — 2026-11-20
 - **Tory obok siebie na zjeździe do tunelu** mają jedną wysokość (wyrównanie z sąsiednimi torami tej sieci do 9 m) — w wykopie linii średnicowej tory leżały na różnych poziomach, a między nimi stały mury.
 
