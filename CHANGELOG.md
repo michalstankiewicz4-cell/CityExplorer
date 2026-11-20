@@ -2,6 +2,9 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.23.9 — 2026-11-20
+- Schody z poziomem „0;-1” (zejście do przejścia podziemnego) też są usuwane, razem z daszkiem nad nimi — na Rondzie Czterdziestolatka zostawały jeszcze dwa daszki.
+
 ## 0.23.8 — 2026-11-20
 - **Daszki nad zejściami do przejść podziemnych** (np. zielone daszki na Rondzie Czterdziestolatka) są pomijane razem z przejściami — zostawały same, jak klocki na środku ulicy.
 

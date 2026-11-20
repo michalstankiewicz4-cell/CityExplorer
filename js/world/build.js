@@ -95,7 +95,7 @@ function buildWorld(D) {
   const lines = [], goneFoot = [];   // goneFoot: usunięte przejścia podziemne i schody (daszki nad zejściami też znikają)
   for (const w of D.ways) {
     const t = w.t; if (!t) continue;
-    const footHw = /^(footway|steps|corridor|path|pedestrian|cycleway)$/.test(t.highway || ''), below = num(t.level) < 0 || num(t.layer) < 0 || t.location === 'underground';
+    const footHw = /^(footway|steps|corridor|path|pedestrian|cycleway)$/.test(t.highway || ''), below = num(t.level) < 0 || num(t.layer) < 0 || t.location === 'underground' || (t.highway === 'steps' && /(^|;)\s*-\d/.test(t.level || ''));   // schody „0;-1” — zejście pod ziemię
     const bridgeTag = !!t.bridge && t.bridge !== 'no', tunTag = !!t.tunnel && t.tunnel !== 'no' && t.tunnel !== 'culvert';
     if (t.highway === 'elevator' || t.indoor === 'yes' || t.highway === 'corridor') continue;
     if (footHw && !keepBridge.has(w) && (bridgeTag || ((tunTag || below) && t.tunnel !== 'building_passage'))) { if (!bridgeTag) { const P = wayXZ(w); if (P.length) goneFoot.push(P); } continue; }   // kładki i przejścia podziemne: usunięte
