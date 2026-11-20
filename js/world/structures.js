@@ -249,6 +249,25 @@ function buildStructures(lines, ctx) {
     if (l.kind === 'free' && maxOff > 0.15) l.kind = 'ramp';
   }
 
+  // tory obok siebie na zjeździe (wspólny wykop kilku torów): jedna wysokość dla całego korytarza — każdy punkt rampy
+  // wyrównany ze średnią najbliższych punktów sąsiednich torów tej sieci (do 9 m), żeby tory nie leżały na różnych poziomach
+  { const RC = 12, idx = new Map();
+    for (const l of lines) if (l.samples && RAILNET.has(l.net) && (l.kind === 'ramp' || l.kind === 'tunnel')) l.samples.forEach((p, i) => { const k = Math.floor(p[0] / RC) * 100003 + Math.floor(p[1] / RC); (idx.get(k) || idx.set(k, []).get(k)).push([l, i]); });
+    for (let pass = 0; pass < 4; pass++) for (const l of lines) {
+      if (!l.samples || !RAILNET.has(l.net) || l.kind !== 'ramp') continue;
+      const S = l.samples, ny = S.map(p => p[2]);
+      for (let i = 1; i < S.length - 1; i++) {
+        const p = S[i], best = new Map(), cx = Math.floor(p[0] / RC), cz = Math.floor(p[1] / RC);
+        for (let gx = cx - 1; gx <= cx + 1; gx++) for (let gz = cz - 1; gz <= cz + 1; gz++) for (const [o, k] of idx.get(gx * 100003 + gz) || []) {
+          if (o === l || o.net !== l.net) continue; const q = o.samples[k], d = Math.hypot(q[0] - p[0], q[1] - p[1]);
+          if (d < 9 && Math.abs(q[2] - p[2]) < 8 && (!best.has(o) || d < best.get(o)[0])) best.set(o, [d, q[2]]);
+        }
+        if (!best.size) continue; let sm = p[2], c = 1; for (const [, [, y]] of best) { sm += y; c++; } ny[i] = sm / c;
+      }
+      for (let i = 1; i < S.length - 1; i++) S[i][2] = ny[i];
+    }
+  }
+
   /* ---------- geometria ---------- */
   const G = { deck: { road: new Geo(true), rail: new Geo(true), foot: new Geo(true) }, conc: new Geo(false), tube: new Geo(false), lamp: new Geo(false) };
   const CONC = new THREE.Color('#9d9890'), CONC_D = new THREE.Color('#7f7a72'), RAIL_C = new THREE.Color('#b9b4ab'), TUBE_C = { road: new THREE.Color('#a8a397'), rail: new THREE.Color('#8b867c'), subway: new THREE.Color('#9aa3a6'), tram: new THREE.Color('#8b867c'), foot: new THREE.Color('#b8b2a4') }, CEIL_C = new THREE.Color('#77736b');

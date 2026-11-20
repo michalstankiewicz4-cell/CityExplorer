@@ -2,6 +2,9 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.23.6 — 2026-11-20
+- **Tory obok siebie na zjeździe do tunelu** mają jedną wysokość (wyrównanie z sąsiednimi torami tej sieci do 9 m) — w wykopie linii średnicowej tory leżały na różnych poziomach, a między nimi stały mury.
+
 ## 0.23.5 — 2026-11-20
 - Poprawka 0.23.4: prowadzenie toru prosto między węzłami tylko na zjazdach i podjazdach, nie w tunelach (w Tunelu Średnicowym pojawiły się stromizny).
 
