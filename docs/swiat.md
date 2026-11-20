@@ -13,6 +13,9 @@ Budynki z `height` / `building:levels` / `min_height` / `roof:shape`, łączone 
 budynek ma części (`building:part`), rysowane są części. Drzewa — instancje. Zderzenia z obrysami budynków i pniami.
 
 ## Wiadukty, tunele, przejazdy (`buildStructures`)
+Od 0.22.0 zostają tylko mosty nad rzeką / kanałem (odcinek mostu przecinający wodę i połączone z nim odcinki mostu —
+dojazdy). Pozostałe wiadukty są spłaszczone do terenu (ulica / tor zostaje, `layer` = 0), kładki i przejścia podziemne
+(piesze mosty i tunele, schody i korytarze pod ziemią) są pominięte; `tunnel=building_passage` zostaje.
 OSM podaje tylko poziom (`layer`), więc wysokości są liczone:
 - wiadukt: pomost między przyczółkami, podniesiony tak, by nad przecinaną drogą / torem był prześwit (`CLEAR`: droga
   5,3 m, kolej i metro 6,8 m, tramwaj 6,2 m), podjazdy na sąsiednich ulicach (spadek drogi do 7%);
@@ -58,15 +61,12 @@ Overpass na żywo (poza Warszawą, kafel po kaflu). Duża mapa (M): wyśrodkowan
 `data/wkd.json` — jeden tor linii (ten, którym jedzie się na zachód) z OSM, 16,5 km, 13 przystanków; punkty w mikrostopniach
 zapisane przyrostami, warstwa punktu (tunel / teren / most) i przystanki z odległością od początku. Odświeżanie:
 `node tools/fetch-wkd.mjs` (Overpass) albo `node tools/fetch-wkd.mjs odpowiedź-overpass.json`. W grze (`js/vehicles/rail.js`):
-współrzędne tak jak cała mapa (1:1), wysokości na dokładnej mapie z jej linii WKD (tunel pod Śródmieściem), dalej grunt kafli;
+współrzędne tak jak cała mapa (1:1), po ziemi na całej trasie (bez tunelu i wykopu — wysokość = teren); tory WKD z OSM nie są
+rysowane na dokładnej mapie (`js/world/build.js`). Początek trasy jest za ostatnim budynkiem stojącym na torze (sprawdzanie
+obrysów ±1,5 m od osi) + 30 m — dziś to Warszawa Ochota WKD (ok. 0,82 km od Śródmieścia), pierwszy przystanek przeniesiony na nowy początek;
 szyny, podkłady i podsypka budowane kawałkami po 1 km w promieniu ok. 1 km od składu i od gracza, dalsze zwalniane.
 
-## Podziemia: przejścia, schody, korytarze metra
+## Podziemia
 
-- Ciągi piesze pod ziemią: `tunnel`, warstwa lub poziom < 0, `location=underground`, korytarze `indoor` pod ziemią (stacje metra) —
-  tunel pieszy (`js/world/build.js`), głębokość z warstwy / poziomu (`tunnelDepth`: −1 → 5 m, −2 → 8,5 m).
-- Schody łączące ulicę z przejściem schodzą od ulicy do posadzki: węzeł u ich stóp jest już pod ziemią (`js/world/structures.js`, tunele).
-- Wejście: tam, gdzie posadzka jest płycej niż wysokość przejścia (3 m) — otwarta klatka schodowa (wycięty teren, bez stropu, murek
-  0,9 m), dalej zamknięty korytarz z lampami.
-- Nawierzchnia: posadzki, schody i kładki są w siatce nawierzchni z flagą „tylko pieszy” (`surfaceAt(x, z, y, true)` — pieszy,
-  zombie, inni gracze; auta jej nie widzą). Na posadzce w wykopie resztki siatki terenu nad pieszym się nie liczą.
+Usunięte w 0.22.0 (glitchowały): kładki, przejścia podziemne, schody i korytarze metra nie są budowane. Kod tuneli
+pieszych w `js/world/structures.js` (klatki schodowe, nawierzchnia „tylko pieszy”) został, ale nie dostaje linii.

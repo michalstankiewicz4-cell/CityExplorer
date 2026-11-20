@@ -2,6 +2,11 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.22.0 — 2026-11-20
+- **Usunięte kładki, wiadukty i przejścia podziemne** (glitchowały): kładki i przejścia podziemne (także schody i korytarze metra pod ziemią) nie są budowane, pozostałe wiadukty są spłaszczone do terenu — ulica lub tor biegnie po ziemi. **Mosty nad rzeką i kanałem zostają** (razem z połączonymi z nimi odcinkami mostu — dojazdami). Przejazdy przez budynki (`building_passage`) zostają.
+- **WKD po ziemi**: bez tunelu i wykopu pod Śródmieściem — tor na całej trasie leży na terenie; tory WKD z OSM nie są już rysowane na dokładnej mapie (szyny daje trasa pociągu).
+- **Pierwszy przystanek WKD przesunięty**: po ziemi tor wpadał w budynki przy Śródmieściu i Ochocie, więc trasa zaczyna się 30 m za ostatnim budynkiem na torze — dziś na Warszawie Ochocie WKD (pociąg rusza stąd do Pruszkowa, 15,75 km, 12 przystanków).
+
 ## 0.21.0 — 2026-11-07
 - **Wejścia do podziemi**: do przejść podziemnych i korytarzy stacji metra da się zejść i nimi przejść. Posadzki przejść, schody i kładki są nawierzchnią dla pieszych (i zombie), nie dla aut. Schody prowadzące do przejścia schodzą od ulicy do posadzki (wcześniej leżały płasko na ulicy, a przejście nurkowało 5 m na kilku metrach). Przy wejściu otwarta klatka schodowa: wycięcie w terenie, bez stropu, murek 0,9 m; dalej zamknięty korytarz z lampami.
 - **Korytarze metra i przejścia z OSM** oznaczone poziomem poniżej zera, `location=underground` albo `indoor` (pod ziemią) są tunelami pieszymi (wcześniej pomijane).

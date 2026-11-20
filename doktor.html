@@ -304,7 +304,7 @@ function checkWkd() {
     add('tory', 'e', `WKD: przeszkoda na torze: ${KIND[r.v] || r.v}`, `${Math.max(4, Math.round(r.len))} m (${where(r.s)})`, r.at, { heading: r.heading });
   // budynki na kaflach (poza dokładną mapą): bryły z kafli wczytanych w doktorze
   const R = G.RAILS.train;
-  add('tory', 'i', `WKD: ${(T.L / 1000).toFixed(2)} km, ${Wk.data.stations.length} przystanków; skład czołem ${Math.round(R.s)} m od kozła (peron Śródmieście WKD: ${Wk.data.stations[0].s} m)`, '', null);
+  add('tory', 'i', `WKD: ${(T.L / 1000).toFixed(2)} km, ${Wk.data.stations.length} przystanków; skład czołem ${Math.round(R.s)} m od kozła (pierwszy przystanek: ${Wk.data.stations[0].name}, ${Math.round(Wk.data.stations[0].s)} m)`, '', null);
 }
 
 /* ---------- 4b. wiadukty: bryły na jezdni, ulice pod wiaduktami (przejazd, prześwit), ulice dochodzące do wiaduktów ---------- */

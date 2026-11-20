@@ -77,20 +77,33 @@ function buildWorld(D) {
     const pts = wayXZ(w); g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(PX(p[0]), PX(p[1])) : g.moveTo(PX(p[0]), PX(p[1])));
     g.strokeStyle = '#3e6b8a'; g.lineWidth = ww * sc; g.lineCap = g.lineJoin = 'round'; g.stroke();
   }
-  // drogi
+  // mosty: zostają tylko mosty nad rzeką (odcinek przecinający rzekę / kanał i połączone z nim odcinki mostu — dojazdy);
+  // pozostałe wiadukty są spłaszczone do terenu (ulica / tor zostaje), kładki i przejścia podziemne są usunięte (glitchowały)
+  const riverBridge = (() => {
+    const wl = []; for (const w of D.ways) if (w.t && /^(river|canal)$/.test(w.t.waterway || '')) { const P = wayXZ(w); if (P && P.length > 1) wl.push(P); }
+    const sx = (a, b, c, d) => { const r = [b[0] - a[0], b[1] - a[1]], q = [d[0] - c[0], d[1] - c[1]], den = r[0] * q[1] - r[1] * q[0]; if (Math.abs(den) < 1e-9) return false; const t = ((c[0] - a[0]) * q[1] - (c[1] - a[1]) * q[0]) / den, u = ((c[0] - a[0]) * r[1] - (c[1] - a[1]) * r[0]) / den; return t >= 0 && t <= 1 && u >= 0 && u <= 1; };
+    const br = D.ways.filter(w => w.t && w.t.bridge && w.t.bridge !== 'no' && (w.t.highway || w.t.railway)), keep = new Set(), byNode = new Map();
+    for (const w of br) { for (const id of w.n) (byNode.get(id) || byNode.set(id, []).get(id)).push(w);
+      const P = wayXZ(w); if (!P) continue; outer: for (let i = 0; i < P.length - 1; i++) for (const R of wl) for (let k = 0; k < R.length - 1; k++) if (sx(P[i], P[i + 1], R[k], R[k + 1])) { keep.add(w); break outer; } }
+    const q = [...keep]; while (q.length) { const w = q.pop(); for (const id of [w.n[0], w.n[w.n.length - 1]]) for (const o of byNode.get(id) || []) if (!keep.has(o)) { keep.add(o); q.push(o); } }
+    return keep;
+  })();
   const lines = [];
   for (const w of D.ways) {
     const t = w.t; if (!t) continue;
-    // ciągi piesze pod ziemią (przejścia, schody, korytarze stacji metra): tunel pieszy, także gdy w OSM to indoor / level < 0
-    const footHw = /^(footway|steps|corridor|path|pedestrian)$/.test(t.highway || ''), below = num(t.level) < 0 || num(t.layer) < 0 || t.location === 'underground';
-    if (t.highway === 'elevator' || ((t.indoor === 'yes' || t.highway === 'corridor') && !(footHw && below))) continue;
-    const isB = !!t.bridge && t.bridge !== 'no';
+    const footHw = /^(footway|steps|corridor|path|pedestrian|cycleway)$/.test(t.highway || ''), below = num(t.level) < 0 || num(t.layer) < 0 || t.location === 'underground';
+    const bridgeTag = !!t.bridge && t.bridge !== 'no', tunTag = !!t.tunnel && t.tunnel !== 'no' && t.tunnel !== 'culvert';
+    if (t.highway === 'elevator' || t.indoor === 'yes' || t.highway === 'corridor') continue;
+    if (footHw && !riverBridge.has(w) && (bridgeTag || ((tunTag || below) && t.tunnel !== 'building_passage'))) continue;   // kładki i przejścia podziemne: usunięte
+    const isB = bridgeTag && riverBridge.has(w);
+    const wkd = /Kolej Dojazdowa|WKD/.test(t.name || '');   // WKD jedzie po ziemi (bez tunelu i wykopu pod Śródmieściem)
+    if (wkd && t.railway) continue;   // tory WKD rysuje trasa pociągu (data/wkd.json, js/vehicles/rail.js) — po ziemi, nie tunelem
     // tory pod ziemią bez znacznika tunelu (stacja podziemna: level < 0 albo location=underground) to tunel
-    const isT = (!!t.tunnel && t.tunnel !== 'no' && t.tunnel !== 'culvert') || (!!t.railway && !isB && (num(t.level) < 0 || t.location === 'underground')) || (footHw && below && !isB);
-    let L = num(t.layer); if (isNaN(L) && footHw && num(t.level) < 0) L = num(t.level);
+    const isT = !wkd && ((tunTag) || (!!t.railway && !isB && (num(t.level) < 0 || t.location === 'underground')));
+    let L = num(t.layer); if (wkd || (bridgeTag && !isB)) L = 0;
     const passage = isT && !t.railway && (t.tunnel === 'building_passage' || isNaN(L));
     if (!isT && !isB && L < 0 && t.railway) L = 0;   // tor w wykopie (layer −1 bez tunelu): zjazd z portalu w wykopie robią konstrukcje
-    if (!isT && !isB && (L < 0 || num(t.level) < 0 || t.location === 'underground')) continue;
+    if (!isT && !isB && !wkd && (L < 0 || num(t.level) < 0 || t.location === 'underground')) continue;
     if (isNaN(L)) L = isB ? 1 : (isT && !passage) ? -1 : 0;
     const ids = [], pts = []; for (const id of w.n) { const p = xyOf(id); if (p) { ids.push(id); pts.push(p); } }
     if (pts.length < 2) continue;

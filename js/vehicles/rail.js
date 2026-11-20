@@ -62,29 +62,34 @@ function railTrack(ch, westward) {   // opis toru (łuki, wysokości) dla ciągu
   return trackCache.get(key);
 }
 /* ---------- WKD: cała trasa Śródmieście WKD → Pruszków WKD (data/wkd.json, z OSM przez tools/fetch-wkd.mjs) ----------
-   Geometria torów 1:1 z mapy. Wysokości: na dokładnej mapie z jej linii WKD (tunel pod Śródmieściem, wykopy), dalej grunt
-   kafli. Szyny i podkłady budowane kawałkami po 1 km, gdy skład (albo gracz) jest blisko — reszta trasy nie obciąża klatki. */
+   Geometria torów 1:1 z mapy, po ziemi na całej trasie (bez tunelu i wykopu): wysokość = teren. Początek za ostatnim budynkiem
+   stojącym na torze (pierwszy przystanek przesunięty). Szyny i podkłady budowane kawałkami po 1 km, gdy skład (albo gracz) jest blisko — reszta trasy nie obciąża klatki. */
 let WKD = null;
 async function wkdTrack() {
   if (WKD) return WKD;
-  const d = await fetch('data/wkd.json').then(r => r.json());
+  let d = await fetch('data/wkd.json').then(r => r.json());
   let la = 0, lo = 0; const pts = [];
   for (let i = 0; i < d.pts.length; i += 2) { la += d.pts[i]; lo += d.pts[i + 1]; const [x, z] = toXZ(la / 1e6, lo / 1e6); pts.push([x, z]); }
   const cum = [0]; for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
-  // wysokości z próbek linii WKD dokładnej mapy (najbliższa próbka do 6 m), poza mapą — grunt
-  const S = []; for (const l of W.lines) if (l.net === 'rail' && l.samples && /Kolej Dojazdowa/.test(l.t.name || '')) for (const p of l.samples) S.push(p);
-  const lim = E - 25;
-  for (const p of pts) {
-    let y = H(p[0], p[1]);
-    if (Math.abs(p[0]) < lim && Math.abs(p[1]) < lim) { let bd = 36; for (const q of S) { const dd = (q[0] - p[0]) ** 2 + (q[1] - p[1]) ** 2; if (dd < bd) { bd = dd; y = q[2]; } } }
-    p.push(y);
+  // po ziemi na całej trasie (bez tunelu i wykopu): wysokość toru = teren
+  for (const p of pts) p.push(H(p[0], p[1]));
+  // początek za ostatnim budynkiem stojącym na torze (na dokładnej mapie) — przesunięty pierwszy przystanek
+  const lim = E - 25; let hit = -1;
+  for (let i = 1; i < pts.length; i++) { const a = pts[i - 1], b = pts[i], n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2));
+    for (let k = 0; k <= n; k++) { const x = a[0] + (b[0] - a[0]) * k / n, z = a[1] + (b[1] - a[1]) * k / n; if (Math.abs(x) < lim && Math.abs(z) < lim && (W.inBuilding(x, z) || W.inBuilding(x + 1.5, z) || W.inBuilding(x - 1.5, z) || W.inBuilding(x, z + 1.5) || W.inBuilding(x, z - 1.5))) hit = cum[i - 1] + (cum[i] - cum[i - 1]) * k / n; } }
+  let stations = d.stations.map(q => ({ ...q }));
+  if (hit >= 0) {
+    const s0 = hit + 30; let i = 1; while (i < cum.length && cum[i] < s0) i++;
+    const f = (s0 - cum[i - 1]) / ((cum[i] - cum[i - 1]) || 1), a = pts[i - 1], b = pts[i], p0 = [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+    p0.push(H(p0[0], p0[1])); pts.splice(0, i, p0); const c0 = s0; cum.splice(0, i, c0); for (let k = 0; k < cum.length; k++) cum[k] -= c0;
+    const gone = stations.filter(q => q.s < s0); stations = stations.filter(q => q.s >= s0).map(q => ({ ...q, s: q.s - s0 }));
+    if (gone.length && (!stations.length || stations[0].s > 60)) stations.unshift({ name: gone[gone.length - 1].name, s: 0 });   // przystanek przesunięty na nowy początek
+    console.info('[W3D] WKD: początek przesunięty o ' + Math.round(s0) + ' m (za budynkiem na torze); pierwszy przystanek: ' + (stations[0] && stations[0].name));
   }
-  // warstwa w punkcie toru (tunel −1, teren 0, most 1) — doktor mapy porównuje wysokość toru z terenem
-  const layerAt = (s) => { let i = 0; while (i < cum.length - 1 && cum[i + 1] < s) i++; return d.layer[i] || 0; };
+  d = { ...d, stations };
   const T = PATH.pathTrack(pts, { step: 4, smooth: 3 });
-  // na dokładnej mapie tory WKD rysuje mapa (oba tory, rozjazdy) — własne szyny trasy dopiero od jej krawędzi
-  let sOut = 0; for (let s = 0; s < T.L; s += 5) { const p = T.station(s); if (Math.abs(p.px) >= lim || Math.abs(p.pz) >= lim) { sOut = s; break; } }
-  WKD = { data: d, T, chunks: new Map(), layerAt, sOut };
+  const sOut = 0;   // tory WKD na dokładnej mapie są wyłączone (js/world/build.js) — szyny trasy od początku
+  WKD = { data: d, T, chunks: new Map(), layerAt: () => 0, sOut };
   return WKD;
 }
 const WKD_CHUNK = 1000;
