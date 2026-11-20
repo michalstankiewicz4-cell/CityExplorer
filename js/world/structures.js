@@ -292,16 +292,18 @@ function buildStructures(lines, ctx) {
   }
   // drugi tunel tej samej sieci tuż obok (po danej stronie osi, na podobnej wysokości) — wspólne wnętrze, bez ściany między tubami
   const tubeIdx = new Map();
-  for (const o of lines) if (o.samples && (o.kind === 'tunnel' || o.kind === 'ramp')) { const S = o.samples; for (let i = 0; i < S.length - 1; i++) gridAdd(tubeIdx, 20, S[i][0], S[i][1], S[i + 1][0], S[i + 1][1], 7, [o, i]); }
-  const twinTube = (l, S, i, side, hw) => {
-    const p = S[i], r = frameAt(S, i);
+  for (const o of lines) if (o.samples && (o.kind === 'tunnel' || o.kind === 'ramp')) { const S = o.samples; for (let i = 0; i < S.length - 1; i++) gridAdd(tubeIdx, 20, S[i][0], S[i][1], S[i + 1][0], S[i + 1][1], 14, [o, i]); }
+  // gap: największy odstęp między krawędziami (tunel 1 m — wspólne wnętrze pod jednym stropem; wykop / rampa 8 m — wspólny wykop
+  // kilku torów, teren między nimi wycięty); zwraca punkt na osi sąsiada albo null
+  const twinTube = (l, S, i, side, hw, gap = 1.0) => {
+    const p = S[i], r = frameAt(S, i); let best = null;
     for (const [o, k] of tubeIdx.get(Math.floor(p[0] / 20) * 100003 + Math.floor(p[1] / 20)) || []) {
       if (o === l || o.net !== l.net || o.net === 'road') continue; const a = o.samples[k], b = o.samples[k + 1];
       if (Math.abs((a[2] + b[2]) / 2 - p[2]) > 3) continue;
-      const [d, cx, cz] = segDist(p[0], p[1], [a[0], a[1], b[0], b[1]]), lim = hw + (o.wd || 4.6) / 2 + 1.0;
-      if (d > 0.5 && d < lim && ((cx - p[0]) * r[0] + (cz - p[1]) * r[1]) * side > 0) return true;
+      const [d, cx, cz] = segDist(p[0], p[1], [a[0], a[1], b[0], b[1]]), lim = hw + (o.wd || 4.6) / 2 + gap;
+      if (d > 0.5 && d < lim && ((cx - p[0]) * r[0] + (cz - p[1]) * r[1]) * side > 0 && (!best || d < best[0])) best = [d, cx, cz, Math.min(a[2], b[2])];
     }
-    return false;
+    return best;
   };
   const onLineBelow = (x, z, yTop) => { for (const [o, i] of belowIdx.get(Math.floor(x / 20) * 100003 + Math.floor(z / 20)) || []) { const a = o.samples[i], b = o.samples[i + 1]; if (Math.min(a[2], b[2]) > yTop - 2.5) continue; if (segDist(x, z, [a[0], a[1], b[0], b[1]])[0] < (o.wd || (o.net === 'road' ? 6 : 3.4)) / 2 + 1.2) return true; } return false; };
 
@@ -342,7 +344,7 @@ function buildStructures(lines, ctx) {
       // ściany boczne; tam, gdzie obok biegnie drugi tunel tej sieci (np. dwa tory WKD w osobnych tubach), ściany między nimi nie ma — jeden szerszy tunel
       for (const side of [-1, 1]) {
         const tw = S.map((p, i) => twinTube(l, S, i, side, hw)); let i0 = 0;
-        for (let i = 0; i <= n; i++) if (i === n || tw[i] !== tw[i0]) { const i1 = Math.min(n, i); if (!tw[i0] && i1 > i0) { wall(G.tube, S, i0, i1, side, hw + 0.4, k => S[k][2] - 0.2, wallTop, col, -1); collEdge(S, i0, i1, side, hw + 0.3, k => S[k][2] - 1, wallTop); } i0 = i; }
+        for (let i = 0; i <= n; i++) if (i === n || !tw[i] !== !tw[i0]) { const i1 = Math.min(n, i); if (!tw[i0] && i1 > i0) { wall(G.tube, S, i0, i1, side, hw + 0.4, k => S[k][2] - 0.2, wallTop, col, -1); collEdge(S, i0, i1, side, hw + 0.3, k => S[k][2] - 1, wallTop); } i0 = i; }
       }
       // strop tylko nad zamkniętą częścią (klatka schodowa jest otwarta)
       for (let i = 0, j0 = 0; i <= n; i++) if (i === n || open[i] !== open[j0]) { if (!open[j0] && i > j0) ribbon(G.tube, S, j0, i, w + 0.8, hT, -1, 10); j0 = i; }
@@ -369,8 +371,10 @@ function buildStructures(lines, ctx) {
         for (const side of [-1, 1]) {
           const edgeH = i => { const r = frameAt(S, i); return H(S[i][0] + r[0] * side * (hw + 0.3), S[i][1] + r[1] * side * (hw + 0.3)); };
           // nasyp: ściana w dół do terenu; wykop: mur oporowy w górę do terenu — bez muru między dwoma torami obok siebie (wspólny wykop / nasyp)
-          const tw = []; for (let i = a; i <= b; i++) tw[i] = twinTube(l, S, i, side, hw);
-          for (let i = a, j0 = a; i <= b; i++) if (i === b || tw[i] !== tw[j0]) { const j1 = Math.min(b, i); if (!tw[j0] && j1 > j0) {
+          const tw = []; for (let i = a; i <= b; i++) tw[i] = net === 'road' ? null : twinTube(l, S, i, side, hw, 8);
+          // wspólny wykop: teren między dwoma torami wycięty do poziomu torów (bez muru i grzbietu terenu między nimi)
+          for (let i = a; i <= b; i++) { const t = tw[i]; if (t && S[i][2] < S[i][3] - 0.2) cuts.push([(S[i][0] + t[1]) / 2, (S[i][1] + t[2]) / 2, Math.min(S[i][2], t[3]), t[0] / 2 + 0.6]); }
+          for (let i = a, j0 = a; i <= b; i++) if (i === b || !tw[i] !== !tw[j0]) { const j1 = Math.min(b, i); if (!tw[j0] && j1 > j0) {
             wall(G.conc, S, j0, j1, side, hw + 0.3, i => Math.min(S[i][2], edgeH(i) - 0.4), i => S[i][2] + 0.05, CONC, 1);
             wall(G.conc, S, j0, j1, side, hw + 0.3, i => S[i][2] - 0.05, i => Math.max(S[i][2], edgeH(i) + 0.6), CONC_D, -1); } j0 = i; }
           for (let i = a; i < b; i++) {

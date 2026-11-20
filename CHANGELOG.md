@@ -2,6 +2,9 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.23.2 — 2026-11-20
+- **Wspólny wykop kilku torów**: między torami biegnącymi obok siebie w wykopie (do 8 m odstępu) nie ma już muru, a teren między nimi jest wycięty do poziomu torów — znikają pionowe ściany między torami linii średnicowej (doktor: mury do 13 m nad terenem na 300 m).
+
 ## 0.23.1 — 2026-11-20
 - **Rondo Czterdziestolatka**: wróciły tam przez pomyłkę wiszące wiadukty (Chałubińskiego, Al. Jana Pawła II) — reguła „wiadukt nad wykopem” brała za wykop tory stacji podziemnej (`level` < 0). Teraz liczy się tylko otwarty wykop.
 
