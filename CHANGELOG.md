@@ -2,6 +2,9 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.23.1 — 2026-11-20
+- **Rondo Czterdziestolatka**: wróciły tam przez pomyłkę wiszące wiadukty (Chałubińskiego, Al. Jana Pawła II) — reguła „wiadukt nad wykopem” brała za wykop tory stacji podziemnej (`level` < 0). Teraz liczy się tylko otwarty wykop.
+
 ## 0.23.0 — 2026-11-20
 - **Wiadukty nad torami w wykopie wracają** (Żelazna i Towarowa nad linią średnicową przy wylocie Tunelu Średnicowego): po spłaszczeniu ulica leżała na ziemi, a tory pod nią zjeżdżały do tunelu — tory zachodziły na siebie, a mury wykopu stały jak płaskie ściany. Zostają wiadukty drogowe i kolejowe przecinające tor w wykopie (bez kładek) i połączone z nimi odcinki mostu.
 - **Doktor mapy**: nowe sprawdzenie „Płaskie ściany” (mur wykopu, rampy lub tunelu, którego wierzch jest > 1,5 m nad terenem po obu stronach) i w torach „Gwałtowne wzniesienie / zejście toru” (zmiana spadku na ok. 8 m: kolej > 2%, metro > 2,5%, tramwaj > 4%); trasa WKD sprawdzana też na stromizny i gwałtowne wzniesienia.

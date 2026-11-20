@@ -82,7 +82,7 @@ function buildWorld(D) {
   // pozostałe wiadukty są spłaszczone do terenu (ulica / tor zostaje), kładki i przejścia podziemne są usunięte (glitchowały)
   const keepBridge = (() => {
     const wl = []; for (const w of D.ways) { const t = w.t; if (!t) continue;
-      const cut = t.railway && num(t.layer) < 0 && !(t.tunnel && t.tunnel !== 'no') && !/Kolej Dojazdowa|WKD/.test(t.name || '');   // tor w wykopie
+      const cut = t.railway && num(t.layer) < 0 && !(t.tunnel && t.tunnel !== 'no') && !(num(t.level) < 0) && t.location !== 'underground' && !/Kolej Dojazdowa|WKD/.test(t.name || '');   // tor w otwartym wykopie (nie stacja podziemna)
       const water = /^(river|canal)$/.test(t.waterway || '');
       if (water || cut) { const P = wayXZ(w); if (P && P.length > 1) { P.water = water; wl.push(P); } } }
     const sx = (a, b, c, d) => { const r = [b[0] - a[0], b[1] - a[1]], q = [d[0] - c[0], d[1] - c[1]], den = r[0] * q[1] - r[1] * q[0]; if (Math.abs(den) < 1e-9) return false; const t = ((c[0] - a[0]) * q[1] - (c[1] - a[1]) * q[0]) / den, u = ((c[0] - a[0]) * r[1] - (c[1] - a[1]) * r[0]) / den; return t >= 0 && t <= 1 && u >= 0 && u <= 1; };
