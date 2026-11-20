@@ -72,6 +72,7 @@ const CHECKS = {
   tory: 'Ciągłość torów',
   przejscia: 'Przejścia i tunele',
   wiadukty: 'Wiadukty (ulice pod nimi i przy nich)',
+  sciany: 'Płaskie ściany',
   modele: 'Modele (doktor GameLaboratory)',
   kafle: 'Kafle mapy (wczytywane w locie)',
 };
@@ -194,6 +195,19 @@ function checkView() {
 /* ---------- 3. ciągłość torów ---------- */
 const GRADE = { rail: 0.04, subway: 0.05, tram: 0.09 };
 const MIN_R = { rail: 150, subway: 120, tram: 18 };
+const KINK = { rail: 0.02, subway: 0.025, tram: 0.04 };   // największa zmiana spadku na ok. 8 m (załom profilu: nagłe wzniesienie / dołek)
+// załomy profilu: spadek przed i za punktem (okna ok. 8 m) różni się o więcej niż lim
+function kinks(S, lim) {
+  const out = [];
+  for (let k = 0; k < S.length; k++) {
+    let a = k, b = k; while (a > 0 && Math.hypot(S[k][0] - S[a][0], S[k][1] - S[a][1]) < 8) a--; while (b < S.length - 1 && Math.hypot(S[b][0] - S[k][0], S[b][1] - S[k][1]) < 8) b++;
+    const d1 = Math.hypot(S[k][0] - S[a][0], S[k][1] - S[a][1]), d2 = Math.hypot(S[b][0] - S[k][0], S[b][1] - S[k][1]); if (d1 < 6 || d2 < 6) continue;
+    const g = (S[b][2] - S[k][2]) / d2 - (S[k][2] - S[a][2]) / d1;
+    if (Math.abs(g) > lim && (!out.length || Math.hypot(S[k][0] - out[out.length - 1].p[0], S[k][1] - out[out.length - 1].p[1]) > 15)) out.push({ p: S[k], g });
+    else if (out.length && Math.abs(g) > Math.abs(out[out.length - 1].g) && Math.hypot(S[k][0] - out[out.length - 1].p[0], S[k][1] - out[out.length - 1].p[1]) <= 15) out[out.length - 1] = { p: S[k], g };
+  }
+  return out;
+}
 function checkRails() {
   for (const net of ['rail', 'subway', 'tram']) {
     const L = G.W.lines.filter(l => l.net === net && l.samples && l.samples.length > 1); if (!L.length) continue;
@@ -221,6 +235,8 @@ function checkRails() {
       const S = l.samples, lim = GRADE[net];
       for (const r of runs(S, (p, k) => { if (k < 2) return null; const q = S[k - 2], d = Math.hypot(p[0] - q[0], p[1] - q[1]); return d > 3 && Math.abs(p[2] - q[2]) / d > lim ? 'stromo' : null; }))
         if (r.len >= 8) add('tory', 'w', `Za stromo dla: ${label} (>${Math.round(lim * 100)}%)`, `${lineName(l)} (${l.kind}) · ${Math.round(r.len)} m`, r.at, { heading: r.heading });
+      // gwałtowne wzniesienia i dołki: nagła zmiana spadku
+      for (const q of kinks(S, KINK[net])) if (inArea(q.p)) add('tory', 'w', `Gwałtowne ${q.g > 0 ? 'wzniesienie' : 'zejście'} toru: zmiana spadku ${(Math.abs(q.g) * 100).toFixed(1)}% (${label})`, `${lineName(l)} (${l.kind})`, [q.p[0], q.p[2], q.p[1]]);
       // ostre załamania łamanej (ważne dla fizyki „koło na szynie” z aTrain)
       let minR = 1e9, at = null;
       for (let i = 1; i < l.pts.length - 1; i++) {
@@ -299,12 +315,31 @@ function checkWkd() {
   // tor a teren: nad terenem bez mostu, pod terenem bez tunelu / wykopu
   for (const r of myRuns(p => { const g = G.H(p[0], p[1]), L = Wk.layerAt(p[3]), dy = p[2] - g; return dy > 1.2 && L <= 0 ? 'nad' : dy < -1.0 && L >= 0 ? 'pod' : null; }))
     if (r.len >= 8) add('tory', 'w', r.v === 'nad' ? 'WKD: tor nad terenem bez mostu' : 'WKD: tor pod terenem bez tunelu i wykopu', `${Math.round(r.len)} m (${where(r.s)})`, r.at, { heading: r.heading });
+  // stromizny i gwałtowne wzniesienia na całej trasie (tor po terenie)
+  for (const r of myRuns(p => { const k = p[3] / 4 | 0; if (k < 2) return null; const q = S[k - 2]; return Math.abs(p[2] - q[2]) / Math.max(1, p[3] - q[3]) > GRADE.rail ? 'stromo' : null; }))
+    if (r.len >= 8) add('tory', 'w', `WKD: za stromo (>${Math.round(GRADE.rail * 100)}%)`, `${Math.round(r.len)} m (${where(r.s)})`, r.at, { heading: r.heading });
+  for (const q of kinks(S.map(p => [p[0], p[1], p[2], p[3]]), KINK.rail)) add('tory', 'w', `WKD: gwałtowne ${q.g > 0 ? 'wzniesienie' : 'zejście'} toru: zmiana spadku ${(Math.abs(q.g) * 100).toFixed(1)}%`, where(q.p[3]), [q.p[0], q.p[2], q.p[1]]);
   // budynki i przeszkody na torze (na dokładnej mapie)
   for (const r of myRuns(p => { if (!inMap(p)) return null; if (G.W.inBuilding(p[0], p[1]) && p[2] > G.H(p[0], p[1]) - 1.5) return 'b'; const o = obstaclesAt(p[0], p[1], p[2], 1.25).filter(k => k !== 'g'); return o.length ? o[0] : null; }))
     add('tory', 'e', `WKD: przeszkoda na torze: ${KIND[r.v] || r.v}`, `${Math.max(4, Math.round(r.len))} m (${where(r.s)})`, r.at, { heading: r.heading });
   // budynki na kaflach (poza dokładną mapą): bryły z kafli wczytanych w doktorze
   const R = G.RAILS.train;
   add('tory', 'i', `WKD: ${(T.L / 1000).toFixed(2)} km, ${Wk.data.stations.length} przystanków; skład czołem ${Math.round(R.s)} m od kozła (pierwszy przystanek: ${Wk.data.stations[0].name}, ${Math.round(Wk.data.stations[0].s)} m)`, '', null);
+}
+
+/* ---------- 4c. płaskie ściany: mury wykopów, ramp i tuneli sterczące nad teren po obu stronach ---------- */
+function checkWalls() {
+  const WL = G.W.walls || []; let cur = null; const out = [];
+  for (const w of WL) {
+    const [ax, az, bx, bz, ta, tb, l, nx, nz] = w, mx = (ax + bx) / 2, mz = (az + bz) / 2, top = (ta + tb) / 2;
+    const gOut = G.H(mx + nx * 1.2, mz + nz * 1.2), gIn = G.H(mx - nx * 1.2, mz - nz * 1.2), ex = top - Math.max(gOut, gIn);
+    const bad = ex > 1.5 && inArea([mx, mz]);
+    if (bad && cur && cur.l === l && Math.hypot(ax - cur.b[0], az - cur.b[1]) < 6) { cur.b = [bx, bz]; cur.len += Math.hypot(bx - ax, bz - az); if (ex > cur.ex) { cur.ex = ex; cur.at = [mx, top, mz]; } }
+    else if (bad) { if (cur) out.push(cur); cur = { l, a: [ax, az], b: [bx, bz], len: Math.hypot(bx - ax, bz - az), ex, at: [mx, top, mz] }; }
+  }
+  if (cur) out.push(cur);
+  for (const c of out) if (c.len >= 3) add('sciany', c.ex > 3 ? 'e' : 'w', `Płaska ściana nad terenem: ${c.ex.toFixed(1)} m (${Math.round(c.len)} m)`, `${lineName(c.l)} (${c.l.net}, ${c.l.kind}) — teren po obu stronach muru niżej niż jego wierzch`, c.at, { heading: Math.atan2(c.b[0] - c.a[0], c.b[1] - c.a[1]) });
+  add('sciany', 'i', `Ściany konstrukcji poza mostami: ${WL.length} pól`, 'próg: wierzch muru > 1,5 m nad terenem po obu stronach', null);
 }
 
 /* ---------- 4b. wiadukty: bryły na jezdni, ulice pod wiaduktami (przejazd, prześwit), ulice dochodzące do wiaduktów ---------- */
@@ -404,6 +439,7 @@ async function examine() {
   status('Badam tory…'); await tick(); checkRails(); checkWkd();
   status('Badam przejścia…'); await tick(); checkPassages();
   status('Badam wiadukty…'); await tick(); checkBridges();
+  status('Badam ściany…'); await tick(); checkWalls();
   status('Doktor modeli…'); await tick(); await checkModels();
   status('Kafle mapy…'); await tick(); await checkTiles();
   const order = { e: 0, w: 1, i: 2 };

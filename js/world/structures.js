@@ -256,6 +256,7 @@ function buildStructures(lines, ctx) {
     }
   };
   // pionowa ściana wzdłuż krawędzi; yb/yt: funkcje (i) -> wysokość; facing: +1 na zewnątrz, -1 do środka
+  const walls = []; let wallLine = null;   // ściany konstrukcji poza mostami (doktor mapy: płaskie ściany sterczące nad terenem)
   const wall = (Gm, S, i0, i1, side, w, yb, yt, col, facing) => {
     for (let i = i0; i < i1; i++) {
       const ra = frameAt(S, i), rb = frameAt(S, i + 1);
@@ -264,6 +265,7 @@ function buildStructures(lines, ctx) {
       if (A1[1] - A0[1] < 0.02 && B1[1] - B0[1] < 0.02) continue;
       const hint = [ra[0] * side * facing, 0, ra[1] * side * facing];
       Gm.tri(A0, B0, B1, col, hint); Gm.tri(A0, B1, A1, col, hint);
+      if (wallLine && wallLine.kind !== 'bridge') walls.push([ax, az, bx, bz, A1[1], B1[1], wallLine, ra[0] * side, ra[1] * side]);
     }
   };
   const box = (Gm, x, y0, z, sx, sy, sz, col) => {
@@ -304,7 +306,7 @@ function buildStructures(lines, ctx) {
   const onLineBelow = (x, z, yTop) => { for (const [o, i] of belowIdx.get(Math.floor(x / 20) * 100003 + Math.floor(z / 20)) || []) { const a = o.samples[i], b = o.samples[i + 1]; if (Math.min(a[2], b[2]) > yTop - 2.5) continue; if (segDist(x, z, [a[0], a[1], b[0], b[1]])[0] < (o.wd || (o.net === 'road' ? 6 : 3.4)) / 2 + 1.2) return true; } return false; };
 
   for (const l of lines) {
-    const S = l.samples; if (!S || S.length < 2) continue;
+    const S = l.samples; if (!S || S.length < 2) continue; wallLine = l;
     const net = l.net, w = l.wd || 4.6, hw = w / 2, n = S.length - 1, dk = deckKind(net);
     const uvLen = dk === 'foot' ? 4 : 12;
     if (l.kind === 'bridge') {
@@ -413,7 +415,7 @@ function buildStructures(lines, ctx) {
     const hw = Math.min(5, Math.max(1.4, (l.wd || 4) / 2 + (l.net === 'road' ? 0.6 : 0.2)));
     for (let i = 0; i < l.pts.length - 1; i++) { const a = l.pts[i], b = l.pts[i + 1]; gridAdd(passGrid, PASS_CELL, a[0], a[1], b[0], b[1], hw, [a[0], a[1], b[0], b[1], hw, l.net === 'road' ? 4.2 : 3.0]); }
   }
-  return { G, stats, nets };
+  return { G, stats, nets, walls };
 }
 // luki w krawędzi budynku: zwraca listę [t0, t1, wysokośćPrześwitu] (t w 0..1 wzdłuż krawędzi)
 function passageGaps(ax, az, bx, bz) {

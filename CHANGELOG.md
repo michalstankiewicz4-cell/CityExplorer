@@ -2,6 +2,10 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.23.0 — 2026-11-20
+- **Wiadukty nad torami w wykopie wracają** (Żelazna i Towarowa nad linią średnicową przy wylocie Tunelu Średnicowego): po spłaszczeniu ulica leżała na ziemi, a tory pod nią zjeżdżały do tunelu — tory zachodziły na siebie, a mury wykopu stały jak płaskie ściany. Zostają wiadukty drogowe i kolejowe przecinające tor w wykopie (bez kładek) i połączone z nimi odcinki mostu.
+- **Doktor mapy**: nowe sprawdzenie „Płaskie ściany” (mur wykopu, rampy lub tunelu, którego wierzch jest > 1,5 m nad terenem po obu stronach) i w torach „Gwałtowne wzniesienie / zejście toru” (zmiana spadku na ok. 8 m: kolej > 2%, metro > 2,5%, tramwaj > 4%); trasa WKD sprawdzana też na stromizny i gwałtowne wzniesienia.
+
 ## 0.22.0 — 2026-11-20
 - **Usunięte kładki, wiadukty i przejścia podziemne** (glitchowały): kładki i przejścia podziemne (także schody i korytarze metra pod ziemią) nie są budowane, pozostałe wiadukty są spłaszczone do terenu — ulica lub tor biegnie po ziemi. **Mosty nad rzeką i kanałem zostają** (razem z połączonymi z nimi odcinkami mostu — dojazdami). Przejazdy przez budynki (`building_passage`) zostają.
 - **WKD po ziemi**: bez tunelu i wykopu pod Śródmieściem — tor na całej trasie leży na terenie; tory WKD z OSM nie są już rysowane na dokładnej mapie (szyny daje trasa pociągu).

@@ -13,8 +13,8 @@ Budynki z `height` / `building:levels` / `min_height` / `roof:shape`, łączone 
 budynek ma części (`building:part`), rysowane są części. Drzewa — instancje. Zderzenia z obrysami budynków i pniami.
 
 ## Wiadukty, tunele, przejazdy (`buildStructures`)
-Od 0.22.0 zostają tylko mosty nad rzeką / kanałem (odcinek mostu przecinający wodę i połączone z nim odcinki mostu —
-dojazdy). Pozostałe wiadukty są spłaszczone do terenu (ulica / tor zostaje, `layer` = 0), kładki i przejścia podziemne
+Od 0.22.0 zostają tylko mosty nad rzeką / kanałem i (od 0.23.0) wiadukty nad torami w wykopie (`layer` < 0 bez tunelu —
+Żelazna, Towarowa nad linią średnicową; bez kładek) — odcinek mostu przecinający wodę / wykop i połączone z nim odcinki mostu (dojazdy). Pozostałe wiadukty są spłaszczone do terenu (ulica / tor zostaje, `layer` = 0), kładki i przejścia podziemne
 (piesze mosty i tunele, schody i korytarze pod ziemią) są pominięte; `tunnel=building_passage` zostaje.
 OSM podaje tylko poziom (`layer`), więc wysokości są liczone:
 - wiadukt: pomost między przyczółkami, podniesiony tak, by nad przecinaną drogą / torem był prześwit (`CLEAR`: droga
