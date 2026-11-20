@@ -225,7 +225,7 @@ function buildStructures(lines, ctx) {
         if (va.a != null && vb.a != null) y = va.a + (vb.a - va.a) * t;
         else { const oa = va.o ?? (va.a - H(a[0], a[1])), ob = vb.o ?? (vb.a - H(b[0], b[1]));
           // tory obniżone / podniesione: prosto między węzłami (bezwzględnie), nie po garbach terenu — droga dalej idzie za terenem
-          if (RAILNET.has(l.net) && (oa || ob)) { const ya = H(a[0], a[1]) + oa, yb = H(b[0], b[1]) + ob; y = ya + (yb - ya) * t; }
+          if (RAILNET.has(l.net) && l.kind !== 'tunnel' && (oa || ob)) { const ya = H(a[0], a[1]) + oa, yb = H(b[0], b[1]) + ob; y = ya + (yb - ya) * t; }
           else y = h + oa + (ob - oa) * t; }
         if (l.kind === 'tunnel' && l.net !== 'foot') y = Math.min(y, h - 0.4);   // przejście pieszych: przy wejściu posadzka równo z terenem (otwarta klatka schodowa)
         const uc = underCuts.get(l);

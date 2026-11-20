@@ -2,6 +2,9 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.23.5 — 2026-11-20
+- Poprawka 0.23.4: prowadzenie toru prosto między węzłami tylko na zjazdach i podjazdach, nie w tunelach (w Tunelu Średnicowym pojawiły się stromizny).
+
 ## 0.23.4 — 2026-11-20
 - **Tory na zjazdach i podjazdach** biegną prosto między węzłami (bezwzględnie), a nie po garbach terenu — przy Żelaznej tor w wykopie skakał o 3–4 m, bo teren nad wylotem tunelu (ulica) jest wyżej niż dno wykopu w NMT.
 
