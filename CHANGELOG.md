@@ -2,6 +2,9 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.23.8 — 2026-11-20
+- **Daszki nad zejściami do przejść podziemnych** (np. zielone daszki na Rondzie Czterdziestolatka) są pomijane razem z przejściami — zostawały same, jak klocki na środku ulicy.
+
 ## 0.23.7 — 2026-11-20
 - **Al. Jana Pawła II / Rondo Czterdziestolatka**: usunięte wiszące klocki po wiaduktach i przejściach — części budynków z `layer` ≥ 1 uniesione nad ziemię (`min_height` > 0), pod którymi nie ma już pomostu (np. daszki wejść do przejścia podziemnego).
 

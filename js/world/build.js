@@ -92,13 +92,13 @@ function buildWorld(D) {
     const q = [...keep]; while (q.length) { const w = q.pop(); for (const id of [w.n[0], w.n[w.n.length - 1]]) for (const o of byNode.get(id) || []) if (!keep.has(o)) { keep.add(o); q.push(o); } }
     return keep;
   })();
-  const lines = [];
+  const lines = [], goneFoot = [];   // goneFoot: usunięte przejścia podziemne i schody (daszki nad zejściami też znikają)
   for (const w of D.ways) {
     const t = w.t; if (!t) continue;
     const footHw = /^(footway|steps|corridor|path|pedestrian|cycleway)$/.test(t.highway || ''), below = num(t.level) < 0 || num(t.layer) < 0 || t.location === 'underground';
     const bridgeTag = !!t.bridge && t.bridge !== 'no', tunTag = !!t.tunnel && t.tunnel !== 'no' && t.tunnel !== 'culvert';
     if (t.highway === 'elevator' || t.indoor === 'yes' || t.highway === 'corridor') continue;
-    if (footHw && !keepBridge.has(w) && (bridgeTag || ((tunTag || below) && t.tunnel !== 'building_passage'))) continue;   // kładki i przejścia podziemne: usunięte
+    if (footHw && !keepBridge.has(w) && (bridgeTag || ((tunTag || below) && t.tunnel !== 'building_passage'))) { if (!bridgeTag) { const P = wayXZ(w); if (P.length) goneFoot.push(P); } continue; }   // kładki i przejścia podziemne: usunięte
     const isB = bridgeTag && keepBridge.has(w);
     const wkd = /Kolej Dojazdowa|WKD/.test(t.name || '');   // WKD jedzie po ziemi (bez tunelu i wykopu pod Śródmieściem)
     if (wkd && t.railway) continue;   // tory WKD rysuje trasa pociągu (data/wkd.json, js/vehicles/rail.js) — po ziemi, nie tunelem
@@ -218,6 +218,8 @@ function buildWorld(D) {
     const t = b.t;
     if (!b.part && hasParts(b)) continue;
     let isRoof = t.building === 'roof' || t['building:part'] === 'roof' || t.covered === 'yes';
+    // daszek nad zejściem do usuniętego przejścia podziemnego: pomijany
+    if (isRoof && goneFoot.some(P => P.some(p => pip(p, b.outer)))) continue;
     const lv = num(t['building:levels']), rl = num(t['roof:levels']);
     let h = num(t.height), rh = num(t['roof:height']);
     let minH = num(t.min_height); if (isNaN(minH)) { const ml = num(t['building:min_level']); minH = isNaN(ml) ? 0 : ml * 3.2; }
