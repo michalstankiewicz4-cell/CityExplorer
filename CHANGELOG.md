@@ -2,6 +2,9 @@
 
 Gra nazywała się wcześniej „Warszawa 3D”; od 0.18.0 — „Wielka Kradzież Aut VI”.
 
+## 0.23.4 — 2026-11-20
+- **Tory na zjazdach i podjazdach** biegną prosto między węzłami (bezwzględnie), a nie po garbach terenu — przy Żelaznej tor w wykopie skakał o 3–4 m, bo teren nad wylotem tunelu (ulica) jest wyżej niż dno wykopu w NMT.
+
 ## 0.23.3 — 2026-11-20
 - **Zjazdy do tuneli**: tor (i droga) przed portalem wznosi się od wysokości portalu ze stałym spadkiem aż do terenu. Wcześniej obniżenie liczone względem terenu dawało dołek, gdy teren przed portalem też opadał (wykop w NMT) — linia średnicowa przy Żelaznej schodziła 6 m poniżej tunelu i wracała stromo w górę, a tory obok siebie miały różne wysokości.
 

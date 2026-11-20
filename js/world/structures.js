@@ -9,6 +9,7 @@
    - tunel: spąg = teren - głębokość; przy portalu uwzględniamy istniejący
      wykop w NMT, brakujący zjazd robimy na drodze dojazdowej (wykop + mury)
    ========================================================================= */
+const RAILNET = new Set(['rail', 'subway', 'tram']);
 const NET_SLOPE = { road: 0.07, foot: 0.12, rail: 0.03, subway: 0.04, tram: 0.06 };
 const TUBE_H = { road: 5.6, foot: 3.0, rail: 6.6, subway: 6.0, tram: 5.6 };
 const tunnelDepth = (net, L) => { const a = Math.max(1, Math.abs(isNaN(L) ? 1 : L)); return net === 'subway' ? 8 + 5 * a : net === 'rail' ? 5 + 3.5 * a : net === 'foot' ? 1.5 + 3.5 * a : 4 + 3.5 * a; };
@@ -222,7 +223,10 @@ function buildStructures(lines, ctx) {
         const t = k / steps, x = a[0] + (b[0] - a[0]) * t, z = a[1] + (b[1] - a[1]) * t, h = H(x, z);
         let y;
         if (va.a != null && vb.a != null) y = va.a + (vb.a - va.a) * t;
-        else { const oa = va.o ?? (va.a - H(a[0], a[1])), ob = vb.o ?? (vb.a - H(b[0], b[1])); y = h + oa + (ob - oa) * t; }
+        else { const oa = va.o ?? (va.a - H(a[0], a[1])), ob = vb.o ?? (vb.a - H(b[0], b[1]));
+          // tory obniżone / podniesione: prosto między węzłami (bezwzględnie), nie po garbach terenu — droga dalej idzie za terenem
+          if (RAILNET.has(l.net) && (oa || ob)) { const ya = H(a[0], a[1]) + oa, yb = H(b[0], b[1]) + ob; y = ya + (yb - ya) * t; }
+          else y = h + oa + (ob - oa) * t; }
         if (l.kind === 'tunnel' && l.net !== 'foot') y = Math.min(y, h - 0.4);   // przejście pieszych: przy wejściu posadzka równo z terenem (otwarta klatka schodowa)
         const uc = underCuts.get(l);
         if (uc) { const d = l.cum[i] + (l.cum[i + 1] - l.cum[i]) * t; for (const [s0, s1, h1, h2, ymax] of uc) if (d > s0 && d < s1) { const f = (d - s0) / (s1 - s0), yl = Math.min(h1 + (h2 - h1) * f, ymax); y = Math.min(y, yl); } }
