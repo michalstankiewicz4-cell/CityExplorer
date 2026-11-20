@@ -169,6 +169,9 @@ function buildStructures(lines, ctx) {
       if (l0.kind !== 'free') continue;
       const i0 = l0.ids.indexOf(sid);
       for (const step of [1, -1]) {
+        // zjazd do tunelu liczony od wysokości portalu (bezwzględnie): tor wznosi się ze stałym spadkiem do terenu — gdy teren
+        // obok też opada (wykop w NMT), tor nie schodzi głębiej niż portal (wcześniej przesunięcie względem terenu dawało dołek)
+        const yP = H(N.get(sid).x, N.get(sid).z) + o0; let acc = 0;
         let l = l0, i = i0, st = step, v = Math.abs(o0), guard = 0;
         if (i + st < 0 || i + st >= l.ids.length) continue;
         while (v > 0.02 && guard++ < 500) {
@@ -182,7 +185,9 @@ function buildStructures(lines, ctx) {
           }
           const nid = l.ids[j], k = K(net, nid);
           if (abs.has(k) || N.get(nid).ways.some(w => w.kind === 'tunnel')) break;
-          v -= slope * Math.abs(l.cum[j] - l.cum[i]); if (v <= 0.02) break;
+          acc += Math.abs(l.cum[j] - l.cum[i]);
+          if (sign < 0) { const nj = N.get(nid); v = H(nj.x, nj.z) - (yP + slope * acc); } else v -= slope * Math.abs(l.cum[j] - l.cum[i]);
+          if (v <= 0.02) break;
           const cur = off.get(k) || 0; if (sign > 0 ? v > cur : -v < cur) off.set(k, sign * v);
           i = j;
         }
